@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>marIAn · Présidentielle 2027</title>
+  <meta name="description" content="Ce qu’ils promettent. Ce qu’ils ont voté. Les candidats à la présidentielle 2027 face à leurs actes, thème par thème, avec une source pour chaque information.">
+  <meta name="theme-color" content="#FFEF9F">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main id="app" class="shell" tabindex="-1"></main>
+
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-backdrop" data-close></div>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <p class="eb">Lexique</p>
+      <h2 id="sheet-title" class="sheet-title"></h2>
+      <p id="sheet-body" class="sheet-body"></p>
+      <button type="button" class="btn btn-light" data-close>Fermer</button>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
