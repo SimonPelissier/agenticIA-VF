@@ -1,0 +1,14 @@
+{
+  "_note": "Candidats suivis par l'agent de collecte. 'acteur' est l'identifiant du député sur data.assemblee-nationale.fr (null : jamais député). Les mandats et les groupes sont lus dans les données officielles, pas ici.",
+  "candidats": [
+    { "id": "attal", "nom": "Gabriel Attal", "acteur": "PA722190" },
+    { "id": "faure", "nom": "Olivier Faure", "acteur": "PA609332" },
+    { "id": "glucksmann", "nom": "Raphaël Glucksmann", "acteur": null },
+    { "id": "le-pen", "nom": "Marine Le Pen", "acteur": "PA720614" },
+    { "id": "melenchon", "nom": "Jean-Luc Mélenchon", "acteur": "PA2150" },
+    { "id": "philippe", "nom": "Édouard Philippe", "acteur": "PA345619" },
+    { "id": "retailleau", "nom": "Bruno Retailleau", "acteur": null },
+    { "id": "roussel", "nom": "Fabien Roussel", "acteur": "PA720692" },
+    { "id": "tondelier", "nom": "Marine Tondelier", "acteur": null }
+  ]
+}
