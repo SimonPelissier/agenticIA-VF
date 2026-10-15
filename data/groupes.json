@@ -1,0 +1,184 @@
+{
+  "PO793087": {
+    "abrege": "NI",
+    "debut": "2022-06-22",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "Non inscrit"
+  },
+  "PO800484": {
+    "abrege": "DEM",
+    "debut": "2022-06-28",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "Démocrate (MoDem et Indépendants)"
+  },
+  "PO800490": {
+    "abrege": "LFI-NUPES",
+    "debut": "2022-06-28",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "La France insoumise - Nouvelle Union Populaire écologique et sociale"
+  },
+  "PO800496": {
+    "abrege": "SOC",
+    "debut": "2022-06-28",
+    "fin": "2023-10-18",
+    "legislature": "16",
+    "nom": "Socialistes et apparentés (membre de l’intergroupe NUPES)"
+  },
+  "PO800502": {
+    "abrege": "GDR-NUPES",
+    "debut": "2022-06-28",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "Gauche démocrate et républicaine - NUPES"
+  },
+  "PO800508": {
+    "abrege": "LR",
+    "debut": "2022-06-28",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "Les Républicains"
+  },
+  "PO800514": {
+    "abrege": "HOR",
+    "debut": "2022-06-28",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "Horizons et apparentés"
+  },
+  "PO800520": {
+    "abrege": "RN",
+    "debut": "2022-06-28",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "Rassemblement National"
+  },
+  "PO800526": {
+    "abrege": "ECOLO",
+    "debut": "2022-06-28",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "Écologiste - NUPES"
+  },
+  "PO800532": {
+    "abrege": "LIOT",
+    "debut": "2022-06-28",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "Libertés, Indépendants, Outre-mer et Territoires"
+  },
+  "PO800538": {
+    "abrege": "RE",
+    "debut": "2022-06-28",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "Renaissance"
+  },
+  "PO830170": {
+    "abrege": "SOC-A",
+    "debut": "2023-10-19",
+    "fin": "2024-06-09",
+    "legislature": "16",
+    "nom": "Socialistes et apparentés"
+  },
+  "PO840056": {
+    "abrege": "NI",
+    "debut": "2024-07-01",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Non inscrit"
+  },
+  "PO845401": {
+    "abrege": "RN",
+    "debut": "2024-07-18",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Rassemblement National"
+  },
+  "PO845407": {
+    "abrege": "EPR",
+    "debut": "2024-07-18",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Ensemble pour la République"
+  },
+  "PO845413": {
+    "abrege": "LFI-NFP",
+    "debut": "2024-07-18",
+    "fin": null,
+    "legislature": "17",
+    "nom": "La France insoumise - Nouveau Front Populaire"
+  },
+  "PO845419": {
+    "abrege": "SOC",
+    "debut": "2024-07-18",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Socialistes et apparentés"
+  },
+  "PO845425": {
+    "abrege": "DR",
+    "debut": "2024-07-18",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Droite Républicaine"
+  },
+  "PO845439": {
+    "abrege": "ECOS",
+    "debut": "2024-07-18",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Écologiste et Social"
+  },
+  "PO845454": {
+    "abrege": "DEM",
+    "debut": "2024-07-18",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Les Démocrates"
+  },
+  "PO845470": {
+    "abrege": "HOR",
+    "debut": "2024-07-18",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Horizons & Indépendants"
+  },
+  "PO845485": {
+    "abrege": "LIOT",
+    "debut": "2024-07-18",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Libertés, Indépendants, Outre-mer et Territoires"
+  },
+  "PO845514": {
+    "abrege": "GDR",
+    "debut": "2024-07-18",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Gauche Démocrate et Républicaine"
+  },
+  "PO845520": {
+    "abrege": "AD",
+    "debut": "2024-07-18",
+    "fin": "2024-09-11",
+    "legislature": "17",
+    "nom": "À Droite"
+  },
+  "PO847173": {
+    "abrege": "UDR",
+    "debut": "2024-09-12",
+    "fin": "2025-09-04",
+    "legislature": "17",
+    "nom": "UDR"
+  },
+  "PO872880": {
+    "abrege": "UDDPLR",
+    "debut": "2025-09-05",
+    "fin": null,
+    "legislature": "17",
+    "nom": "Union des droites pour la République"
+  }
+}

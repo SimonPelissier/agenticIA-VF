@@ -1,0 +1,79 @@
+# Agent de collecte : chaque nuit, récupère les scrutins de l'Assemblée nationale
+# et ouvre une pull request si les données ont changé. Aucune clé ni secret à configurer.
+name: Agent de collecte
+
+on:
+  schedule:
+    - cron: "30 4 * * *"   # chaque jour à 4 h 30 UTC (6 h 30 à Paris l'été)
+  workflow_dispatch:        # bouton « Run workflow » dans l'onglet Actions
+
+permissions:
+  contents: write          # pousser la branche de collecte
+  pull-requests: write     # ouvrir la pull request
+
+concurrency:
+  group: collecte
+  cancel-in-progress: false
+
+jobs:
+  collecte:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Lancer l'agent
+        run: python3 agents/collecte/collecte.py
+
+      - name: Ouvrir une pull request si les données ont changé
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(git status --porcelain data/)" ]; then
+            echo "Aucun changement dans les données : rien à proposer."
+            exit 0
+          fi
+
+          JOUR=$(date -u +%F)
+          BRANCHE="collecte/$JOUR-${{ github.run_number }}"
+          git config user.name "agent-collecte[bot]"
+          git config user.email "agent-collecte@users.noreply.github.com"
+          git switch -c "$BRANCHE"
+          git add data/
+          git commit -m "Collecte du $JOUR : scrutins de l'Assemblée nationale"
+          git push origin "$BRANCHE"
+
+          {
+            echo "Collecte automatique du $JOUR (données ouvertes de l'Assemblée nationale)."
+            echo
+            echo "## Ce qui a changé"
+            echo '```'
+            git diff --stat HEAD~1 -- data/
+            echo '```'
+            echo
+            echo "## Chiffres"
+            echo '```json'
+            cat data/collecte.json
+            echo '```'
+            echo
+            echo "## Empreintes SHA-256 des archives téléchargées"
+            echo '```json'
+            cat agents/collecte/.cache/empreintes.json
+            echo '```'
+            echo
+            echo "À relire avant fusion : vérifier sur assemblee-nationale.fr un ou deux scrutins récents."
+          } > corps.md
+
+          URL=$(gh pr create --base main --head "$BRANCHE" --title "Collecte du $JOUR" --body-file corps.md)
+          echo "Pull request : $URL"
+
+          # Une seule collecte en attente à la fois : les plus anciennes sont fermées.
+          gh pr list --state open --json number,headRefName \
+            --jq ".[] | select(.headRefName | startswith(\"collecte/\")) | select(.headRefName != \"$BRANCHE\") | .number" |
+          while read -r ANCIENNE; do
+            gh pr close "$ANCIENNE" --delete-branch --comment "Remplacée par une collecte plus récente : $URL"
+          done
