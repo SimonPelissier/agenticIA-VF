@@ -59,8 +59,8 @@
         "votes": 71
       },
       "tous": {
-        "scrutins": 8823,
-        "taux": 20.1,
+        "scrutins": 8837,
+        "taux": 20.0,
         "votes": 1770
       }
     },
@@ -12524,9 +12524,9 @@
         "votes": 101
       },
       "tous": {
-        "scrutins": 12838,
+        "scrutins": 12852,
         "taux": 8.3,
-        "votes": 1068
+        "votes": 1070
       }
     },
     "votes": [
@@ -20005,6 +20005,20 @@
         "parDelegation": false,
         "position": "pour",
         "scrutin": "VTANR5L17V8732"
+      },
+      {
+        "date": "2026-10-15",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "contre",
+        "scrutin": "VTANR5L17V8742"
+      },
+      {
+        "date": "2026-10-15",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "contre",
+        "scrutin": "VTANR5L17V8746"
       }
     ]
   },
@@ -20084,8 +20098,8 @@
         "votes": 105
       },
       "tous": {
-        "scrutins": 12838,
-        "taux": 11.0,
+        "scrutins": 12852,
+        "taux": 10.9,
         "votes": 1406
       }
     },
