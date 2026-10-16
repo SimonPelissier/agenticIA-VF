@@ -12,7 +12,7 @@
   "licence": "Licence Ouverte / Open Licence (Etalab), source : Assemblée nationale",
   "scrutins": {
     "16": 4106,
-    "17": 8746
+    "17": 8806
   },
   "sources": {
     "acteurs": "https://data.assemblee-nationale.fr/static/openData/repository/17/amo/tous_acteurs_mandats_organes_xi_legislature/AMO30_tous_acteurs_tous_mandats_tous_organes_historique.json.zip",
