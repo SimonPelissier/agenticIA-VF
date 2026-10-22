@@ -59,8 +59,8 @@
         "votes": 71
       },
       "tous": {
-        "scrutins": 8837,
-        "taux": 20.0,
+        "scrutins": 9058,
+        "taux": 19.5,
         "votes": 1770
       }
     },
@@ -12524,9 +12524,9 @@
         "votes": 101
       },
       "tous": {
-        "scrutins": 12852,
-        "taux": 8.3,
-        "votes": 1070
+        "scrutins": 13073,
+        "taux": 8.2,
+        "votes": 1074
       }
     },
     "votes": [
@@ -20019,6 +20019,34 @@
         "parDelegation": false,
         "position": "contre",
         "scrutin": "VTANR5L17V8746"
+      },
+      {
+        "date": "2026-10-15",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "contre",
+        "scrutin": "VTANR5L17V8747"
+      },
+      {
+        "date": "2026-10-15",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "contre",
+        "scrutin": "VTANR5L17V8748"
+      },
+      {
+        "date": "2026-10-15",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "contre",
+        "scrutin": "VTANR5L17V8750"
+      },
+      {
+        "date": "2026-10-15",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "contre",
+        "scrutin": "VTANR5L17V8751"
       }
     ]
   },
@@ -20098,8 +20126,8 @@
         "votes": 105
       },
       "tous": {
-        "scrutins": 12852,
-        "taux": 10.9,
+        "scrutins": 13073,
+        "taux": 10.8,
         "votes": 1406
       }
     },
