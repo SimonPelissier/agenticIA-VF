@@ -20,6 +20,7 @@ import hashlib
 import json
 import os
 import sys
+import time
 import urllib.request
 import zipfile
 
@@ -37,6 +38,8 @@ SOURCES = {
                "AMO30_tous_acteurs_tous_mandats_tous_organes_historique.json.zip",
 }
 LEGISLATURES = ["16", "17"]
+TENTATIVES = 3
+ATTENTE = 60  # secondes, multipliées par le numéro de l'essai
 
 # Clés du décompte nominatif de l'Assemblée -> position affichée dans l'application.
 POSITIONS = {
@@ -86,14 +89,28 @@ def telecharger(nom, url, hors_ligne=False):
             sys.exit("Hors ligne : fichier absent du cache, " + chemin)
         print("Cache : " + chemin)
     else:
-        print("Téléchargement de " + url)
-        requete = urllib.request.Request(url, headers={"User-Agent": "marIAn-collecte"})
-        with urllib.request.urlopen(requete, timeout=300) as reponse, open(chemin, "wb") as f:
-            while True:
-                bloc = reponse.read(1 << 20)
-                if not bloc:
+        # Le serveur de l'Assemblée est parfois indisponible quelques minutes (erreur 503) : on réessaie.
+        for essai in range(1, TENTATIVES + 1):
+            print("Téléchargement de %s (essai %d/%d)" % (url, essai, TENTATIVES))
+            try:
+                requete = urllib.request.Request(url, headers={"User-Agent": "marIAn-collecte"})
+                with urllib.request.urlopen(requete, timeout=300) as reponse, open(chemin, "wb") as f:
+                    while True:
+                        bloc = reponse.read(1 << 20)
+                        if not bloc:
+                            break
+                        f.write(bloc)
+                if zipfile.is_zipfile(chemin):
                     break
-                f.write(bloc)
+                print("Le fichier reçu n'est pas une archive zip.")
+            except OSError as erreur:  # erreurs réseau et HTTP (503...)
+                print("Échec : %s" % erreur)
+            if essai < TENTATIVES:
+                time.sleep(ATTENTE * essai)
+        else:
+            sys.exit("Impossible de télécharger %s après %d essais : on réessaiera à la prochaine collecte." % (url, TENTATIVES))
+    if not zipfile.is_zipfile(chemin):
+        sys.exit("Fichier invalide (pas une archive zip) : " + chemin)
     empreinte = hashlib.sha256()
     with open(chemin, "rb") as f:
         for bloc in iter(lambda: f.read(1 << 20), b""):
@@ -197,9 +214,14 @@ def en_mandat(depute, date):
 # ---------- Scrutins ----------
 
 def lire_scrutins(chemin_zip, legislature, groupes, suivis):
-    """Résume chaque scrutin et relève les votes personnels des députés suivis."""
+    """Résume chaque scrutin et relève les votes personnels des députés suivis.
+
+    Renvoie aussi, pour chaque scrutin solennel, l'ensemble des députés qui ont voté :
+    il sert à calculer la participation médiane de l'hémicycle.
+    """
     scrutins = []
     votes = {uid: [] for uid in suivis}
+    participants_solennels = {}
     for doc in fichiers_json(chemin_zip, "json/"):
         s = doc["scrutin"]
         uid = texte(s["uid"])
@@ -249,6 +271,8 @@ def lire_scrutins(chemin_zip, legislature, groupes, suivis):
             for cle, position in POSITIONS.items():
                 for votant in en_liste((nominatif.get(cle) or {}).get("votant")):
                     acteur = texte(votant.get("acteurRef"))
+                    if resume["solennel"] and position != "non-votant":
+                        participants_solennels.setdefault(uid, set()).add(acteur)
                     if acteur in votes:
                         votes[acteur].append({
                             "scrutin": uid,
@@ -260,7 +284,101 @@ def lire_scrutins(chemin_zip, legislature, groupes, suivis):
         resume["groupes"].sort(key=lambda x: x["groupe"] or "")
         scrutins.append(resume)
     scrutins.sort(key=lambda x: x["numero"])
-    return scrutins, votes
+    return scrutins, votes, participants_solennels
+
+
+# ---------- Fichier de l'application ----------
+
+# Un même courant politique change de sigle d'une législature à l'autre (RE devient EPR, LR devient DR...).
+# La « famille » permet de suivre le groupe d'un candidat dans le temps. Les codes sont ceux de js/data.js.
+FAMILLES = {
+    "LFI-NUPES": "LFI", "LFI-NFP": "LFI",
+    "SOC": "SOC", "SOC-A": "SOC",
+    "ECOLO": "ECO", "ECOS": "ECO",
+    "GDR-NUPES": "GDR", "GDR": "GDR",
+    "RE": "EPR", "EPR": "EPR",
+    "DEM": "DEM", "HOR": "HOR",
+    "LR": "LR", "DR": "LR",
+    "RN": "RN", "LIOT": "LIOT", "UDR": "UDR",
+}
+
+
+def mediane(valeurs):
+    valeurs = sorted(valeurs)
+    if not valeurs:
+        return None
+    milieu = len(valeurs) // 2
+    return valeurs[milieu] if len(valeurs) % 2 else (valeurs[milieu - 1] + valeurs[milieu]) / 2.0
+
+
+def participation_mediane(deputes, solennels_par_date, participants):
+    """Participation médiane aux scrutins solennels, parmi les députés présents pour au moins 10 d'entre eux."""
+    taux_deputes = []
+    for uid, depute in deputes.items():
+        pendant = [s for s in solennels_par_date if en_mandat(depute, s["date"] or "")]
+        if len(pendant) >= 10:
+            votes = sum(1 for s in pendant if uid in participants.get(s["uid"], ()))
+            taux_deputes.append(100.0 * votes / len(pendant))
+    m = mediane(taux_deputes)
+    return {"taux": round(m, 1) if m is not None else None, "deputes": len(taux_deputes)}
+
+
+def construire_app(votes_cles, candidats, deputes, groupes, tous_scrutins, votes, fiches, mediane_sol):
+    """Petit fichier pour l'application : seulement ce qu'elle affiche (quelques dizaines de Ko)."""
+    index = {(s["legislature"], s["numero"]): s for leg in LEGISLATURES for s in tous_scrutins[leg]}
+    sortie_votes = []
+    for v in votes_cles:
+        entree = dict(v)
+        s = index.get((v.get("legislature"), v.get("numero")))
+        if v.get("numero") is not None and s is None:
+            print("Attention : scrutin %s n° %s introuvable pour le vote clé « %s »." % (v["legislature"], v["numero"], v["id"]))
+        if s:
+            entree["officiel"] = {
+                "uid": s["uid"], "date": s["date"], "titre": s["titre"], "sort": s["sort"],
+                "pour": s["pour"], "contre": s["contre"], "abstentions": s["abstentions"],
+                "votants": s["votants"], "requis": s["requis"], "url": s["url"], "solennel": s["solennel"],
+                "groupes": [{
+                    "groupe": g["groupe"],
+                    "nom": (groupes.get(g["ref"]) or {}).get("nom") or g["groupe"],
+                    "famille": FAMILLES.get(g["groupe"]),
+                    "position": g["position"], "cohesion": g["cohesion"],
+                    "pour": g["pour"], "contre": g["contre"], "abstentions": g["abstentions"],
+                } for g in s["groupes"]],
+            }
+        sortie_votes.append(entree)
+
+    sortie_candidats = {}
+    for c, fiche in zip(candidats, fiches):
+        depute = deputes.get(c.get("acteur")) if c.get("acteur") else None
+        perso = {}
+        if depute:
+            par_scrutin = {x["scrutin"]: x for x in votes.get(c["acteur"], [])}
+            for v in sortie_votes:
+                off = v.get("officiel")
+                if not off:
+                    continue
+                siegeait = en_mandat(depute, off["date"])
+                vote = par_scrutin.get(off["uid"])
+                perso[v["id"]] = {
+                    "siegeait": siegeait,
+                    "position": vote["position"] if vote else ("absent" if siegeait else None),
+                    "groupe": vote["groupe"] if vote else None,
+                }
+        sortie_candidats[c["id"]] = {
+            "depute": depute is not None,
+            "mandats": fiche["mandats"],
+            "groupes": [{"abrege": p["abrege"], "debut": p["debut"], "fin": p["fin"], "legislature": p["legislature"]} for p in fiche["groupes"]],
+            "participation": fiche["participation"],
+            "votesCles": perso,
+        }
+
+    return {
+        "dernierScrutin": max(s["date"] for leg in LEGISLATURES for s in tous_scrutins[leg] if s["date"]),
+        "medianeSolennels": mediane_sol,
+        "votesCles": sortie_votes,
+        "candidats": sortie_candidats,
+        "source": "Assemblée nationale, data.assemblee-nationale.fr (Licence Ouverte)",
+    }
 
 
 # ---------- Programme principal ----------
@@ -282,9 +400,11 @@ def main():
 
     tous_scrutins = {}
     votes = {uid: [] for uid in suivis}
+    participants = {}
     for leg in LEGISLATURES:
-        scrutins, votes_leg = lire_scrutins(chemins["scrutins-" + leg], leg, groupes, suivis)
+        scrutins, votes_leg, participants_leg = lire_scrutins(chemins["scrutins-" + leg], leg, groupes, suivis)
         tous_scrutins[leg] = scrutins
+        participants.update(participants_leg)
         for uid, liste in votes_leg.items():
             votes[uid].extend(liste)
         ecrire("scrutins-%s.json" % leg, scrutins, une_ligne_par_element=True)
@@ -314,6 +434,19 @@ def main():
     ecrire("candidats-votes.json", sortie_candidats)
 
     ecrire("groupes.json", groupes)
+
+    # Fichier de l'application : un script JavaScript, pour que index.html s'ouvre d'un double-clic.
+    with open(os.path.join(RACINE, "contenu", "votes-cles.json"), encoding="utf-8") as f:
+        votes_cles = json.load(f)["votes"]
+    solennels_liste = [s for leg in LEGISLATURES for s in tous_scrutins[leg] if s["solennel"]]
+    app = construire_app(votes_cles, candidats, deputes, groupes, tous_scrutins, votes, sortie_candidats,
+                         participation_mediane(deputes, solennels_liste, participants))
+    with open(os.path.join(SORTIE, "app.js"), "w", encoding="utf-8") as f:
+        f.write("// Fichier produit par agents/collecte/collecte.py : ne pas modifier à la main.\n")
+        f.write("window.MARIAN_DONNEES = ")
+        json.dump(app, f, ensure_ascii=False, sort_keys=True, indent=1)
+        f.write(";\n")
+    print("Écrit : data/app.js")
 
     # Ni date ni empreinte ici : l'Assemblée régénère ses archives chaque nuit. Le fichier ne change
     # que si les données changent, ce qui évite une pull request chaque nuit pour rien.

@@ -1,6 +1,7 @@
-// Données de marIAn.
-// Règle : chaque information affichée vient du document de cadrage (docs/cadrage.md)
-// et renvoie à une source. Rien n'est inventé : quand une donnée manque, l'interface le dit.
+// Données éditoriales de marIAn (thèmes, candidats, quiz, lexique).
+// Les votes et leurs chiffres ne sont plus écrits ici : ils viennent de data/app.js,
+// produit par l'agent de collecte à partir de contenu/votes-cles.json et des données de l'Assemblée.
+// Règle : rien n'est inventé ; quand une donnée manque, l'interface le dit.
 
 window.DATA = {
   appName: "marIAn",
@@ -22,7 +23,7 @@ window.DATA = {
     { id: "europe", label: "Europe et défense", questions: "Ukraine, service militaire ou civique, UE" }
   ],
 
-  // Groupes parlementaires de l'Assemblée nationale.
+  // Familles de groupes à l'Assemblée : un même courant change parfois de sigle d'une législature à l'autre.
   groups: {
     LFI: "La France insoumise",
     SOC: "Socialistes",
@@ -34,154 +35,13 @@ window.DATA = {
     LR: "Droite républicaine (LR)",
     RN: "Rassemblement national",
     LIOT: "LIOT",
+    UDR: "Union des droites pour la République",
     UC: "Union centriste (Sénat)"
   },
 
-  // Positions : pour, contre, abstention, divise, autre (avec une note).
-  votes: [
-    {
-      id: "zucman",
-      date: "2025-10-31",
-      title: "Taxe Zucman",
-      context: "Budget 2026 (PLF)",
-      summary: "Un impôt plancher de 2 % sur les patrimoines de plus de 100 millions d’euros.",
-      theme: "budget",
-      chamber: "Assemblée nationale",
-      result: "Rejetée",
-      count: "172 pour, 228 contre",
-      positions: [
-        { groups: ["LFI", "SOC", "ECO", "GDR"], pos: "pour" },
-        { groups: ["EPR", "DEM", "HOR", "LR", "RN"], pos: "contre" }
-      ],
-      source: { label: "LCP", url: "https://lcp.fr/actualites/budget-2026-la-taxe-zucman-rejetee-par-l-assemblee-nationale-413632" }
-    },
-    {
-      id: "suspension-retraites",
-      date: "2025-11-12",
-      title: "Suspension de la réforme des retraites",
-      context: "Article 45 bis du budget de la Sécu (PLFSS)",
-      summary: "Mettre en pause le recul de l’âge de départ prévu par la réforme de 2023.",
-      theme: "retraites",
-      chamber: "Assemblée nationale",
-      result: "Adoptée",
-      count: "255 pour, 146 contre",
-      positions: [
-        { groups: ["EPR"], pos: "abstention", note: "annoncée par Gabriel Attal" },
-        { groups: ["DEM"], pos: "abstention", note: "majoritairement" },
-        { groups: ["LFI"], pos: "autre", note: "n’a pas soutenu" }
-      ],
-      incomplete: true,
-      source: { label: "LCP", url: "https://lcp.fr/actualites/budget-de-la-secu-en-commission-les-deputes-retablissent-la-suspension-de-la-reforme-des" }
-    },
-    {
-      id: "duplomb",
-      date: "2025-07-08",
-      title: "Loi Duplomb",
-      context: "Agriculture",
-      summary: "Lever des contraintes pour les agriculteurs, dont le retour d’un pesticide interdit, l’acétamipride.",
-      theme: "ecologie",
-      chamber: "Assemblée nationale",
-      result: "Adoptée",
-      count: "316 pour, 223 contre",
-      positions: [
-        { groups: ["SOC", "GDR"], pos: "contre" },
-        { groups: ["LIOT"], pos: "pour", note: "majoritairement" }
-      ],
-      after: "LFI, les Écologistes et GDR saisissent le Conseil constitutionnel, qui censure l’acétamipride le 7 août 2025.",
-      incomplete: true,
-      source: { label: "Datan", url: "https://datan.fr/votes/legislature-17/vote_2957" }
-    },
-    {
-      id: "aide-a-mourir",
-      date: "2025-05-27",
-      title: "Aide à mourir",
-      context: "1re lecture",
-      summary: "Créer un droit à l’aide à mourir pour des malades en fin de vie, sous conditions.",
-      theme: "sante",
-      chamber: "Assemblée nationale",
-      result: "Adoptée",
-      count: "305 pour, 199 contre",
-      positions: [
-        { groups: ["RN"], pos: "contre", note: "19 pour, 101 contre" }
-      ],
-      incomplete: true,
-      source: { label: "LCP", url: "https://lcp.fr/actualites/aide-a-mourir-qui-a-vote-quoi-a-l-assemblee-nationale-431842" }
-    },
-    {
-      id: "ukraine",
-      date: "2024-03-12",
-      title: "Accord de sécurité avec l’Ukraine",
-      context: "Débat suivi d’un vote (article 50-1)",
-      summary: "Approuver l’accord de sécurité signé entre la France et l’Ukraine.",
-      theme: "europe",
-      chamber: "Assemblée nationale",
-      result: "Approuvé",
-      count: "372 pour, 99 contre",
-      positions: [
-        { groups: ["EPR", "DEM", "HOR", "SOC", "ECO", "LIOT"], pos: "pour" },
-        { groups: ["LR"], pos: "pour", note: "très majoritairement" },
-        { groups: ["RN"], pos: "abstention" },
-        { groups: ["LFI", "GDR"], pos: "contre" }
-      ],
-      source: { label: "LCP", url: "https://lcp.fr/actualites/l-assemblee-nationale-soutient-largement-l-accord-avec-l-ukraine-sans-le-rn-qui-s" }
-    },
-    {
-      id: "ivg",
-      date: "2024-03-04",
-      title: "IVG dans la Constitution",
-      context: "Vote du Congrès à Versailles",
-      summary: "Inscrire dans la Constitution la liberté de recourir à l’IVG.",
-      theme: null,
-      chamber: "Congrès (députés et sénateurs)",
-      result: "Adoptée",
-      count: "780 pour, 72 contre",
-      positions: [
-        { groups: ["LR", "RN", "UC"], pos: "divise" }
-      ],
-      incomplete: true,
-      source: { label: "LCP", url: "https://lcp.fr/actualites/apres-le-vote-du-congres-la-france-devient-le-premier-pays-au-monde-a-inscrire-l-ivg" }
-    },
-    {
-      id: "immigration",
-      date: "2023-12-19",
-      title: "Loi immigration",
-      context: "Vote final",
-      summary: "Loi « pour contrôler l’immigration, améliorer l’intégration ».",
-      theme: "immigration",
-      chamber: "Assemblée nationale",
-      result: "Adoptée",
-      count: "349 pour, 186 contre",
-      positions: [
-        { groups: ["RN", "LR"], pos: "pour" },
-        { groups: ["LFI", "SOC", "ECO", "GDR"], pos: "contre", note: "la gauche (NUPES)" },
-        { groups: ["EPR"], pos: "divise", note: "majorité pour ; 20 contre, 17 abstentions" },
-        { groups: ["DEM"], pos: "divise", note: "majorité pour ; 5 contre, 15 abstentions" },
-        { groups: ["HOR"], pos: "divise", note: "majorité pour ; 2 contre" },
-        { groups: ["LIOT"], pos: "divise" }
-      ],
-      source: { label: "LCP", url: "https://lcp.fr/actualites/le-projet-de-loi-sur-l-immigration-largement-adopte-par-l-assemblee-la-majorite" }
-    },
-    {
-      id: "censure-2023",
-      date: "2023-03-20",
-      title: "Motion de censure sur la réforme des retraites",
-      context: "Motion transpartisane après le 49.3",
-      summary: "Faire tomber le gouvernement après l’adoption sans vote de la réforme des retraites.",
-      theme: "retraites",
-      chamber: "Assemblée nationale",
-      result: "Rejetée",
-      // Le cadrage indique 289 voix requises ; la majorité absolue dépend des sièges pourvus ce jour-là. À vérifier sur Datan.
-      count: "278 voix, majorité absolue non atteinte",
-      positions: [
-        { groups: ["LFI", "SOC", "ECO", "GDR"], pos: "pour", note: "la gauche (NUPES)" },
-        { groups: ["RN"], pos: "pour" },
-        { groups: ["LR"], pos: "divise", note: "19 députés sur 61 pour" }
-      ],
-      source: { label: "Datan", url: "https://datan.fr/votes/legislature-16/vote_1240" }
-    }
-  ],
-
-  // Candidats principaux au 8 octobre 2026. Mandats notés de mémoire dans le cadrage : à vérifier.
+  // Candidats principaux au 8 octobre 2026. 'group' : famille de groupe à l'Assemblée.
+  // Pour les députés, les mandats affichés viennent des données officielles (data/app.js) ;
+  // 'mandate' ne sert que pour les autres, et reste « à vérifier ».
   candidates: [
     { id: "attal", name: "Gabriel Attal", party: "Renaissance", status: "Déclaré", group: "EPR", mandate: "Ministre 2022-2024, député depuis 2024", filter: "AN", mandateVerified: false },
     { id: "faure", name: "Olivier Faure", party: "Parti socialiste", status: "Primaire de la gauche", group: "SOC", mandate: "Député de Seine-et-Marne", filter: "AN", mandateVerified: false },

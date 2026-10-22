@@ -1,0 +1,93 @@
+{
+  "_note": "Votes clés choisis par l'équipe. Le texte (titre, résumé, thème) est éditorial et relu par l'équipe. Les chiffres et les positions des groupes viennent du scrutin officiel désigné par 'legislature' et 'numero', ajoutés par l'agent de collecte dans data/app.js. Un vote absent des données de l'Assemblée (Congrès) garde ses chiffres écrits à la main dans 'manuel'.",
+  "votes": [
+    {
+      "id": "zucman",
+      "legislature": "17",
+      "numero": 3300,
+      "theme": "budget",
+      "title": "Taxe Zucman",
+      "context": "Budget 2026 (PLF)",
+      "summary": "Un impôt plancher de 2 % sur les patrimoines de plus de 100 millions d’euros.",
+      "source": { "label": "LCP", "url": "https://lcp.fr/actualites/budget-2026-la-taxe-zucman-rejetee-par-l-assemblee-nationale-413632" }
+    },
+    {
+      "id": "suspension-retraites",
+      "legislature": "17",
+      "numero": 3684,
+      "theme": "retraites",
+      "title": "Suspension de la réforme des retraites",
+      "context": "Article 45 bis du budget de la Sécu (PLFSS)",
+      "summary": "Mettre en pause le recul de l’âge de départ prévu par la réforme de 2023.",
+      "source": { "label": "LCP", "url": "https://lcp.fr/actualites/budget-de-la-secu-en-commission-les-deputes-retablissent-la-suspension-de-la-reforme-des" }
+    },
+    {
+      "id": "duplomb",
+      "legislature": "17",
+      "numero": 2957,
+      "theme": "ecologie",
+      "title": "Loi Duplomb",
+      "context": "Agriculture",
+      "summary": "Lever des contraintes pour les agriculteurs, dont le retour d’un pesticide interdit, l’acétamipride.",
+      "after": "LFI, les Écologistes et GDR saisissent le Conseil constitutionnel, qui censure l’acétamipride le 7 août 2025.",
+      "source": { "label": "Datan", "url": "https://datan.fr/votes/legislature-17/vote_2957" }
+    },
+    {
+      "id": "aide-a-mourir",
+      "legislature": "17",
+      "numero": 2107,
+      "theme": "sante",
+      "title": "Aide à mourir",
+      "context": "1re lecture",
+      "summary": "Créer un droit à l’aide à mourir pour des malades en fin de vie, sous conditions.",
+      "source": { "label": "LCP", "url": "https://lcp.fr/actualites/aide-a-mourir-qui-a-vote-quoi-a-l-assemblee-nationale-431842" }
+    },
+    {
+      "id": "ukraine",
+      "legislature": "16",
+      "numero": 3461,
+      "theme": "europe",
+      "title": "Accord de sécurité avec l’Ukraine",
+      "context": "Débat suivi d’un vote (article 50-1)",
+      "summary": "Approuver l’accord de sécurité signé entre la France et l’Ukraine.",
+      "source": { "label": "LCP", "url": "https://lcp.fr/actualites/l-assemblee-nationale-soutient-largement-l-accord-avec-l-ukraine-sans-le-rn-qui-s" }
+    },
+    {
+      "id": "ivg",
+      "legislature": null,
+      "numero": null,
+      "theme": null,
+      "title": "IVG dans la Constitution",
+      "context": "Vote du Congrès à Versailles",
+      "summary": "Inscrire dans la Constitution la liberté de recourir à l’IVG.",
+      "manuel": {
+        "date": "2024-03-04",
+        "chamber": "Congrès (députés et sénateurs)",
+        "result": "Adoptée",
+        "count": "780 pour, 72 contre",
+        "positions": [{ "familles": ["LR", "RN", "UC"], "pos": "divise" }]
+      },
+      "source": { "label": "LCP", "url": "https://lcp.fr/actualites/apres-le-vote-du-congres-la-france-devient-le-premier-pays-au-monde-a-inscrire-l-ivg" }
+    },
+    {
+      "id": "immigration",
+      "legislature": "16",
+      "numero": 3213,
+      "theme": "immigration",
+      "title": "Loi immigration",
+      "context": "Vote final",
+      "summary": "Loi « pour contrôler l’immigration, améliorer l’intégration ».",
+      "source": { "label": "LCP", "url": "https://lcp.fr/actualites/le-projet-de-loi-sur-l-immigration-largement-adopte-par-l-assemblee-la-majorite" }
+    },
+    {
+      "id": "censure-2023",
+      "legislature": "16",
+      "numero": 1240,
+      "theme": "retraites",
+      "title": "Motion de censure sur la réforme des retraites",
+      "context": "Motion transpartisane après le 49.3",
+      "summary": "Faire tomber le gouvernement après l’adoption sans vote de la réforme des retraites.",
+      "source": { "label": "Datan", "url": "https://datan.fr/votes/legislature-16/vote_1240" }
+    }
+  ]
+}

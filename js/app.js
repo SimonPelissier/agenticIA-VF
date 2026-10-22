@@ -3,7 +3,43 @@
   "use strict";
 
   var D = window.DATA;
+  // Données officielles produites par l'agent de collecte (data/app.js).
+  var MD = window.MARIAN_DONNEES || { votesCles: [], candidats: {} };
   var app = document.getElementById("app");
+
+  // Transforme un vote clé (texte de l'équipe + chiffres officiels) en objet prêt à afficher.
+  function normalizeVote(v) {
+    var o = v.officiel;
+    var m = v.manuel;
+    var base = { id: v.id, theme: v.theme, title: v.title, context: v.context, summary: v.summary, after: v.after, source: v.source };
+    if (o) {
+      base.date = o.date;
+      base.chamber = "Assemblée nationale";
+      base.official = o.url;
+      base.result = o.sort === "adopté" ? "Adopté" : "Rejeté";
+      // Une motion de censure ne compte que les voix pour : on montre alors le seuil à atteindre.
+      base.count = o.contre === 0 && o.abstentions === 0
+        ? o.pour + " voix pour, il en fallait " + o.requis
+        : o.pour + " pour, " + o.contre + " contre, " + o.abstentions + " abstentions";
+      base.groups = o.groupes.map(function (g) {
+        var votants = g.pour + g.contre + g.abstentions;
+        return {
+          label: g.nom, groupe: g.groupe, famille: g.famille, pos: g.position, cohesion: g.cohesion,
+          detail: votants ? g.pour + " pour, " + g.contre + " contre, " + g.abstentions + " abst." : "aucun votant"
+        };
+      });
+    } else if (m) {
+      base.date = m.date;
+      base.chamber = m.chamber;
+      base.result = m.result;
+      base.count = m.count;
+      base.groups = m.positions.map(function (p) {
+        return { label: p.familles.map(function (f) { return D.groups[f] || f; }).join(", "), familles: p.familles, pos: p.pos };
+      });
+    }
+    return base;
+  }
+  D.votes = MD.votesCles.map(normalizeVote).filter(function (v) { return v.date; });
 
   // ---------- Outils ----------
 
@@ -92,38 +128,58 @@
 
   // ---------- Briques ----------
 
-  var POS_LABEL = { pour: "Pour", contre: "Contre", abstention: "Abstention", divise: "Divisé", autre: "Autre" };
+  var POS_LABEL = {
+    pour: "Pour", contre: "Contre", abstention: "Abstention", divise: "Divisé", partage: "Partagé",
+    "non-votant": "Non-votant", absent: "Absent", aucun: "N’a pas voté", autre: "Non documenté"
+  };
+  var POS_CLASS = { pour: "pour", contre: "contre", abstention: "abstention", divise: "divise", partage: "divise" };
 
-  function posPill(p) {
-    if (!p) return '<span class="pos pos-autre">Non documenté</span>';
-    return '<span class="pos pos-' + p.pos + '">' + POS_LABEL[p.pos] + "</span>";
+  function posPill(pos) {
+    var key = pos || "aucun";
+    return '<span class="pos pos-' + (POS_CLASS[key] || "autre") + '">' + (POS_LABEL[key] || key) + "</span>";
   }
 
-  function groupPos(v, group) {
-    var hit = null;
-    v.positions.forEach(function (p) { if (p.groups.indexOf(group) !== -1) hit = p; });
-    return hit;
+  // Un groupe est présenté comme divisé quand moins des deux tiers de ses votants ont suivi la position.
+  function divided(g) { return g.cohesion !== null && g.cohesion !== undefined && g.cohesion < 67; }
+
+  // Position de la famille d'un candidat sur un vote, ou null si elle n'est pas connue.
+  function groupPos(v, family) {
+    for (var i = 0; i < v.groups.length; i++) {
+      var g = v.groups[i];
+      if (g.famille === family || (g.familles && g.familles.indexOf(family) !== -1)) return g;
+    }
+    return null;
   }
 
-  function sitsAtAN(c) { return c.filter === "AN"; }
+  function candData(c) { return MD.candidats[c.id] || { depute: false, votesCles: {} }; }
 
   function groupNote(c) {
     var g = D.groups[c.group];
-    return sitsAtAN(c)
-      ? "Positions du groupe " + g + ". Le vote personnel de " + c.name + " sera ajouté depuis les scrutins publics."
-      : c.name + " ne siège pas à l’Assemblée nationale : ce sont les votes du groupe " + g + ", donnés comme contexte.";
+    return candData(c).depute
+      ? "Quand " + c.name + " siégeait à l’Assemblée, c’est son vote personnel qui est affiché. Sinon, celui du groupe " + g + ", à titre de contexte."
+      : c.name + " n’a pas siégé à l’Assemblée nationale depuis 2022 : ce sont les votes du groupe " + g + ", donnés comme contexte, pas ses votes.";
   }
 
   function voteRow(v, c) {
-    var p = groupPos(v, c.group);
-    return '<a class="row-link" href="' + esc(v.source.url) + '" target="_blank" rel="noopener"><span><span class="row-title">' + esc(v.title) + "</span>" +
-      '<span class="row-meta">' + fmtDate(v.date) + (p && p.note ? " · " + esc(p.note) : "") + " · " + esc(v.source.label) + " ↗</span></span>" + posPill(p) + "</a>";
+    var perso = candData(c).votesCles[v.id];
+    var pill, who;
+    if (perso && perso.siegeait) {
+      pill = posPill(perso.position);
+      who = "Son vote";
+    } else {
+      var g = groupPos(v, c.group);
+      pill = g ? posPill(g.pos) : posPill("autre");
+      who = "Vote du groupe" + (g && g.groupe ? " " + g.groupe : "") + (g && divided(g) ? ", divisé" : "");
+    }
+    var link = v.official || v.source.url;
+    return '<a class="row-link" href="' + esc(link) + '" target="_blank" rel="noopener"><span><span class="row-title">' + esc(v.title) + "</span>" +
+      '<span class="row-meta">' + fmtDate(v.date) + " · " + esc(who) + " ↗</span></span>" + pill + "</a>";
   }
 
   function voteCard(v) {
-    var rows = v.positions.map(function (p) {
-      var names = p.groups.map(function (g) { return D.groups[g] || g; }).join(", ");
-      return "<div>" + posPill(p) + "<span>" + esc(names) + (p.note ? " <em>(" + esc(p.note) + ")</em>" : "") + "</span></div>";
+    var rows = v.groups.map(function (g) {
+      return "<div>" + posPill(g.pos) + "<span>" + esc(g.label) +
+        (g.detail ? " <em>(" + esc(g.detail) + (divided(g) ? ", divisé" : "") + ")</em>" : "") + "</span></div>";
     }).join("");
     return '<article class="card soft">' +
       '<p class="eb">Scrutin · ' + esc(v.chamber) + " · " + fmtDate(v.date) + "</p>" +
@@ -132,14 +188,14 @@
       '<span class="result">' + esc(v.result) + " · " + esc(v.count) + "</span>" +
       '<div class="groups">' + rows + "</div>" +
       (v.after ? '<p class="note">' + withTerms(v.after) + "</p>" : "") +
-      (v.incomplete ? '<p class="cap">Positions des autres groupes à compléter.</p>' : "") +
-      '<a class="link" href="' + esc(v.source.url) + '" target="_blank" rel="noopener">Source : ' + esc(v.source.label) + " ↗</a>" +
+      (v.official ? '<a class="link" href="' + esc(v.official) + '" target="_blank" rel="noopener">Scrutin officiel (Assemblée nationale) ↗</a>' : "") +
+      '<a class="link" href="' + esc(v.source.url) + '" target="_blank" rel="noopener">Pour comprendre : ' + esc(v.source.label) + " ↗</a>" +
       "</article>";
   }
 
   function foot() {
     return '<p class="foot">Sans compte. Aucune donnée personnelle collectée.<br>Chaque information renvoie à sa source officielle.<br>' +
-      "Données au " + esc(D.updatedAt) + ' · <a href="#/methode">Méthode</a> · <a href="#/lexique">Lexique</a></p>';
+      "Votes à jour au " + (MD.dernierScrutin ? fmtDate(MD.dernierScrutin) : esc(D.updatedAt)) + ' · <a href="#/methode">Méthode</a> · <a href="#/lexique">Lexique</a></p>';
   }
 
   function backBar(href, label, right) {
@@ -186,7 +242,7 @@
       '<div class="cand-meta"><span class="party">' + esc(c.party) + '</span><span class="cand-role">' + esc(c.filter) + "</span></div></div></div>" +
       thermo() +
       '<div class="promise"><p class="eb">Promesse 2027</p><p>Pas encore publiée.</p><span class="cap">Citation exacte et page du programme dès sa publication.</span></div>' +
-      '<div class="since"><p class="eb muted">Depuis 2022 · votes de son groupe</p>' +
+      '<div class="since"><p class="eb muted">Depuis 2022 · votes clés sur ce thème</p>' +
       (votes.length ? "<div>" + votes.map(function (v) { return voteRow(v, c); }).join("") + "</div>" : '<p class="note">Aucun vote documenté sur ce thème pour l’instant.</p>') +
       '<p class="cap">' + esc(groupNote(c)) + "</p></div>" +
       "</article>";
@@ -239,7 +295,28 @@
   function candidate(id) {
     var c = byId(D.candidates, id);
     if (!c) return notFound();
-    var related = D.votes.filter(function (v) { return groupPos(v, c.group); });
+    var cd = candData(c);
+    var related = D.votes.filter(function (v) {
+      var perso = cd.votesCles[v.id];
+      return (perso && perso.siegeait) || groupPos(v, c.group);
+    });
+    var sol = cd.participation ? cd.participation.solennels : null;
+    var all = cd.participation ? cd.participation.tous : null;
+    var med = MD.medianeSolennels && MD.medianeSolennels.taux;
+    var pct = function (x) { return String(x).replace(".", ",") + " %"; };
+    var stats = cd.depute
+      ? '<div class="stats"><div><b class="accent">' + (sol && sol.taux !== null ? pct(sol.taux) : "—") + "</b><span>grands votes</span></div>" +
+        "<div><b>" + (all ? all.votes : "—") + "</b><span>votes</span></div><div><b>—</b><span>amend.</span></div><div><b>—</b><span>propositions</span></div></div>" +
+        '<p class="cap">Participation aux scrutins solennels pendant son mandat : ' + (sol ? sol.votes + " sur " + sol.scrutins : "—") +
+        (med ? " (médiane de l’hémicycle : " + pct(med) + ")" : "") + ". Source : Assemblée nationale. Amendements et propositions : collecte à venir.</p>"
+      : '<div class="stats"><div><b class="accent">—</b><span>grands votes</span></div><div><b>—</b><span>votes</span></div><div><b>—</b><span>amend.</span></div><div><b>—</b><span>propositions</span></div></div>' +
+        '<p class="cap">Pas de mandat de député depuis 2022 : pas de votes à l’Assemblée à afficher.</p>';
+    var mandates = cd.depute
+      ? cd.mandats.map(function (m) {
+          return '<div class="kv"><span>Mandat de député, ' + esc(m.legislature) + "e législature</span><span>" +
+            fmtDate(m.debut) + " – " + (m.fin ? fmtDate(m.fin) : "auj.") + "</span></div>";
+        }).join("") + '<p class="cap">Source : Assemblée nationale. Un député qui entre au gouvernement quitte son siège.</p>'
+      : '<div class="kv"><span>' + esc(c.mandate) + '<span class="flag">à vérifier</span></span><span>' + esc(c.filter) + "</span></div>";
     var rows = D.themes.map(function (t) {
       return '<a class="theme-row" href="#/themes/' + t.id + '"><b>' + esc(t.label) + '</b><span class="mini-thermo">' + THERMO_MINI + "En attente</span></a>";
     }).join("");
@@ -247,19 +324,17 @@
       '<section class="card raised profile">' +
       '<div class="profile-head"><span class="avatar lg" aria-hidden="true">' + initials(c.name) + "</span><div>" +
       "<h1>" + esc(c.name) + '</h1><span class="party">' + esc(c.party) + '</span><p class="cap" style="padding:4px 0 0">' + esc(c.status) + "</p></div></div>" +
-      '<div class="stats"><div><b class="accent">—</b><span>présence</span></div><div><b>' + related.length + "</b><span>votes suivis</span></div><div><b>—</b><span>amend.</span></div><div><b>—</b><span>propositions</span></div></div>" +
-      '<p class="cap">« Votes suivis » : votes de son groupe documentés ici. Présence, amendements et propositions : collecte en cours (data.assemblee-nationale.fr).</p>' +
+      stats +
       "</section>" +
-      '<section class="card"><p class="eb">Mandats depuis 2022</p><div>' +
-      '<div class="kv"><span>' + esc(c.mandate) + (c.mandateVerified ? "" : '<span class="flag">à vérifier</span>') + "</span><span>" + esc(c.filter) + "</span></div>" +
+      '<section class="card"><p class="eb">Mandats depuis 2022</p><div>' + mandates +
       '<div class="kv"><span>Groupe à l’Assemblée</span><span>' + esc(D.groups[c.group]) + "</span></div>" +
       "</div></section>" +
       '<section class="card"><p class="eb">Position par thème</p><div>' + rows + "</div></section>" +
       '<section class="card yellow evo"><p class="eb">Évolution</p><h2>Ce qui a changé depuis 2022</h2>' +
       '<div class="evo-grid"><div><b>2022</b><p>Programme 2022 en cours de collecte.</p></div><div><b class="accent">2027</b><p>Programme 2027 pas encore publié.</p></div></div></section>' +
-      '<section class="card"><p class="eb">Votes de son groupe</p><p class="group-note">' + esc(groupNote(c)) + "</p><div>" +
+      '<section class="card"><p class="eb">' + (cd.depute ? "Ses votes clés" : "Votes de son groupe") + '</p><p class="group-note">' + esc(groupNote(c)) + "</p><div>" +
       related.map(function (v) { return voteRow(v, c); }).join("") + "</div>" +
-      (D.votes.length - related.length ? '<p class="cap">' + (D.votes.length - related.length) + " vote(s) sans position documentée pour ce groupe.</p>" : "") +
+      (D.votes.length - related.length ? '<p class="cap">' + (D.votes.length - related.length) + " vote(s) clé(s) sans position connue pour ce groupe.</p>" : "") +
       "</section>" + foot() + "</div>";
   }
 
@@ -307,7 +382,8 @@
       '<p class="ask">' + esc(q.prompt) + "</p></div>" +
       '<div class="options">' + opts + "</div>" +
       (answered ? '<div class="feedback" role="status"><b>' + (picked === q.answer ? "Bien vu." : "Raté. C’était : " + esc(q.options[q.answer]) + ".") + "</b>" +
-        "<p>" + esc(q.explain) + '</p><a class="link" href="' + esc(v.source.url) + '" target="_blank" rel="noopener">Voir le vote (' + esc(v.source.label) + ") ↗</a></div>" +
+        "<p>" + esc(q.explain) + '</p><a class="link" href="' + esc(v.official || v.source.url) + '" target="_blank" rel="noopener">' +
+        (v.official ? "Voir le scrutin officiel ↗" : "Voir le vote (" + esc(v.source.label) + ") ↗") + "</a></div>" +
         '<button type="button" class="btn" data-next>' + (quiz.i + 1 < quiz.order.length ? "Question suivante" : "Voir mon score") + "</button>" : "") +
       "</div>";
   }
@@ -356,7 +432,8 @@
       "<li>Aucune consigne de vote. On compare chaque candidat à ses propres promesses, jamais les candidats entre eux.</li>" +
       "<li>Ordre alphabétique, jamais par sondage. Aucune couleur de parti.</li>" +
       "<li>Même format pour chaque candidat : même longueur de résumé, même nombre de votes affichés.</li>" +
-      "<li>Quand un candidat n’est pas député, on l’écrit : les votes de son groupe sont du contexte, pas ses votes.</li>" +
+      "<li>Quand un candidat a siégé, on affiche son vote personnel. Sinon, on l’écrit : les votes de son groupe sont du contexte, pas ses votes.</li>" +
+      "<li>Les chiffres des votes viennent directement des données ouvertes de l’Assemblée nationale, mises à jour chaque nuit et relues avant publication.</li>" +
       "<li>L’indice « + souple / conforme / + rigide » n’apparaîtra qu’avec ses définitions publiées, thème par thème.</li>" +
       "<li>Les textes préparés avec l’IA sont relus et validés par l’équipe avant publication.</li>" +
       "<li>Sans compte. Le quiz se joue dans ton navigateur et rien n’est envoyé.</li>" +
