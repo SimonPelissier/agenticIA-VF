@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>marIAn · Présidentielle 2027</title>
-  <meta name="description" content="Ce qu’ils promettent. Ce qu’ils ont voté. Les candidats à la présidentielle 2027 face à leurs actes, thème par thème, avec une source pour chaque information.">
-  <meta name="theme-color" content="#FFEF9F">
+  <title>MarIAn · Présidentielle 2027</title>
+  <meta name="description" content="Ce qu’ils promettent. Ce qu’ils ont voté. Les candidats à la présidentielle 2027 face à leurs votes, sujet par sujet, avec une source pour chaque information.">
+  <meta name="theme-color" content="#FFF8D7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -14,13 +14,56 @@
 <body>
   <main id="app" class="shell" tabindex="-1"></main>
 
+  <nav class="tabbar" aria-label="Navigation principale">
+    <a href="#/" data-tab="accueil"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Accueil</a>
+    <a href="#/debat" data-tab="debat"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Débat</a>
+    <a href="#/quiz" data-tab="quiz"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.5V14M12 17.5v.01"/></svg>Quiz</a>
+    <a href="#/sujets" data-tab="sujets"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Sujets</a>
+    <a href="#/candidats" data-tab="candidats"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Candidats</a>
+  </nav>
+
+  <div id="splash" class="splash" role="button" tabindex="0" aria-label="Entrer dans MarIAn">
+    <div class="splash-inner">
+      <svg viewBox="0 0 330 270" aria-hidden="true">
+        <circle cx="165" cy="132" r="118" fill="#6D28D9"/>
+        <circle cx="252" cy="58" r="16" fill="#FFEF9F"/>
+        <line x1="165" y1="86" x2="165" y2="22" stroke="#1D1836" stroke-width="3" stroke-linecap="round"/>
+        <g class="mar-flag">
+          <rect x="167" y="24" width="14" height="26" fill="#1D4ED8" stroke="#1D1836" stroke-width="2"/>
+          <rect x="181" y="24" width="14" height="26" fill="#FFFFFF" stroke="#1D1836" stroke-width="2"/>
+          <rect x="195" y="24" width="14" height="26" fill="#E5484D" stroke="#1D1836" stroke-width="2"/>
+        </g>
+        <polygon points="22,134 308,134 290,112 40,112" fill="#1D1836"/>
+        <rect x="28" y="134" width="274" height="96" fill="#FFFFFF" stroke="#1D1836" stroke-width="3"/>
+        <rect x="118" y="96" width="94" height="134" fill="#FFFFFF" stroke="#1D1836" stroke-width="3"/>
+        <rect x="112" y="86" width="106" height="12" fill="#1D1836"/>
+        <g fill="#FFEF9F" stroke="#1D1836" stroke-width="2">
+          <rect x="44" y="146" width="16" height="22" rx="2"/><rect x="70" y="146" width="16" height="22" rx="2"/><rect x="96" y="146" width="16" height="22" rx="2"/>
+          <rect x="218" y="146" width="16" height="22" rx="2"/><rect x="244" y="146" width="16" height="22" rx="2"/><rect x="270" y="146" width="16" height="22" rx="2"/>
+          <rect x="132" y="122" width="14" height="20" rx="2"/><rect x="158" y="122" width="14" height="20" rx="2"/><rect x="184" y="122" width="14" height="20" rx="2"/>
+        </g>
+        <g fill="#FFFFFF" stroke="#1D1836" stroke-width="2">
+          <rect x="44" y="184" width="16" height="26" rx="2"/><rect x="70" y="184" width="16" height="26" rx="2"/><rect x="96" y="184" width="16" height="26" rx="2"/>
+          <rect x="218" y="184" width="16" height="26" rx="2"/><rect x="244" y="184" width="16" height="26" rx="2"/><rect x="270" y="184" width="16" height="26" rx="2"/>
+          <rect x="126" y="160" width="7" height="70"/><rect x="144" y="160" width="7" height="70"/><rect x="179" y="160" width="7" height="70"/><rect x="197" y="160" width="7" height="70"/>
+        </g>
+        <path d="M155 230 V196 a10 10 0 0 1 20 0 V230" fill="#1D1836"/>
+        <rect x="10" y="230" width="310" height="8" fill="#1D1836"/>
+        <line x1="10" y1="262" x2="320" y2="262" stroke="#1D1836" stroke-width="3"/>
+      </svg>
+      <span class="splash-name">Mar<span>(IA)</span>n</span>
+      <span class="splash-sub">On dépouille les votes…</span>
+      <div class="slips-row" aria-hidden="true"><span class="mar-slip"></span><span class="mar-slip"></span><span class="mar-slip"></span></div>
+    </div>
+  </div>
+
   <div id="sheet" class="sheet" hidden>
     <div class="sheet-backdrop" data-close></div>
     <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
       <p class="eb">Lexique</p>
       <h2 id="sheet-title" class="sheet-title"></h2>
       <p id="sheet-body" class="sheet-body"></p>
-      <button type="button" class="btn btn-light" data-close>Fermer</button>
+      <button type="button" class="btn-dark" data-close>Fermer</button>
     </div>
   </div>
 
