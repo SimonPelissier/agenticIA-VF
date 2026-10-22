@@ -12,26 +12,28 @@ Le cadrage complet (objectifs, sources, agents, règles éditoriales) est dans [
 
 | Écran | Contenu |
 | --- | --- |
-| Accueil | Compte à rebours, entrées « Par thème » et « Par candidat », quiz, barre « thèmes explorés » |
-| Par thème | 10 thèmes, une carte par candidat (thermomètre « promesse vs votes » en attente, son vote ou celui de son groupe sur les votes clés), puis le détail des votes avec les chiffres officiels de chaque groupe |
-| Par candidat | 9 candidats principaux : mandats officiels, participation aux grands votes comparée à la médiane, votes personnels sur les votes clés (ou votes du groupe, signalés comme tels) |
-| Qui a voté ça ? | 10 questions à 4 choix tirées de votes réels, progression en bulletins, carte de score au format story |
-| Lexique, Méthode | Mots compliqués (49.3, PLFSS…) et règles éditoriales |
+| Chargement | « On dépouille les votes… », une fois par visite |
+| Accueil | Compte à rebours, débat du jour, quiz, « Complète 3 sujets », entrées Par sujet et Par candidat |
+| Débat | Une question reliée à un vote clé ; après ta réponse (gardée sur ton téléphone), le vote de chaque candidat |
+| Sujets | 8 sujets ; pour chacun, une carte par candidat (promesse en attente, son vote ou celui de son groupe) et le détail des votes |
+| Candidats | Bilan : promesses tenues (en attente), participation aux grands votes face à la médiane, mandats officiels, votes sujet par sujet |
+| Qui a voté ça ? | 10 questions à 4 choix sur de vrais votes, série et points, carte de score au format story |
+| Comment on décide, Lexique | Règles de jugement et règles éditoriales, signalement d'erreur, mots compliqués |
 
 Les promesses 2027 ne sont pas encore affichées : les programmes ne sont pas publiés. L'interface l'indique au lieu d'inventer du contenu. Les chiffres des votes et les mandats de député viennent des données ouvertes de l'Assemblée nationale (voir `agents/collecte/`) ; les autres mandats restent « à vérifier ».
 
 ## Structure
 
 ```
-index.html      page unique, barre d'onglets en bas
-css/style.css   style (papier crème, encre noire, jaune)
+index.html      page unique, barre d'onglets à 5 entrées, écran de chargement
+css/style.css   style V4 (crème et jaune, accent violet, contours noirs)
 js/data.js      données éditoriales : thèmes, candidats, quiz, lexique
-js/app.js       écrans et navigation (#/themes, #/candidats, #/quiz…)
+js/app.js       écrans et navigation (#/sujets, #/candidats, #/debat, #/quiz…)
 contenu/        votes clés choisis par l'équipe (texte + numéro du scrutin officiel)
 data/app.js     données officielles pour l'application, produites par l'agent de collecte
 data/*.json     données brutes collectées (scrutins, votes, groupes)
 agents/         agents (collecte des votes de l'Assemblée)
-docs/           cadrage du projet, avancement
+docs/           cadrage, avancement, décisions du groupe
 ```
 
 Aucune dépendance, aucune étape de compilation : HTML, CSS et JavaScript simples.

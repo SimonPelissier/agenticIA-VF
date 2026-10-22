@@ -4,24 +4,30 @@
 // Règle : rien n'est inventé ; quand une donnée manque, l'interface le dit.
 
 window.DATA = {
-  appName: "marIAn",
+  appName: "MarIAn",
   // Date provisoire du 1er tour, en attente du décret.
   electionDate: "2027-04-11",
   electionDateProvisional: true,
   updatedAt: "8 octobre 2026",
 
+  // Les 8 sujets de la V4 (décision du 22 octobre 2026, voir docs/decisions.md).
+  // 'id' correspond au thème des votes clés (contenu/votes-cles.json) ; 'sur' sert au titre « Qui vote quoi sur… ».
   themes: [
-    { id: "education", label: "Éducation", questions: "Parcoursup, bourses, moyens des lycées, apprentissage" },
-    { id: "logement", label: "Logement", questions: "Loyers, logement étudiant, APL" },
-    { id: "travail", label: "Travail et pouvoir d’achat", questions: "Smic, premier emploi, stages, chômage" },
-    { id: "sante", label: "Santé", questions: "Déserts médicaux, santé mentale, remboursements" },
-    { id: "ecologie", label: "Écologie, énergie et agriculture", questions: "Climat, nucléaire, pesticides, transports" },
-    { id: "immigration", label: "Immigration", questions: "Titres de séjour, étudiants étrangers, droit d’asile" },
-    { id: "securite", label: "Sécurité et justice", questions: "Police, prisons, justice des mineurs" },
-    { id: "budget", label: "Dette, budget et impôts", questions: "Déficit, taxe Zucman, TVA, où couper ou investir" },
-    { id: "retraites", label: "Retraites", questions: "Âge de départ, ce que ça change pour ma génération" },
-    { id: "europe", label: "Europe et défense", questions: "Ukraine, service militaire ou civique, UE" }
+    { id: "logement", label: "Logement", sur: "le logement", questions: "Loyers, logement étudiant, APL", icon: "M3 11l9-8 9 8M5 10v10h14V10M10 20v-6h4v6" },
+    { id: "travail", label: "Travail", sur: "le travail", questions: "Smic, premier emploi, stages, chômage", icon: "M3 8h18v12H3zM8 8V5h8v3M3 13h18" },
+    { id: "ecologie", label: "Climat", sur: "le climat", questions: "Climat, nucléaire, pesticides, transports", icon: "M5 19C5 9 11 4 20 4c0 9-5 15-15 15zM5 19l8-8" },
+    { id: "sante", label: "Santé", sur: "la santé", questions: "Déserts médicaux, santé mentale, fin de vie", icon: "M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z" },
+    { id: "securite", label: "Sécurité", sur: "la sécurité", questions: "Police, prisons, justice des mineurs", icon: "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" },
+    { id: "education", label: "École", sur: "l’école", questions: "Parcoursup, bourses, moyens des lycées, apprentissage", icon: "M4 5h6a2 2 0 0 1 2 2v12c0-1-1-2-2-2H4zM20 5h-6a2 2 0 0 0-2 2v12c0-1 1-2 2-2h6z" },
+    { id: "retraites", label: "Retraites", sur: "les retraites", questions: "Âge de départ, ce que ça change pour ma génération", icon: "M6 3h12M6 21h12M7 3c0 5 10 6 10 9s-10 4-10 9M17 3c0 5-10 6-10 9s10 4 10 9" },
+    { id: "numerique", label: "Numérique", sur: "le numérique", questions: "Réseaux sociaux, écrans, données personnelles, IA", icon: "M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM11 18h2" }
   ],
+
+  // Débat du jour : une question simple, reliée à un vote clé vérifié. La réponse n'est enregistrée nulle part.
+  debate: {
+    question: "Faut-il suspendre la réforme des retraites ?",
+    vote: "suspension-retraites"
+  },
 
   // Familles de groupes à l'Assemblée : un même courant change parfois de sigle d'une législature à l'autre.
   groups: {

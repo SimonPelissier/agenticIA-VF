@@ -1,4 +1,4 @@
-// marIAn — design « V3 Colorful ». Sans compte ni serveur : tout est calculé dans le navigateur.
+// MarIAn — design « V4 ». Sans compte ni serveur : tout est calculé dans le navigateur.
 (function () {
   "use strict";
 
@@ -6,6 +6,92 @@
   // Données officielles produites par l'agent de collecte (data/app.js).
   var MD = window.MARIAN_DONNEES || { votesCles: [], candidats: {} };
   var app = document.getElementById("app");
+
+  // ---------- Outils ----------
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function byId(list, id) {
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return null;
+  }
+
+  var MONTHS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+  function fmtDate(iso) {
+    var p = iso.split("-");
+    return parseInt(p[2], 10) + " " + MONTHS[parseInt(p[1], 10) - 1] + " " + p[0];
+  }
+  function fmtMonth(iso) {
+    var p = iso.split("-");
+    return MONTHS[parseInt(p[1], 10) - 1] + " " + p[0];
+  }
+  function pct(x) { return String(x).replace(".", ",") + " %"; }
+
+  function daysLeft() {
+    var p = D.electionDate.split("-");
+    var target = new Date(+p[0], +p[1] - 1, +p[2]);
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.max(0, Math.round((target - today) / 86400000));
+  }
+
+  function initials(name) {
+    var w = name.split(/\s+/);
+    return (w[0][0] + w[w.length - 1][0]).toUpperCase();
+  }
+
+  function icon(d, size) {
+    return '<svg width="' + (size || 22) + '" height="' + (size || 22) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"/></svg>';
+  }
+  var I = {
+    back: "M19 12H5M11 6l-6 6 6 6",
+    arrow: "M5 12h14M13 6l6 6-6 6",
+    chat: "M4 5h16v11H9l-5 4z",
+    grid: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",
+    person: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6",
+    list: "M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01",
+    share: "M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13",
+    flame: "M12 22c4 0 7-3 7-7 0-4-3-6-4-10-2 2-3 4-3 6-1-1-2-2-2-4-2 2-5 5-5 8 0 4 3 7 7 7z",
+    lock: "M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4"
+  };
+
+  // Stockage local, uniquement sur l'appareil, pour les sujets explorés.
+  var STORE_KEY = "marian:themes-vus";
+  function seenThemes() {
+    var ids = D.themes.map(function (t) { return t.id; });
+    try {
+      return (JSON.parse(localStorage.getItem(STORE_KEY)) || []).filter(function (id) { return ids.indexOf(id) !== -1; });
+    } catch (e) { return []; }
+  }
+  function markSeen(id) {
+    var seen = seenThemes();
+    if (seen.indexOf(id) === -1) {
+      seen.push(id);
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(seen)); } catch (e) { /* navigation privée */ }
+    }
+  }
+
+  // Lexique : rend cliquables les mots compliqués.
+  var termIndex = {};
+  var termWords = [];
+  D.glossary.forEach(function (g, i) {
+    g.match.forEach(function (m) { termIndex[m.toLowerCase()] = i; termWords.push(m); });
+  });
+  termWords.sort(function (a, b) { return b.length - a.length; });
+  var termRe = new RegExp("(" + termWords.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("|") + ")", "gi");
+
+  function withTerms(text) {
+    return esc(text).replace(termRe, function (m) {
+      var i = termIndex[m.toLowerCase()];
+      return i === undefined ? m : '<button type="button" class="term" data-term="' + i + '">' + m + "</button>";
+    });
+  }
+
+  // ---------- Données des votes ----------
 
   // Transforme un vote clé (texte de l'équipe + chiffres officiels) en objet prêt à afficher.
   function normalizeVote(v) {
@@ -41,96 +127,9 @@
   }
   D.votes = MD.votesCles.map(normalizeVote).filter(function (v) { return v.date; });
 
-  // ---------- Outils ----------
-
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
-  }
-
-  function byId(list, id) {
-    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
-    return null;
-  }
-
-  var MONTHS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
-  function fmtDate(iso) {
-    var p = iso.split("-");
-    return parseInt(p[2], 10) + " " + MONTHS[parseInt(p[1], 10) - 1] + " " + p[0];
-  }
-  function fmtMonth(iso) {
-    var p = iso.split("-");
-    return MONTHS[parseInt(p[1], 10) - 1] + " " + p[0];
-  }
-
-  function daysLeft() {
-    var p = D.electionDate.split("-");
-    var target = new Date(+p[0], +p[1] - 1, +p[2]);
-    var now = new Date();
-    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    return Math.max(0, Math.round((target - today) / 86400000));
-  }
-
-  function initials(name) {
-    var w = name.split(/\s+/);
-    return (w[0][0] + w[w.length - 1][0]).toUpperCase();
-  }
-
-  // Stockage local, uniquement sur l'appareil, pour la barre « thèmes explorés ».
-  var STORE_KEY = "marian:themes-vus";
-  function seenThemes() {
-    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch (e) { return []; }
-  }
-  function markSeen(id) {
-    var seen = seenThemes();
-    if (seen.indexOf(id) === -1) {
-      seen.push(id);
-      try { localStorage.setItem(STORE_KEY, JSON.stringify(seen)); } catch (e) { /* navigation privée */ }
-    }
-  }
-
-  // Lexique : rend cliquables les mots compliqués.
-  var termIndex = {};
-  var termWords = [];
-  D.glossary.forEach(function (g, i) {
-    g.match.forEach(function (m) { termIndex[m.toLowerCase()] = i; termWords.push(m); });
-  });
-  termWords.sort(function (a, b) { return b.length - a.length; });
-  var termRe = new RegExp("(" + termWords.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("|") + ")", "gi");
-
-  function withTerms(text) {
-    return esc(text).replace(termRe, function (m) {
-      var i = termIndex[m.toLowerCase()];
-      return i === undefined ? m : '<button type="button" class="term" data-term="' + i + '">' + m + "</button>";
-    });
-  }
-
-  // ---------- Icônes ----------
-
-  var ARROW = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-  var BACK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>';
-  var CLOSE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
-  var BOX = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4z"/><path d="M9 11V4h6v7"/><path d="M8 15h8"/></svg>';
-  var FILTER = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>';
-  var CHECK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
-  var CROSS = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
-
-  // Thermomètre à bulletin, état « en attente » : aucune promesse 2027 publiée, donc pas d'indice.
-  var THERMO_EMPTY = '<svg viewBox="0 0 280 36" aria-hidden="true"><rect x="20" y="16" width="252" height="12" rx="6" fill="#fff" stroke="#796F91" stroke-width="1.5" stroke-dasharray="4 3"/><circle cx="14" cy="22" r="11" fill="#fff" stroke="#796F91" stroke-width="1.5" stroke-dasharray="4 3"/></svg>';
-  var THERMO_MINI = '<svg width="72" height="22" viewBox="0 0 72 22" aria-hidden="true"><rect x="10" y="9" width="60" height="8" rx="4" fill="#fff" stroke="#796F91" stroke-width="1.3" stroke-dasharray="3 2"/><circle cx="7" cy="13" r="6" fill="#fff" stroke="#796F91" stroke-width="1.3" stroke-dasharray="3 2"/></svg>';
-
-  function thermo() {
-    return '<div class="thermo"><div class="thermo-top"><span class="thermo-state">En attente</span><span class="thermo-kind">Promesse vs votes</span></div>' +
-      '<div class="thermo-text">Pas d’indice tant que le programme 2027 n’est pas publié.</div>' + THERMO_EMPTY +
-      '<div class="thermo-scale"><span>+ souple</span><span>conforme</span><span>+ rigide</span></div></div>';
-  }
-
-  // ---------- Briques ----------
-
   var POS_LABEL = {
     pour: "Pour", contre: "Contre", abstention: "Abstention", divise: "Divisé", partage: "Partagé",
-    "non-votant": "Non-votant", absent: "Absent", aucun: "N’a pas voté", autre: "Non documenté"
+    "non-votant": "Non-votant", absent: "Absent", aucun: "N’a pas voté", autre: "Inconnu"
   };
   var POS_CLASS = { pour: "pour", contre: "contre", abstention: "abstention", divise: "divise", partage: "divise" };
 
@@ -142,7 +141,6 @@
   // Un groupe est présenté comme divisé quand moins des deux tiers de ses votants ont suivi la position.
   function divided(g) { return g.cohesion !== null && g.cohesion !== undefined && g.cohesion < 67; }
 
-  // Position de la famille d'un candidat sur un vote, ou null si elle n'est pas connue.
   function groupPos(v, family) {
     for (var i = 0; i < v.groups.length; i++) {
       var g = v.groups[i];
@@ -151,7 +149,31 @@
     return null;
   }
 
-  function candData(c) { return MD.candidats[c.id] || { depute: false, votesCles: {} }; }
+  function candData(c) { return MD.candidats[c.id] || { depute: false, votesCles: {}, mandats: [] }; }
+
+  // Rôle affiché sous le nom : tiré des données officielles pour les députés.
+  function role(c) {
+    var cd = candData(c);
+    if (cd.depute) {
+      var last = cd.mandats[cd.mandats.length - 1];
+      return last && !last.fin ? "Siège à l’Assemblée" : "A siégé (" + cd.mandats[0].debut.slice(0, 4) + "-" + (last.fin || "").slice(0, 4) + ")";
+    }
+    return { PE: "Parlement européen", "Sénat": "Sénat" }[c.filter] || "Sans mandat de député";
+  }
+
+  // Son vote s'il siégeait, sinon celui de son groupe (toujours signalé comme tel).
+  function candVote(v, c) {
+    var perso = candData(c).votesCles[v.id];
+    if (perso && perso.siegeait) return { pos: perso.position, who: "Son vote", personal: true };
+    var g = groupPos(v, c.group);
+    return { pos: g ? g.pos : "autre", who: "Vote du groupe" + (g && g.groupe ? " " + g.groupe : "") + (g && divided(g) ? ", divisé" : ""), personal: false };
+  }
+
+  function voteItem(v, c) {
+    var cv = candVote(v, c);
+    return '<a class="vote-item" href="' + esc(v.official || v.source.url) + '" target="_blank" rel="noopener"><span><span class="t">' + esc(v.title) + "</span>" +
+      '<span class="m">' + fmtDate(v.date) + " · " + esc(cv.who) + " ↗</span></span>" + posPill(cv.pos) + "</a>";
+  }
 
   function groupNote(c) {
     var g = D.groups[c.group];
@@ -160,30 +182,14 @@
       : c.name + " n’a pas siégé à l’Assemblée nationale depuis 2022 : ce sont les votes du groupe " + g + ", donnés comme contexte, pas ses votes.";
   }
 
-  function voteRow(v, c) {
-    var perso = candData(c).votesCles[v.id];
-    var pill, who;
-    if (perso && perso.siegeait) {
-      pill = posPill(perso.position);
-      who = "Son vote";
-    } else {
-      var g = groupPos(v, c.group);
-      pill = g ? posPill(g.pos) : posPill("autre");
-      who = "Vote du groupe" + (g && g.groupe ? " " + g.groupe : "") + (g && divided(g) ? ", divisé" : "");
-    }
-    var link = v.official || v.source.url;
-    return '<a class="row-link" href="' + esc(link) + '" target="_blank" rel="noopener"><span><span class="row-title">' + esc(v.title) + "</span>" +
-      '<span class="row-meta">' + fmtDate(v.date) + " · " + esc(who) + " ↗</span></span>" + pill + "</a>";
-  }
-
   function voteCard(v) {
     var rows = v.groups.map(function (g) {
       return "<div>" + posPill(g.pos) + "<span>" + esc(g.label) +
         (g.detail ? " <em>(" + esc(g.detail) + (divided(g) ? ", divisé" : "") + ")</em>" : "") + "</span></div>";
     }).join("");
-    return '<article class="card soft">' +
-      '<p class="eb">Scrutin · ' + esc(v.chamber) + " · " + fmtDate(v.date) + "</p>" +
-      '<div class="vote-head"><h3 class="vote-title">' + esc(v.title) + '</h3><p class="cap">' + withTerms(v.context) + "</p></div>" +
+    return '<article class="box flat">' +
+      '<p class="eb">' + esc(v.chamber) + " · " + fmtDate(v.date) + "</p>" +
+      '<h3 class="vote-title">' + esc(v.title) + '</h3><p class="cap">' + withTerms(v.context) + "</p>" +
       '<p class="vote-summary">' + withTerms(v.summary) + "</p>" +
       '<span class="result">' + esc(v.result) + " · " + esc(v.count) + "</span>" +
       '<div class="groups">' + rows + "</div>" +
@@ -193,147 +199,194 @@
       "</article>";
   }
 
+  // ---------- Briques d'écran ----------
+
   function foot() {
-    return '<p class="foot">Sans compte. Aucune donnée personnelle collectée.<br>Chaque information renvoie à sa source officielle.<br>' +
-      "Votes à jour au " + (MD.dernierScrutin ? fmtDate(MD.dernierScrutin) : esc(D.updatedAt)) + ' · <a href="#/methode">Méthode</a> · <a href="#/lexique">Lexique</a></p>';
+    return '<p class="foot">Sans compte. Aucune donnée personnelle collectée. Chaque information renvoie à sa source officielle.<br>' +
+      "Votes à jour au " + (MD.dernierScrutin ? fmtDate(MD.dernierScrutin) : esc(D.updatedAt)) + ' · <a href="#/methode">Comment on décide</a> · <a href="#/lexique">Lexique</a></p>';
   }
 
-  function backBar(href, label, right) {
-    return '<div class="topbar"><a class="round-btn" href="' + href + '" aria-label="' + esc(label) + '">' + BACK + "</a>" + (right || "") + "</div>";
+  function topbar(back, title, right) {
+    return '<div class="topbar"><div style="display:flex;align-items:center;gap:12px">' +
+      (back ? '<a class="round-btn" href="' + back + '" aria-label="Retour">' + icon(I.back, 20) + "</a>" : "") +
+      (title ? '<span class="topbar-title">' + title + "</span>" : "") + "</div>" + (right || "") + "</div>";
   }
+
+  function pending(label) { return '<span class="verdict">' + (label || "En attente") + "</span>"; }
 
   // ---------- Accueil ----------
 
+  var debateChoice = null; // réponse au débat du jour : en mémoire seulement, jamais enregistrée
+
+  function debateButtons(prefix) {
+    return '<div class="choice3" role="group" aria-label="Ta réponse">' +
+      [["pour", "Pour", " dark"], ["contre", "Contre", ""], ["nsp", "Je ne sais pas", " unsure"]].map(function (o) {
+        return '<button type="button" class="choice' + o[2] + '" data-debate="' + o[0] + '"' + (prefix ? ' data-go="debat"' : "") +
+          ' aria-pressed="' + (debateChoice === o[0]) + '">' + o[1] + "</button>";
+      }).join("") + "</div>";
+  }
+
   function home() {
-    var seen = seenThemes().length;
-    var seg = D.themes.map(function (t, i) { return '<span class="' + (i < seen ? "on" : "") + '"></span>'; }).join("");
-    return '<div class="screen home">' +
-      '<div class="home-head"><a class="brand" href="#/">' + esc(D.appName) + '</a><span class="pill">Présidentielle 2027</span></div>' +
-      '<div class="card raised" style="gap:6px"><p class="eb">Compte à rebours</p>' +
-      '<p class="count" aria-label="J moins ' + daysLeft() + ' jours">J-<span>' + daysLeft() + "</span></p>" +
-      '<p class="count-sub">avant la présidentielle</p>' +
-      (D.electionDateProvisional ? '<p class="cap">1er tour le ' + fmtDate(D.electionDate) + " · date provisoire</p>" : "") + "</div>" +
-      '<h1 class="headline">Ce qu’ils promettent.<br><span>Ce qu’ils ont voté.</span></h1>' +
-      '<nav class="nav-list" aria-label="Comparer">' +
-      '<a class="nav-card dark" href="#/themes"><span><span class="nav-title">Par thème</span><span class="nav-sub">Logement, travail, climat…</span></span>' + ARROW + "</a>" +
-      '<a class="nav-card" href="#/candidats"><span><span class="nav-title">Par candidat</span><span class="nav-sub">Mandats, présence, positions</span></span>' + ARROW + "</a>" +
-      "</nav>" +
-      '<a class="quiz-card" href="#/quiz"><span class="quiz-mark" aria-hidden="true">?</span><span><span class="quiz-title">Jouer à « Qui a voté ça ? »</span><span class="quiz-sub">' + D.quiz.length + " questions sur de vrais votes. Devine qui a voté quoi.</span></span></a>" +
-      '<div><div class="progress-row"><span>Thèmes explorés</span><span>' + seen + " / " + D.themes.length + '</span></div><div class="seg" aria-hidden="true">' + seg + "</div></div>" +
+    var seen = seenThemes();
+    var topics = D.themes.map(function (t) {
+      var done = seen.indexOf(t.id) !== -1;
+      return '<a class="topic' + (done ? " done" : "") + '" href="#/sujets/' + t.id + '">' + esc(t.label) + '<span aria-hidden="true">' + (done ? "✓" : "+") + "</span></a>";
+    }).join("");
+    return '<div class="screen enter">' +
+      topbar(null, null, "").replace('<div style="display:flex;align-items:center;gap:12px"></div>',
+        '<a class="brand" href="#/">' + esc(D.appName) + '</a><span class="pill-dark" title="1er tour le ' + fmtDate(D.electionDate) + (D.electionDateProvisional ? ", date provisoire" : "") + '">J–' + daysLeft() + "<span>avant le vote</span></span>") +
+      '<section class="box" aria-label="Débat du jour">' +
+      '<span class="tag plain" style="align-self:flex-start;padding:4px 10px;font-size:12px">' + icon(I.chat, 14) + "Débat du jour</span>" +
+      '<p class="debate-q">' + esc(D.debate.question) + "</p>" + debateButtons(true) + "</section>" +
+      '<a class="quiz-hero" href="#/quiz"><span class="quiz-chip">' + icon(I.list, 14) + D.quiz.length + " questions</span>" +
+      '<span class="quiz-title">Qui a voté ça ?</span>' +
+      '<span class="quiz-row"><span>Voyons si tu connais bien les candidats pour 2027.</span><span class="play-btn">Jouer' + icon(I.arrow, 18) + "</span></span></a>" +
+      '<section style="display:flex;flex-direction:column;gap:10px"><div class="section-head"><h2 class="h2" style="font-size:18px">Complète 3 sujets</h2><span>' + Math.min(seen.length, 3) + " / 3</span></div>" +
+      '<div class="topics">' + topics + "</div></section>" +
+      '<nav class="nav-tiles" aria-label="Comparer">' +
+      '<a class="nav-tile dark" href="#/sujets">' + icon(I.grid) + "<span>Par sujet</span></a>" +
+      '<a class="nav-tile" href="#/candidats">' + icon(I.person) + "<span>Par candidat</span></a></nav>" +
       foot() + "</div>";
   }
 
-  // ---------- Par thème ----------
+  // ---------- Débat du jour ----------
 
-  var sortBy = "nom";
+  function debate() {
+    var v = byId(D.votes, D.debate.vote);
+    var labels = { pour: "Pour", contre: "Contre", nsp: "Je ne sais pas" };
+    var html = '<div class="screen enter">' +
+      '<section style="display:flex;flex-direction:column;gap:16px"><span class="tag plain" style="align-self:flex-start">Débat du jour</span>' +
+      '<h1 class="debate-title">' + esc(D.debate.question) + "</h1>" + debateButtons(false) + "</section>";
+    if (!debateChoice) {
+      return html + '<p class="note">Réponds pour voir comment les candidats ont voté sur ce sujet.</p>' + foot() + "</div>";
+    }
+    html += '<div class="private-note">' + icon(I.lock, 20) + "<span>Ta réponse : <b>" + labels[debateChoice] +
+      "</b>. Elle reste sur ton téléphone : on ne l’enregistre nulle part et on ne publie aucun résultat.</span></div>";
+    if (v) {
+      html += '<section style="display:flex;flex-direction:column;gap:12px">' +
+        '<div class="section-head"><h2 class="h2">Et les candidats ?</h2><span>Tient parole ?</span></div>' +
+        '<div class="text-card"><span class="eb">Le texte voté</span><span class="t">' + esc(v.title) + "</span>" +
+        '<span class="m">' + esc(v.chamber) + " · " + fmtDate(v.date) + " · " + esc(v.result) + ", " + esc(v.count) +
+        (v.official ? ' · <a href="' + esc(v.official) + '" target="_blank" rel="noopener" style="font-weight:700">Source ↗</a>' : "") + "</span></div>" +
+        D.candidates.map(function (c) {
+          var cv = candVote(v, c);
+          return '<article class="cand-line"><span><span class="n">' + esc(c.name) + '</span><span class="d">Promet <b>—</b> · ' +
+            (cv.personal ? "Vote <b>" + POS_LABEL[cv.pos || "aucun"] + "</b>" : esc(cv.who) + " : <b>" + POS_LABEL[cv.pos || "aucun"] + "</b>") +
+            "</span></span>" + pending() + "</article>";
+        }).join("") +
+        '<p class="cap">« Tient parole ? » s’affichera quand les programmes 2027 seront publiés : on comparera alors chaque promesse aux votes.</p></section>';
+    }
+    return html + '<button type="button" class="btn-dark" data-share-debate>' + icon(I.share, 20) + "Partager</button>" + foot() + "</div>";
+  }
+
+  // ---------- Sujets ----------
+
+  function topics() {
+    var seen = seenThemes();
+    return '<div class="screen enter">' + topbar(null, "Par sujet") +
+      '<h1 class="h1" style="font-size:34px">Quel sujet <span>te parle</span> ?</h1>' +
+      '<div class="tiles stagger">' + D.themes.map(function (t) {
+        return '<a class="tile' + (seen.indexOf(t.id) !== -1 ? " seen" : "") + '" href="#/sujets/' + t.id + '"><span class="tile-icon">' + icon(t.icon) + '</span><span class="tile-label">' + esc(t.label) + "</span></a>";
+      }).join("") + "</div>" + foot() + "</div>";
+  }
+
+  var sortBy = null;
   var MANDATE_ORDER = ["AN", "AN (2022-2024)", "PE", "Sénat", "Pas de mandat"];
-
   function sortedCandidates() {
     var list = D.candidates.slice();
+    if (sortBy === "nom") list.sort(function (a, b) { return a.name.localeCompare(b.name, "fr"); });
     if (sortBy === "parti") list.sort(function (a, b) { return a.party.localeCompare(b.party, "fr"); });
     if (sortBy === "mandat") list.sort(function (a, b) { return MANDATE_ORDER.indexOf(a.filter) - MANDATE_ORDER.indexOf(b.filter); });
     return list;
   }
 
-  function themeCandidate(c, votes) {
-    return '<article class="card soft" style="gap:16px">' +
-      '<div class="cand-head"><span class="avatar" aria-hidden="true">' + initials(c.name) + "</span>" +
-      '<div style="min-width:0"><a class="cand-name" href="#/candidats/' + c.id + '">' + esc(c.name) + "</a>" +
-      '<div class="cand-meta"><span class="party">' + esc(c.party) + '</span><span class="cand-role">' + esc(c.filter) + "</span></div></div></div>" +
-      thermo() +
-      '<div class="promise"><p class="eb">Promesse 2027</p><p>Pas encore publiée.</p><span class="cap">Citation exacte et page du programme dès sa publication.</span></div>' +
-      '<div class="since"><p class="eb muted">Depuis 2022 · votes clés sur ce thème</p>' +
-      (votes.length ? "<div>" + votes.map(function (v) { return voteRow(v, c); }).join("") + "</div>" : '<p class="note">Aucun vote documenté sur ce thème pour l’instant.</p>') +
-      '<p class="cap">' + esc(groupNote(c)) + "</p></div>" +
-      "</article>";
-  }
-
-  function themes(id) {
-    var theme = byId(D.themes, id) || D.themes[0];
-    markSeen(theme.id);
-    var votes = D.votes.filter(function (v) { return v.theme === theme.id; });
-    var chips = D.themes.map(function (t) {
-      return '<a class="chip" href="#/themes/' + t.id + '"' + (t.id === theme.id ? ' aria-current="true"' : "") + ">" + esc(t.label) + "</a>";
-    }).join("");
-    var seg = [["nom", "Par nom"], ["parti", "Par parti"], ["mandat", "Par mandat"]].map(function (s) {
+  function topic(id) {
+    var t = byId(D.themes, id);
+    if (!t) return notFound();
+    markSeen(t.id);
+    var votes = D.votes.filter(function (v) { return v.theme === t.id; });
+    var seg = [["nom", "Nom"], ["parti", "Parti"], ["mandat", "Mandat"]].map(function (s) {
       return '<button type="button" data-sort="' + s[0] + '" aria-pressed="' + (sortBy === s[0]) + '">' + s[1] + "</button>";
     }).join("");
-    return '<div class="screen" style="padding:0;gap:0">' +
-      '<div class="band">' + backBar("#/", "Retour à l’accueil") +
-      '<p class="eb">Comparer par thème</p>' +
-      '<nav class="chips" aria-label="Thèmes">' + chips + "</nav>" +
-      "<h1>" + esc(theme.label) + '</h1><p class="lede">' + esc(theme.questions) + "</p>" +
-      '<div class="filter-label">' + FILTER + 'Trier</div><div class="segmented" role="group" aria-label="Trier les candidats">' + seg + "</div>" +
-      "</div>" +
-      '<div class="list">' +
-      sortedCandidates().map(function (c) { return themeCandidate(c, votes); }).join("") +
-      '<h2 class="section-h">Les votes en détail</h2>' +
-      (votes.length ? votes.map(voteCard).join("") : '<div class="empty"><strong>Aucun vote documenté sur ce thème.</strong>Les scrutins publics de l’Assemblée sont en cours de collecte.</div>') +
-      foot() + "</div></div>";
+    var cards = sortedCandidates().map(function (c) {
+      return '<article class="box">' +
+        '<div class="cand-head"><span class="avatar" aria-hidden="true">' + initials(c.name) + "</span><div>" +
+        '<a class="name-tag" href="#/candidats/' + c.id + '" style="text-decoration:none">' + esc(c.name) + '</a><span class="meta">' + esc(c.party) + " · " + esc(role(c)) + "</span></div></div>" +
+        '<div class="promise"><div class="promise-row"><span>Promesse 2027 : pas encore publiée</span>' + pending() + "</div>" +
+        (votes.length ? '<div class="vote-list">' + votes.map(function (v) { return voteItem(v, c); }).join("") + "</div>"
+          : '<div class="vote-list"><p class="cap">Aucun vote clé sur ce sujet pour l’instant.</p></div>') +
+        "</div></article>";
+    }).join("");
+    return '<div class="screen enter">' +
+      topbar("#/sujets", null, "").replace("</a></div>", '</a><span class="tag">' + icon(t.icon, 18) + esc(t.label) + "</span></div>") +
+      '<h1 class="h1">Qui vote quoi sur<br><span>' + esc(t.sur) + "</span> ?</h1>" +
+      '<p class="note">' + esc(t.questions) + "</p>" +
+      '<div class="segmented" role="group" aria-label="Trier les candidats">' + seg + "</div>" +
+      cards +
+      '<h2 class="h2">Les votes en détail</h2>' +
+      (votes.length ? votes.map(voteCard).join("") : '<div class="empty"><strong>Aucun vote clé sur ce sujet pour l’instant.</strong>Les votes de l’Assemblée sont collectés chaque nuit ; l’équipe choisit ceux qui comptent pour chaque sujet.</div>') +
+      foot() + "</div>";
   }
 
-  // ---------- Par candidat ----------
-
-  var candFilter = "Tous";
-  function filterKey(c) { return c.filter.indexOf("AN") === 0 ? "AN" : c.filter; }
+  // ---------- Candidats ----------
 
   function candidates() {
-    var keys = [["Tous", "Tous"], ["AN", "Assemblée"], ["PE", "Parlement européen"], ["Sénat", "Sénat"], ["Pas de mandat", "Sans mandat"]];
-    var list = D.candidates.filter(function (c) { return candFilter === "Tous" || filterKey(c) === candFilter; });
-    return '<div class="screen">' + backBar("#/", "Retour à l’accueil", '<span class="pill">Par candidat</span>') +
-      '<h1 class="headline" style="font-size:32px">Les candidats</h1>' +
-      '<p class="note">Principaux candidats déclarés ou pressentis au ' + esc(D.updatedAt) + '. La liste officielle viendra au printemps 2027, après les <button type="button" class="term" data-term="6">parrainages</button>.</p>' +
-      '<div class="chips" role="group" aria-label="Filtrer par mandat">' + keys.map(function (k) {
-        return '<button type="button" class="chip" data-filter="' + esc(k[0]) + '"' + (k[0] === candFilter ? ' aria-current="true"' : "") + ">" + esc(k[1]) + "</button>";
+    return '<div class="screen enter">' + topbar(null, "Par candidat") +
+      '<h1 class="h1" style="font-size:34px">Qui veux-tu <span>checker</span> ?</h1>' +
+      '<div class="people stagger">' + D.candidates.map(function (c) {
+        return '<a class="person" href="#/candidats/' + c.id + '"><span class="avatar" aria-hidden="true">' + initials(c.name) + '</span><span class="n">' + esc(c.name) + '</span><span class="p">' + esc(c.party) + "<br>" + esc(role(c)) + "</span></a>";
       }).join("") + "</div>" +
-      '<div class="card raised" style="padding:6px 20px"><div class="cand-list">' + (list.length ? list.map(function (c) {
-        return '<a href="#/candidats/' + c.id + '"><span class="avatar" aria-hidden="true">' + initials(c.name) + '</span><span class="grow"><span class="cand-name" style="display:block">' + esc(c.name) + '</span><span class="cand-role">' + esc(c.party) + " · " + esc(c.status) + '</span></span><span class="mandate-tag">' + esc(c.filter) + "</span></a>";
-      }).join("") : '<p class="note" style="padding:16px 0">Aucun candidat dans cette catégorie.</p>') + "</div></div>" +
-      '<p class="cap">Ordre alphabétique. Aucune couleur de parti. Mandats en cours de vérification.</p>' + foot() + "</div>";
+      '<p class="cap">Principaux candidats déclarés ou pressentis au ' + esc(D.updatedAt) + ". Ordre alphabétique, aucune couleur de parti. La liste officielle viendra au printemps 2027, après les <button type=\"button\" class=\"term\" data-term=\"6\">parrainages</button>.</p>" +
+      foot() + "</div>";
   }
+
+  var openTopic = null;
 
   function candidate(id) {
     var c = byId(D.candidates, id);
     if (!c) return notFound();
     var cd = candData(c);
+    var sol = cd.participation ? cd.participation.solennels : null;
+    var all = cd.participation ? cd.participation.tous : null;
+    var med = MD.medianeSolennels && MD.medianeSolennels.taux;
+    var ring = '<div class="ring"><svg viewBox="0 0 128 128" aria-hidden="true"><circle cx="64" cy="64" r="52" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="14" stroke-dasharray="6 7"/></svg><span class="ring-center">—</span></div>';
+
+    var assemblee = cd.depute
+      ? '<div class="stats"><div class="stat"><b class="accent">' + (sol && sol.taux !== null ? pct(sol.taux) : "—") + "</b><span>des grands votes</span></div>" +
+        '<div class="stat"><b>' + (all ? all.votes : "—") + "</b><span>votes à l’Assemblée</span></div></div>" +
+        (sol && sol.taux !== null ? '<div class="bar" aria-hidden="true"><div class="bar-fill" style="width:' + sol.taux + '%"></div>' +
+          (med ? '<span class="bar-median" style="left:' + med + '%"></span>' : "") + "</div>" : "") +
+        '<p class="cap">Participation aux scrutins solennels pendant son mandat : ' + (sol ? sol.votes + " sur " + sol.scrutins : "—") +
+        (med ? ". Le trait noir marque la médiane de l’hémicycle (" + pct(med) + ")" : "") + ".</p>" +
+        cd.mandats.map(function (m) {
+          return '<div class="kv"><span>Mandat de député, ' + esc(m.legislature) + "e législature</span><span>" + fmtDate(m.debut) + " – " + (m.fin ? fmtDate(m.fin) : "auj.") + "</span></div>";
+        }).join("") + '<p class="cap">Source : Assemblée nationale. Un député qui entre au gouvernement quitte son siège.</p>'
+      : '<p class="note">Pas de mandat de député depuis 2022 : pas de votes à l’Assemblée à afficher.</p>' +
+        '<div class="kv"><span>' + esc(c.mandate) + '<span class="flag">à vérifier</span></span><span>' + esc(c.filter) + "</span></div>";
+
+    var acc = D.themes.map(function (t) {
+      var votes = D.votes.filter(function (v) { return v.theme === t.id; });
+      var open = openTopic === t.id;
+      return '<div class="acc"><button type="button" class="acc-head" data-acc="' + t.id + '" aria-expanded="' + open + '">' +
+        '<span class="tile-icon">' + icon(t.icon, 18) + '</span><span class="l">' + esc(t.label) + '</span><span class="c">' +
+        (votes.length ? votes.length + " vote" + (votes.length > 1 ? "s" : "") : "—") + " " + (open ? "▴" : "▾") + "</span></button>" +
+        (open ? '<div class="acc-body"><div class="promise-row" style="padding:4px 0"><span>Promesse 2027 : pas encore publiée</span>' + pending() + "</div>" +
+          (votes.length ? votes.map(function (v) { return voteItem(v, c); }).join("") : '<p class="cap">Aucun vote clé sur ce sujet pour l’instant.</p>') + "</div>" : "") +
+        "</div>";
+    }).join("");
+
     var related = D.votes.filter(function (v) {
       var perso = cd.votesCles[v.id];
       return (perso && perso.siegeait) || groupPos(v, c.group);
     });
-    var sol = cd.participation ? cd.participation.solennels : null;
-    var all = cd.participation ? cd.participation.tous : null;
-    var med = MD.medianeSolennels && MD.medianeSolennels.taux;
-    var pct = function (x) { return String(x).replace(".", ",") + " %"; };
-    var stats = cd.depute
-      ? '<div class="stats"><div><b class="accent">' + (sol && sol.taux !== null ? pct(sol.taux) : "—") + "</b><span>grands votes</span></div>" +
-        "<div><b>" + (all ? all.votes : "—") + "</b><span>votes</span></div><div><b>—</b><span>amend.</span></div><div><b>—</b><span>propositions</span></div></div>" +
-        '<p class="cap">Participation aux scrutins solennels pendant son mandat : ' + (sol ? sol.votes + " sur " + sol.scrutins : "—") +
-        (med ? " (médiane de l’hémicycle : " + pct(med) + ")" : "") + ". Source : Assemblée nationale. Amendements et propositions : collecte à venir.</p>"
-      : '<div class="stats"><div><b class="accent">—</b><span>grands votes</span></div><div><b>—</b><span>votes</span></div><div><b>—</b><span>amend.</span></div><div><b>—</b><span>propositions</span></div></div>' +
-        '<p class="cap">Pas de mandat de député depuis 2022 : pas de votes à l’Assemblée à afficher.</p>';
-    var mandates = cd.depute
-      ? cd.mandats.map(function (m) {
-          return '<div class="kv"><span>Mandat de député, ' + esc(m.legislature) + "e législature</span><span>" +
-            fmtDate(m.debut) + " – " + (m.fin ? fmtDate(m.fin) : "auj.") + "</span></div>";
-        }).join("") + '<p class="cap">Source : Assemblée nationale. Un député qui entre au gouvernement quitte son siège.</p>'
-      : '<div class="kv"><span>' + esc(c.mandate) + '<span class="flag">à vérifier</span></span><span>' + esc(c.filter) + "</span></div>";
-    var rows = D.themes.map(function (t) {
-      return '<a class="theme-row" href="#/themes/' + t.id + '"><b>' + esc(t.label) + '</b><span class="mini-thermo">' + THERMO_MINI + "En attente</span></a>";
-    }).join("");
-    return '<div class="screen">' + backBar("#/candidats", "Tous les candidats", '<span class="pill" style="color:var(--mute)">Programme à venir</span>') +
-      '<section class="card raised profile">' +
-      '<div class="profile-head"><span class="avatar lg" aria-hidden="true">' + initials(c.name) + "</span><div>" +
-      "<h1>" + esc(c.name) + '</h1><span class="party">' + esc(c.party) + '</span><p class="cap" style="padding:4px 0 0">' + esc(c.status) + "</p></div></div>" +
-      stats +
-      "</section>" +
-      '<section class="card"><p class="eb">Mandats depuis 2022</p><div>' + mandates +
-      '<div class="kv"><span>Groupe à l’Assemblée</span><span>' + esc(D.groups[c.group]) + "</span></div>" +
-      "</div></section>" +
-      '<section class="card"><p class="eb">Position par thème</p><div>' + rows + "</div></section>" +
-      '<section class="card yellow evo"><p class="eb">Évolution</p><h2>Ce qui a changé depuis 2022</h2>' +
-      '<div class="evo-grid"><div><b>2022</b><p>Programme 2022 en cours de collecte.</p></div><div><b class="accent">2027</b><p>Programme 2027 pas encore publié.</p></div></div></section>' +
-      '<section class="card"><p class="eb">' + (cd.depute ? "Ses votes clés" : "Votes de son groupe") + '</p><p class="group-note">' + esc(groupNote(c)) + "</p><div>" +
-      related.map(function (v) { return voteRow(v, c); }).join("") + "</div>" +
+
+    return '<div class="screen enter">' + topbar("#/candidats", "Son bilan") +
+      '<section class="bilan"><div class="cand-head"><span class="avatar lg" aria-hidden="true">' + initials(c.name) + '</span><div><span class="name-tag">' + esc(c.name) + '</span><span class="meta">' + esc(c.party) + " · " + esc(role(c)) + "</span></div></div>" +
+      '<div class="ring-row">' + ring + '<div class="ring-text"><b>Promesses tenues</b><span>En attente : son programme 2027 n’est pas encore publié. On comparera chaque promesse à ses votes.</span></div></div></section>' +
+      '<section class="box flat"><p class="eb">À l’Assemblée nationale</p>' + assemblee + "</section>" +
+      '<section style="display:flex;flex-direction:column;gap:10px"><h2 class="h2">Sujet par sujet</h2><div class="stagger" style="display:flex;flex-direction:column;gap:10px">' + acc + "</div></section>" +
+      '<section class="box flat"><p class="eb">' + (cd.depute ? "Ses votes clés" : "Votes clés de son groupe") + '</p><p class="group-note">' + esc(groupNote(c)) + "</p>" +
+      '<div style="display:flex;flex-direction:column;gap:6px">' + related.map(function (v) { return voteItem(v, c); }).join("") + "</div>" +
       (D.votes.length - related.length ? '<p class="cap">' + (D.votes.length - related.length) + " vote(s) clé(s) sans position connue pour ce groupe.</p>" : "") +
       "</section>" + foot() + "</div>";
   }
@@ -351,15 +404,15 @@
     return a;
   }
 
-  function newQuiz() { quiz = { order: shuffle(D.quiz), i: 0, results: [], picked: null }; }
+  function newQuiz() { quiz = { order: shuffle(D.quiz), i: 0, results: [], picked: null, streak: 0, points: 0 }; }
 
-  function slips() {
-    return '<div class="slips" aria-label="Question ' + (quiz.i + 1) + " sur " + quiz.order.length + '">' + quiz.order.map(function (q, n) {
-      var rot = [-4, 3, -2, 5, -3, 2, -5, 3, -2, 4][n % 10];
-      if (n < quiz.results.length) return '<div class="slip ' + (quiz.results[n] ? "done" : "miss") + '" style="transform:rotate(' + rot + 'deg)"></div>';
-      if (n === quiz.i) return '<div class="slip current" style="transform:translateY(-4px)"><i style="width:70%"></i><i style="width:45%"></i></div>';
-      return '<div class="slip todo" style="transform:rotate(' + rot + 'deg)"></div>';
-    }).join("") + "</div>";
+  function confetti() {
+    var colors = ["#FFEF9F", "#FFFFFF", "#E3F4E9", "#FFE8D6", "#1D4ED8", "#E5484D"];
+    var s = "";
+    for (var i = 0; i < 14; i++) {
+      s += '<span class="qz-conf" style="left:' + (6 + i * 6.6) + "%;background:" + colors[i % colors.length] + ";animation-delay:" + ((i % 5) * 0.12) + 's"></span>';
+    }
+    return '<div class="confetti" aria-hidden="true">' + s + "</div>";
   }
 
   function quizScreen() {
@@ -369,22 +422,32 @@
     var v = byId(D.votes, q.vote);
     var picked = quiz.picked;
     var answered = picked !== null;
-    var opts = q.options.map(function (label, k) {
-      var cls = "option";
-      if (answered) cls += k === q.answer ? " right" : k === picked ? " wrong" : " dim";
-      return '<button type="button" class="' + cls + '" data-pick="' + k + '"' + (answered ? " disabled" : "") + ">" + esc(label) + "</button>";
+    var win = answered && picked === q.answer;
+    var slips = quiz.order.map(function (x, n) {
+      var cls = n < quiz.results.length ? (quiz.results[n] ? "done" : "miss") : n === quiz.i ? "now" : "";
+      return '<span class="' + cls + '"></span>';
     }).join("");
-    return '<div class="screen">' +
-      '<div class="topbar"><a class="round-btn" href="#/" aria-label="Quitter le jeu">' + CLOSE + '</a><span class="ballot-pill">' + BOX + "Bulletin " + (quiz.i + 1) + " / " + quiz.order.length + "</span></div>" +
-      slips() +
-      '<div class="card raised question"><p class="eb">Scrutin · ' + esc(v.chamber) + " · " + fmtMonth(v.date) + "</p>" +
-      "<blockquote>" + esc(v.title) + '</blockquote><p class="vote-summary">' + withTerms(v.summary) + "</p>" +
+    var opts = q.options.map(function (label, k) {
+      var cls = "option", stamp = "";
+      if (answered) {
+        if (k === q.answer) { cls += " right"; stamp = '<span class="stamp ok qz-pop">Bingo</span>'; }
+        else if (k === picked) { cls += " wrong"; stamp = '<span class="stamp ko qz-pop">Raté</span>'; }
+        else cls += " dim";
+      }
+      return '<button type="button" class="' + cls + '" data-pick="' + k + '"' + (answered ? " disabled" : "") + ">" + esc(label) + stamp + "</button>";
+    }).join("");
+    return '<div class="screen enter">' +
+      '<div class="quiz-top"><div class="quiz-slips" aria-label="Question ' + (quiz.i + 1) + " sur " + quiz.order.length + '">' + slips + "</div>" +
+      '<span class="streak">' + icon(I.flame, 16) + quiz.streak + " d’affilée</span></div>" +
+      '<div class="question"><span class="eb">' + esc(v.chamber) + " · " + fmtMonth(v.date) + "</span>" +
+      "<blockquote>« " + esc(v.title) + ' »</blockquote><p class="vote-summary">' + withTerms(v.summary) + "</p>" +
       '<p class="ask">' + esc(q.prompt) + "</p></div>" +
       '<div class="options">' + opts + "</div>" +
-      (answered ? '<div class="feedback" role="status"><b>' + (picked === q.answer ? "Bien vu." : "Raté. C’était : " + esc(q.options[q.answer]) + ".") + "</b>" +
-        "<p>" + esc(q.explain) + '</p><a class="link" href="' + esc(v.official || v.source.url) + '" target="_blank" rel="noopener">' +
-        (v.official ? "Voir le scrutin officiel ↗" : "Voir le vote (" + esc(v.source.label) + ") ↗") + "</a></div>" +
-        '<button type="button" class="btn" data-next>' + (quiz.i + 1 < quiz.order.length ? "Question suivante" : "Voir mon score") + "</button>" : "") +
+      (answered ? '<div class="feedback qz-pop" style="transform:none;animation-name:mx-in" role="status"><span><span class="v">' + (win ? "Bien vu !" : "Presque ! C’était : " + esc(q.options[q.answer])) + "</span>" +
+        "<p>" + esc(q.explain) + ' <a class="link" href="' + esc(v.official || v.source.url) + '" target="_blank" rel="noopener">' + (v.official ? "Scrutin officiel ↗" : "Source ↗") + "</a></p></span>" +
+        '<span class="points">' + (win ? "+10" : "+0") + "</span></div>" : "") +
+      '<button type="button" class="next-btn" data-next>' + (answered ? (quiz.i + 1 < quiz.order.length ? "Question suivante" : "Voir mon score") : "Passer") + "</button>" +
+      (win ? confetti() : "") +
       "</div>";
   }
 
@@ -394,76 +457,91 @@
     var ballots = quiz.results.map(function (ok, i) {
       var rot = [-4, 3, -2, 5, -3, 2, -5, 3, -2, 4][i % 10];
       return ok
-        ? '<div class="ballot" style="transform:rotate(' + rot + 'deg)"><i style="width:80%"></i><i style="width:55%"></i>' + CHECK + "</div>"
-        : '<div class="ballot ko" style="transform:rotate(' + rot + 'deg)">' + CROSS + "</div>";
+        ? '<div class="ballot" style="transform:rotate(' + rot + 'deg)"><i style="width:80%"></i><i style="width:55%"></i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>'
+        : '<div class="ballot ko" style="transform:rotate(' + rot + 'deg)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></div>';
     }).join("");
-    var host = location.host || "marian.fr";
-    return '<div class="screen">' +
-      '<div class="topbar"><a class="round-btn" href="#/" aria-label="Retour à l’accueil">' + CLOSE + '</a><span class="pill">Ton score</span></div>' +
+    return '<div class="screen enter">' + topbar(null, "Ton score") +
       '<div class="story" id="story">' +
-      '<span class="pill">Qui a voté ça ?</span>' +
-      '<div class="score-card"><span>J’ai trouvé</span><span class="score-num">' + score + "<small>/ " + n + "</small></span><span>bonnes réponses.</span></div>" +
+      '<div class="story-top"><span class="tag">Qui a voté ça ?</span><span style="font-weight:800">' + quiz.points + " pts</span></div>" +
+      '<div class="score-card"><span>J’ai trouvé</span><span class="score-num">' + score + "<small>/ " + n + "</small></span><span>votes de l’Assemblée.</span></div>" +
       '<div class="ballots" aria-label="' + score + " bonnes réponses sur " + n + '">' + ballots + "</div>" +
-      '<p class="story-line">Et toi, tu sais qui vote quoi ?</p>' +
-      '<div class="story-foot"><span>' + esc(D.appName) + "</span><span>" + esc(host) + "</span></div>" +
+      '<p class="story-line">Qui dit mieux ?</p>' +
+      '<div class="story-foot"><span>' + esc(D.appName) + "</span><span>" + esc(location.host || "marian.fr") + "</span></div>" +
       "</div>" +
-      '<button type="button" class="btn" data-share>Partager</button>' +
-      '<button type="button" class="btn btn-light" data-restart>Rejouer</button>' +
+      '<button type="button" class="btn-dark" data-share>' + icon(I.share, 20) + "Partager</button>" +
+      '<button type="button" class="next-btn" data-restart>Rejouer</button>' +
       '<p class="cap">Fais une capture de la carte pour la poster en story. Ton score n’est enregistré nulle part.</p>' +
       "</div>";
   }
 
-  // ---------- Pages annexes ----------
+  // ---------- Méthode, lexique ----------
+
+  function method() {
+    return '<div class="screen enter">' + topbar("#/", "Comment on décide") +
+      '<p class="note" style="font-size:16px">On compare sa promesse à ses votes depuis 2022. C’est tout.</p>' +
+      '<div class="rules">' +
+      '<div class="rule"><span class="verdict oui">Oui</span><span>La plupart de ses votes vont dans le sens de sa promesse.</span></div>' +
+      '<div class="rule"><span class="verdict non">Non</span><span>La plupart de ses votes vont contre.</span></div>' +
+      '<div class="rule"><span class="verdict">Pas de vote</span><span>Moins de 3 votes, ou pas de mandat. On ne juge pas.</span></div>' +
+      '<div class="rule"><span class="verdict">En attente</span><span>Le programme 2027 n’est pas encore publié : c’est le cas de tous les candidats aujourd’hui.</span></div>' +
+      "</div>" +
+      '<section class="box flat"><p class="eb">Nos règles</p><ul class="list">' +
+      "<li>Une source par information, cliquable. Pas de source, pas de publication.</li>" +
+      "<li>Aucune consigne de vote. On compare chaque candidat à ses propres promesses, jamais les candidats entre eux.</li>" +
+      "<li>Ordre alphabétique, jamais par sondage. Aucune couleur de parti.</li>" +
+      "<li>Quand un candidat a siégé, on affiche son vote personnel. Sinon, on l’écrit : les votes de son groupe sont du contexte, pas ses votes.</li>" +
+      "<li>Les chiffres des votes viennent des données ouvertes de l’Assemblée nationale, collectées chaque nuit et relues avant publication.</li>" +
+      "<li>Les textes préparés avec l’IA sont relus et validés par l’équipe.</li>" +
+      "<li>Sans compte. Le quiz et le débat se jouent dans ton navigateur : rien n’est envoyé, aucun résultat n’est publié.</li>" +
+      "</ul></section>" +
+      '<a class="btn-dark" href="https://github.com/SimonPelissier/agenticIA-VF/issues/new" target="_blank" rel="noopener">Signaler une erreur</a>' +
+      foot() + "</div>";
+  }
 
   function lexicon() {
-    return '<div class="screen">' + backBar("#/", "Retour à l’accueil", '<span class="pill">Lexique</span>') +
-      '<h1 class="headline" style="font-size:32px">Les mots <span>compliqués</span></h1>' +
-      '<section class="card"><dl class="gloss" style="margin:0">' + D.glossary.map(function (g) {
+    return '<div class="screen enter">' + topbar("#/methode", "Lexique") +
+      '<h1 class="h1">Les mots <span>compliqués</span></h1>' +
+      '<section class="box flat"><dl class="gloss">' + D.glossary.map(function (g) {
         return "<div><dt>" + esc(g.term) + "</dt><dd>" + esc(g.def) + "</dd></div>";
       }).join("") + "</dl></section>" + foot() + "</div>";
   }
 
-  function method() {
-    return '<div class="screen">' + backBar("#/", "Retour à l’accueil", '<span class="pill">Méthode</span>') +
-      '<h1 class="headline" style="font-size:32px">Nos <span>règles</span></h1>' +
-      '<p class="note">Une plateforme faite par des jeunes, pour des jeunes. Mêmes règles pour tous, méthode publique.</p>' +
-      '<section class="card"><ul class="rules">' +
-      "<li>Une source par information, cliquable. Pas de source, pas de publication.</li>" +
-      "<li>Aucune consigne de vote. On compare chaque candidat à ses propres promesses, jamais les candidats entre eux.</li>" +
-      "<li>Ordre alphabétique, jamais par sondage. Aucune couleur de parti.</li>" +
-      "<li>Même format pour chaque candidat : même longueur de résumé, même nombre de votes affichés.</li>" +
-      "<li>Quand un candidat a siégé, on affiche son vote personnel. Sinon, on l’écrit : les votes de son groupe sont du contexte, pas ses votes.</li>" +
-      "<li>Les chiffres des votes viennent directement des données ouvertes de l’Assemblée nationale, mises à jour chaque nuit et relues avant publication.</li>" +
-      "<li>L’indice « + souple / conforme / + rigide » n’apparaîtra qu’avec ses définitions publiées, thème par thème.</li>" +
-      "<li>Les textes préparés avec l’IA sont relus et validés par l’équipe avant publication.</li>" +
-      "<li>Sans compte. Le quiz se joue dans ton navigateur et rien n’est envoyé.</li>" +
-      "</ul></section>" + foot() + "</div>";
-  }
-
   function notFound() {
-    return '<div class="screen">' + backBar("#/", "Retour à l’accueil") + '<h1 class="headline">Page introuvable</h1><a class="btn" href="#/">Retour à l’accueil</a></div>';
+    return '<div class="screen">' + topbar("#/", "Page introuvable") + '<a class="btn-dark" href="#/">Retour à l’accueil</a></div>';
   }
 
   // ---------- Routeur ----------
+
+  var TAB = { "": "accueil", debat: "debat", quiz: "quiz", sujets: "sujets", themes: "sujets", candidats: "candidats" };
 
   function route() {
     var parts = location.hash.replace(/^#\/?/, "").split("/");
     var html;
     switch (parts[0]) {
       case "": html = home(); break;
-      case "themes": html = themes(parts[1]); break;
+      case "debat": html = debate(); break;
+      case "sujets": case "themes": html = parts[1] ? topic(parts[1]) : topics(); break;
       case "candidats": html = parts[1] ? candidate(parts[1]) : candidates(); break;
       case "quiz": html = quizScreen(); break;
-      case "lexique": html = lexicon(); break;
       case "methode": html = method(); break;
+      case "lexique": html = lexicon(); break;
       default: html = notFound();
     }
     app.innerHTML = html;
+    var tab = TAB[parts[0]] || "";
+    var links = document.querySelectorAll(".tabbar a");
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].getAttribute("data-tab") === tab) links[i].setAttribute("aria-current", "page");
+      else links[i].removeAttribute("aria-current");
+    }
   }
 
   function rerender() {
     var y = window.scrollY;
     route();
+    // Pas d'animation d'entrée quand on met seulement à jour l'écran en cours.
+    var e = app.querySelector(".enter");
+    if (e) e.classList.remove("enter");
     window.scrollTo(0, y);
   }
 
@@ -481,7 +559,7 @@
     document.getElementById("sheet-title").textContent = g.term;
     document.getElementById("sheet-body").textContent = g.def;
     sheet.hidden = false;
-    sheet.querySelector(".btn").focus();
+    sheet.querySelector(".btn-dark").focus();
   }
 
   function closeSheet() {
@@ -489,36 +567,66 @@
     if (lastFocus) lastFocus.focus();
   }
 
+  function share(text, btn) {
+    var url = location.href.split("#")[0];
+    if (navigator.share) {
+      navigator.share({ title: D.appName, text: text, url: url }).catch(function () {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(text + " " + url).then(function () { btn.textContent = "Lien copié"; }, function () {});
+    }
+  }
+
   document.addEventListener("click", function (e) {
-    var t = e.target.closest("[data-term],[data-close],[data-filter],[data-sort],[data-pick],[data-next],[data-restart],[data-share]");
+    var t = e.target.closest("[data-term],[data-close],[data-debate],[data-sort],[data-acc],[data-pick],[data-next],[data-restart],[data-share],[data-share-debate]");
     if (!t) return;
     if (t.hasAttribute("data-term")) openTerm(+t.getAttribute("data-term"));
     else if (t.hasAttribute("data-close")) closeSheet();
-    else if (t.hasAttribute("data-filter")) { candFilter = t.getAttribute("data-filter"); rerender(); }
-    else if (t.hasAttribute("data-sort")) { sortBy = t.getAttribute("data-sort"); rerender(); }
+    else if (t.hasAttribute("data-debate")) {
+      var choice = t.getAttribute("data-debate");
+      debateChoice = debateChoice === choice && !t.hasAttribute("data-go") ? null : choice;
+      if (t.hasAttribute("data-go")) location.hash = "#/debat"; else rerender();
+    }
+    else if (t.hasAttribute("data-sort")) { var s = t.getAttribute("data-sort"); sortBy = sortBy === s ? null : s; rerender(); }
+    else if (t.hasAttribute("data-acc")) { var a = t.getAttribute("data-acc"); openTopic = openTopic === a ? null : a; rerender(); }
     else if (t.hasAttribute("data-pick")) {
       if (quiz.picked !== null) return;
       quiz.picked = +t.getAttribute("data-pick");
-      quiz.results.push(quiz.picked === quiz.order[quiz.i].answer);
+      var ok = quiz.picked === quiz.order[quiz.i].answer;
+      quiz.results.push(ok);
+      quiz.streak = ok ? quiz.streak + 1 : 0;
+      quiz.points += ok ? 10 : 0;
       rerender();
     }
-    else if (t.hasAttribute("data-next")) { quiz.i++; quiz.picked = null; route(); window.scrollTo(0, 0); }
+    else if (t.hasAttribute("data-next")) {
+      if (quiz.picked === null) { quiz.results.push(false); quiz.streak = 0; } // « Passer » compte comme raté
+      quiz.i++; quiz.picked = null; route(); window.scrollTo(0, 0);
+    }
     else if (t.hasAttribute("data-restart")) { newQuiz(); route(); window.scrollTo(0, 0); }
-    else if (t.hasAttribute("data-share")) share(t);
+    else if (t.hasAttribute("data-share")) {
+      share("J’ai trouvé " + quiz.results.filter(Boolean).length + "/" + quiz.order.length + " à « Qui a voté ça ? » sur " + D.appName + ". Qui dit mieux ?", t);
+    }
+    else if (t.hasAttribute("data-share-debate")) share(D.debate.question + " Regarde comment les candidats ont voté sur " + D.appName + ".", t);
   });
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && !sheet.hidden) closeSheet();
   });
 
-  function share(btn) {
-    var score = quiz.results.filter(Boolean).length;
-    var text = "J’ai trouvé " + score + "/" + quiz.order.length + " à « Qui a voté ça ? » sur " + D.appName + ". Et toi, tu sais qui vote quoi ?";
-    var url = location.href.split("#")[0];
-    if (navigator.share) {
-      navigator.share({ title: D.appName, text: text, url: url }).catch(function () {});
-    } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(text + " " + url).then(function () { btn.textContent = "Lien copié"; }, function () {});
+  // Écran de chargement : une fois par visite, retiré au bout d'un instant ou au toucher.
+  var splash = document.getElementById("splash");
+  function hideSplash() {
+    if (!splash || splash.classList.contains("out")) return;
+    splash.classList.add("out");
+    setTimeout(function () { splash.hidden = true; }, 400);
+  }
+  if (splash) {
+    var shown = false;
+    try { shown = sessionStorage.getItem("marian:splash") === "1"; sessionStorage.setItem("marian:splash", "1"); } catch (e) { /* ignoré */ }
+    if (shown) splash.hidden = true;
+    else {
+      splash.addEventListener("click", hideSplash);
+      splash.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") hideSplash(); });
+      setTimeout(hideSplash, 1600);
     }
   }
 
