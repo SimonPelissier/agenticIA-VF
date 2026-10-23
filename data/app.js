@@ -54,8 +54,8 @@ window.MARIAN_DONNEES = {
      "votes": 71
     },
     "tous": {
-     "scrutins": 8837,
-     "taux": 20.0,
+     "scrutins": 9157,
+     "taux": 19.3,
      "votes": 1770
     }
    },
@@ -150,9 +150,9 @@ window.MARIAN_DONNEES = {
      "votes": 101
     },
     "tous": {
-     "scrutins": 12852,
-     "taux": 8.3,
-     "votes": 1070
+     "scrutins": 13172,
+     "taux": 8.2,
+     "votes": 1074
     }
    },
    "votesCles": {
@@ -259,8 +259,8 @@ window.MARIAN_DONNEES = {
      "votes": 105
     },
     "tous": {
-     "scrutins": 12852,
-     "taux": 10.9,
+     "scrutins": 13172,
+     "taux": 10.7,
      "votes": 1406
     }
    },
@@ -404,7 +404,7 @@ window.MARIAN_DONNEES = {
    "votesCles": {}
   }
  },
- "dernierScrutin": "2026-10-15",
+ "dernierScrutin": "2026-10-22",
  "medianeSolennels": {
   "deputes": 819,
   "taux": 87.8
