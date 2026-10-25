@@ -32,7 +32,8 @@ js/app.js       écrans et navigation (#/sujets, #/candidats, #/debat, #/quiz…
 contenu/        votes clés choisis par l'équipe (texte + numéro du scrutin officiel)
 data/app.js     données officielles pour l'application, produites par l'agent de collecte
 data/*.json     données brutes collectées (scrutins, votes, groupes)
-agents/         agents (collecte des votes de l'Assemblée)
+agents/         agents : collecte des votes de l'Assemblée, veille médias
+.claude/        commande /veille-medias (consignes d'extraction pour Claude)
 docs/           cadrage, avancement, décisions du groupe
 ```
 
@@ -60,6 +61,7 @@ Règle : pas de source, pas de publication.
 ## Prochaines étapes techniques
 
 - Classer les scrutins collectés par thème, pour afficher plus que les votes clés
+- Page « L'actu » : afficher les déclarations relevées par la veille médias
 - Collecte Sénat et Parlement européen
 - Agent de vérification des citations (code, sans IA)
 - Base Supabase et interface de relecture humaine, puis lecture des données depuis Supabase

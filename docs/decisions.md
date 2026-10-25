@@ -8,3 +8,6 @@ Une ligne par décision. On ne rouvre pas une décision écrite sans en parler a
 | 2026-10-22 | Débat du jour : « Faut-il suspendre la réforme des retraites ? », relié au scrutin n° 3684 | Sujet relié à un vote déjà vérifié, avec le vote personnel des candidats députés |
 | 2026-10-22 | Pas de résultats agrégés : ni « les autres ont répondu x % » au débat, ni « mieux que x % des joueurs » au quiz | Le cadrage les exclut (loi sur les sondages, RGPD : opinion politique) ; la réponse reste sur le téléphone |
 | 2026-10-22 | « Tient parole ? » et « promesses tenues » restent « En attente » | Pas de programme 2027 publié ni de règles de scoring publiées |
+| 2026-10-25 | Veille médias : 10 médias généralistes de lignes différentes (franceinfo, Le Monde, Le Figaro, Libération, Ouest-France, 20 Minutes, La Croix, Le Parisien, BFMTV, L'Express), lancée chaque jour | Équilibre des regards ; les déclarations sont aujourd'hui la seule source de promesses |
+| 2026-10-25 | Ne relever que les engagements et les positions, en citation directe ; pas les critiques d'adversaires | Rester sur le fond et sur ce qui peut se comparer aux votes |
+| 2026-10-25 | 15 déclarations par jour au maximum, 4 par candidat | Relecture humaine tenable (environ 10 minutes) et équilibre entre candidats |
