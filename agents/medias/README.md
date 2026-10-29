@@ -53,7 +53,11 @@ Un candidat est repéré par son nom complet. Le nom de famille seul ne suffit q
 
 ## Automatique
 
-Chaque nuit, la tâche GitHub « Agent de collecte » lance aussi `veille.py` : les articles (titres et liens) sont mis à jour dans la même pull request que les votes. Le relevé des déclarations par Claude (`/veille-medias`) reste à lancer à la main, ou par une routine Claude Code à créer.
+Chaque jour à 8 h (heure de Paris), une **routine Claude Code** (dans le cloud, sur l'abonnement de Simon, sans clé API) suit `.claude/commands/veille-medias.md` : elle repère les articles, relève au plus 15 déclarations, lance la vérification mot pour mot et ouvre une pull request « Veille médias du … ». Elle ne fusionne jamais : un membre de l'équipe relit chaque citation.
+
+La routine est la seule à modifier `data/medias/articles.json`, `data/actu.js` et `contenu/declarations/` ; la tâche GitHub de chaque nuit ne s'occupe que des votes. Les deux pull requests ne se marchent donc jamais dessus.
+
+Gérer la routine (pause, horaire, historique des passages) : https://claude.ai/code/routines
 
 ## Lancer à la main
 

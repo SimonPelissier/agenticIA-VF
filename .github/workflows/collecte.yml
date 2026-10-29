@@ -1,6 +1,7 @@
-# Mise à jour des données, chaque nuit : scrutins de l'Assemblée (agent de collecte) et articles
-# des médias généralistes (veille, étape sans IA). Ouvre une seule pull request si les données ont
-# changé. Aucune clé ni secret à configurer.
+# Mise à jour des votes, chaque nuit : scrutins de l'Assemblée (agent de collecte). Ouvre une pull
+# request si les données ont changé. Aucune clé ni secret à configurer.
+# La veille médias (articles et déclarations) est faite par la routine Claude Code quotidienne,
+# dans sa propre pull request : les deux ne touchent jamais les mêmes fichiers.
 name: Agent de collecte
 
 on:
@@ -30,11 +31,6 @@ jobs:
       - name: Lancer l'agent de collecte (votes de l'Assemblée)
         run: python3 agents/collecte/collecte.py
 
-      - name: Repérer les articles des médias (veille, sans IA)
-        # Une panne d'un média ne doit pas bloquer la mise à jour des votes.
-        run: |
-          python3 agents/medias/veille.py || echo "Veille médias en échec, les votes sont quand même proposés."
-
       - name: Ouvrir une pull request si les données ont changé
         env:
           GH_TOKEN: ${{ github.token }}
@@ -50,11 +46,11 @@ jobs:
           git config user.email "agent-collecte@users.noreply.github.com"
           git switch -c "$BRANCHE"
           git add data/
-          git commit -m "Mise à jour des données du $JOUR : votes de l'Assemblée et articles des médias"
+          git commit -m "Mise à jour des votes du $JOUR : scrutins de l'Assemblée nationale"
           git push origin "$BRANCHE"
 
           {
-            echo "Mise à jour automatique du $JOUR : votes de l'Assemblée nationale (données ouvertes) et articles repérés par la veille médias (titres et liens)."
+            echo "Mise à jour automatique du $JOUR : votes de l'Assemblée nationale (données ouvertes)."
             echo
             echo "## Ce qui a changé"
             echo '```'
@@ -74,7 +70,7 @@ jobs:
             echo "À relire avant fusion : vérifier sur assemblee-nationale.fr un ou deux scrutins récents."
           } > corps.md
 
-          URL=$(gh pr create --base main --head "$BRANCHE" --title "Mise à jour des données du $JOUR" --body-file corps.md)
+          URL=$(gh pr create --base main --head "$BRANCHE" --title "Mise à jour des votes du $JOUR" --body-file corps.md)
           echo "Pull request : $URL"
 
           # Une seule collecte en attente à la fois : les plus anciennes sont fermées.
