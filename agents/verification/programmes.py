@@ -72,7 +72,14 @@ class Source:
         return False
 
 
-def verifier_parti(dossier, prog):
+def sujets(racine):
+    """Les sujets de l'application (js/data.js), plus « autres » pour ce qui n'entre dans aucun."""
+    data = (racine / "js" / "data.js").read_text(encoding="utf-8")
+    bloc = data[data.index("themes:"):data.index("],", data.index("themes:"))]
+    return set(re.findall(r'\{\s*id:\s*"([^"]+)"', bloc)) | {"autres"}
+
+
+def verifier_parti(dossier, prog, sujets_valides=None):
     """Renvoie la liste des erreurs (vide si tout est retrouvé)."""
     erreurs = []
     structure = prog.get("structure")
@@ -108,6 +115,13 @@ def verifier_parti(dossier, prog):
         nom = "mesure %s" % m.get("ordre", i)
         if m.get("ordre") != i:
             erreurs.append("%s : 'ordre' doit suivre 1, 2, 3…" % nom)
+        if sujets_valides is not None:
+            themes = m.get("themes") or []
+            if not themes:
+                erreurs.append("%s : 'themes' vide (mettre « autres » si aucun sujet ne convient)" % nom)
+            for t in themes:
+                if t not in sujets_valides:
+                    erreurs.append("%s : sujet '%s' inconnu (%s)" % (nom, t, ", ".join(sorted(sujets_valides))))
         if not m.get("texte"):
             erreurs.append("%s : 'texte' vide" % nom)
             continue
@@ -151,6 +165,7 @@ def publier(prog):
         "programme": prog.get("programme"),
         "libelle": prog.get("libelle"),
         "regle": prog.get("regle"),
+        "classementRelu": bool(prog.get("classement_relu")),
         "sources": [{k: s[k] for k in ("id", "titre", "url", "consulte_le")} for s in prog.get("sources", [])],
         "mesures": [{
             "ordre": m["ordre"],
@@ -160,6 +175,7 @@ def publier(prog):
             "page": m.get("page"),
             "url": m.get("url") or sources[m["source"]]["url"],
             "source": m["source"],
+            "themes": m["themes"],
         } for m in prog.get("mesures", [])],
     }
 
@@ -167,6 +183,7 @@ def publier(prog):
 def main(racine=RACINE, ecrire=True):
     dossier = racine / "contenu" / "programmes"
     index = json.loads((dossier / "partis.json").read_text(encoding="utf-8"))
+    sujets_valides = sujets(racine)
     sortie, echecs = [], 0
     for p in index["partis"]:
         entree = {"id": p["id"], "nom": p["nom"], "statut": "a-ajouter"}
@@ -176,7 +193,7 @@ def main(racine=RACINE, ecrire=True):
                 entree["statut"] = "en-cours"
                 print("%s : en cours de collecte" % p["nom"])
             else:
-                erreurs = verifier_parti(dossier, prog)
+                erreurs = verifier_parti(dossier, prog, sujets_valides)
                 if erreurs:
                     echecs += 1
                     entree["statut"] = "en-cours"

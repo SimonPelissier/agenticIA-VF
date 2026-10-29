@@ -299,6 +299,9 @@ button:active, a:active { transform: translateY(2px) scale(0.98); }
 
 /* Programmes : le texte du parti, tel quel */
 .measure { gap: 8px; }
+.tile-count { display: block; margin-top: 2px; font: 600 12px var(--sans); color: var(--ink-2); }
+.tile.off { box-shadow: none; border-style: dashed; color: var(--mute); }
+.tile.off .tile-icon { background: var(--white); }
 .measure-text { margin: 0; font-size: 15px; line-height: 1.5; white-space: pre-line; }
 
 /* Bilan */

@@ -69,6 +69,11 @@ def main():
 
     prog = json.loads((DOSSIER / "lfi.json").read_text(encoding="utf-8"))
     prog.pop("_a_faire", None)
+    # Le classement par sujet est un choix de l'équipe : on le garde pour les mesures dont le texte n'a pas changé.
+    anciens = {m["texte"]: m.get("themes") for m in prog.get("mesures", [])}
+    for m in mesures:
+        if anciens.get(m["texte"]):
+            m["themes"] = anciens[m["texte"]]
     prog.update({
         "programme": "Programme de l’Union populaire, élections européennes 2024",
         "structure": "mesures-cles",

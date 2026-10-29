@@ -19,8 +19,12 @@ SOURCE = """<html><body><script>var x = "Mesure piège";</script>
 </body></html>"""
 
 
+DATA_JS = 'window.DATA = {\n  themes: [\n    { id: "logement", label: "Logement" },\n    { id: "travail", label: "Travail" }\n  ],\n};'
+SUJETS = {"logement", "travail", "autres"}
+
+
 def mesure(ordre, chapitre, texte, **autres):
-    return dict(ordre=ordre, chapitre=chapitre, titre=None, texte=texte, source="s1", **autres)
+    return dict(ordre=ordre, chapitre=chapitre, titre=None, texte=texte, source="s1", themes=["autres"], **autres)
 
 
 class Verification(unittest.TestCase):
@@ -30,6 +34,8 @@ class Verification(unittest.TestCase):
         self.dossier = self.racine / "contenu" / "programmes"
         (self.dossier / "sources").mkdir(parents=True)
         (self.racine / "data").mkdir()
+        (self.racine / "js").mkdir()
+        (self.racine / "js" / "data.js").write_text(DATA_JS, encoding="utf-8")
         src = self.dossier / "sources" / "test.html"
         src.write_text(SOURCE, encoding="utf-8")
         self.prog = {
@@ -48,10 +54,19 @@ class Verification(unittest.TestCase):
         self.tmp.cleanup()
 
     def erreurs(self):
-        return P.verifier_parti(self.dossier, self.prog)
+        return P.verifier_parti(self.dossier, self.prog, SUJETS)
 
     def test_texte_exact_accepte(self):
         self.assertEqual(self.erreurs(), [])
+
+    def test_sujets_lus_dans_l_application(self):
+        self.assertEqual(P.sujets(self.racine), SUJETS)
+
+    def test_sujet_inconnu_ou_absent_rejete(self):
+        self.prog["mesures"][0]["themes"] = ["budget"]
+        self.prog["mesures"][1]["themes"] = []
+        e = self.erreurs()
+        self.assertTrue(any("inconnu" in x for x in e) and any("vide" in x for x in e))
 
     def test_paraphrase_rejetee(self):
         self.prog["mesures"][1]["texte"] = "Porter le SMIC à 1 600 € net."

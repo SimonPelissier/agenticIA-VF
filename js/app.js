@@ -500,7 +500,11 @@
       '<p class="cap">Ordre alphabétique, aucune couleur de parti.</p>' + foot() + "</div>";
   }
 
-  function programme(id) {
+  // Sujets de l'application, plus « Autres sujets » : aucune mesure n'est écartée faute de sujet.
+  var AUTRES = { id: "autres", label: "Autres sujets", icon: "M5 12h.01M12 12h.01M19 12h.01" };
+  function progThemes() { return D.themes.concat([AUTRES]); }
+
+  function programme(id, themeId) {
     var p = byId(PARTIS, id);
     if (!p) return notFound();
     var head = '<section class="box flat"><p class="eb">Programme</p><span class="name-tag">' + esc(p.nom) + "</span>" +
@@ -511,13 +515,30 @@
         (p.statut === "pas-publie" ? "Ce parti n’a pas encore publié de programme pour 2027."
           : "Ses mesures s’afficheront ici une fois recopiées et vérifiées mot pour mot.") + "</div>" + foot() + "</div>";
     }
-    var srcs = {};
-    p.sources.forEach(function (s) { srcs[s.id] = s; });
     var rule = p.structure === "mesures-cles"
-      ? "Les mesures que le parti présente lui-même comme « " + esc(p.libelle) + " », dans son ordre."
-      : "Ce parti ne désigne pas de mesures prioritaires. On affiche <b>la première mesure de chaque chapitre</b> de son programme, dans l’ordre. Ce n’est pas un choix de l’équipe." +
+      ? "Les mesures que le parti présente lui-même comme « " + esc(p.libelle) + " »."
+      : "Ce parti ne désigne pas de mesures prioritaires. On affiche <b>la première mesure de chaque chapitre</b> de son programme. Ce n’est pas un choix de l’équipe." +
         (p.regle ? "<br>" + esc(p.regle) : "");
-    var items = p.mesures.map(function (m) {
+    var tagNote = '<p class="cap">Le texte est celui du parti. Le classement par sujet est fait par l’équipe' +
+      (p.classementRelu ? "." : ' <span class="flag">à relire</span>') + " Une mesure peut avoir plusieurs sujets.</p>";
+    var t = themeId ? byId(progThemes(), themeId) : null;
+
+    if (!t) {
+      if (themeId) return notFound();
+      var tiles = progThemes().map(function (th) {
+        var n = p.mesures.filter(function (m) { return m.themes.indexOf(th.id) !== -1; }).length;
+        var inner = '<span class="tile-icon">' + icon(th.icon) + '</span><span><span class="tile-label">' + esc(th.label) +
+          '</span><span class="tile-count">' + (n ? n + " mesure" + (n > 1 ? "s" : "") : "Aucune mesure") + "</span></span>";
+        return n ? '<a class="tile" href="#/programmes/' + p.id + "/" + th.id + '">' + inner + "</a>"
+          : '<div class="tile off">' + inner + "</div>";
+      }).join("");
+      return '<div class="screen enter">' + topbar("#/programmes", "Programme") + head +
+        '<p class="group-note">' + rule + "</p>" +
+        '<h2 class="h2">Choisis un sujet</h2><div class="tiles stagger">' + tiles + "</div>" + tagNote +
+        progSources(p) + foot() + "</div>";
+    }
+
+    var items = p.mesures.filter(function (m) { return m.themes.indexOf(t.id) !== -1; }).map(function (m) {
       return '<article class="box flat measure">' +
         '<p class="eb">' + (m.chapitre ? esc(m.chapitre) : "Mesure " + m.ordre) + "</p>" +
         (m.titre ? '<h3 class="vote-title">' + esc(m.titre) + "</h3>" : "") +
@@ -525,16 +546,21 @@
         '<a class="link" href="' + esc(m.url) + '" target="_blank" rel="noopener">Lire dans le programme' +
         (m.page ? ", page " + m.page : "") + " ↗</a></article>";
     }).join("");
-    return '<div class="screen enter">' + topbar("#/programmes", "Programme") + head +
-      '<p class="group-note">' + rule + "</p>" +
+    return '<div class="screen enter">' +
+      topbar("#/programmes/" + p.id, null, "").replace("</a></div>", '</a><span class="tag">' + icon(t.icon, 18) + esc(t.label) + "</span></div>") +
+      '<h1 class="h1">' + esc(p.nom) + "<br><span>" + esc(t.label) + "</span></h1>" +
+      '<p class="group-note">' + rule + "</p>" + tagNote +
       '<div class="stagger" style="display:flex;flex-direction:column;gap:12px">' + items + "</div>" +
-      '<section class="box flat"><p class="eb">Sources</p>' + p.sources.map(function (s) {
-        return '<div class="kv"><a class="link" href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.titre) + " ↗</a><span>consulté le " + fmtDate(s.consulte_le) + "</span></div>";
-      }).join("") +
-      '<p class="cap">Texte reproduit sans modification. Vérifié par un programme le ' + fmtDate(PR.verifieLe) +
-      " : chaque mesure a été retrouvée mot pour mot dans la source archivée.</p></section>" +
       '<a class="btn-dark" href="https://github.com/SimonPelissier/agenticIA-VF/issues/new" target="_blank" rel="noopener">Signaler une erreur</a>' +
       foot() + "</div>";
+  }
+
+  function progSources(p) {
+    return '<section class="box flat"><p class="eb">Sources</p>' + p.sources.map(function (s) {
+      return '<div class="kv"><a class="link" href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.titre) + " ↗</a><span>consulté le " + fmtDate(s.consulte_le) + "</span></div>";
+    }).join("") +
+      '<p class="cap">Texte reproduit sans modification. Vérifié par un programme le ' + fmtDate(PR.verifieLe) +
+      " : chaque mesure a été retrouvée mot pour mot dans la source archivée.</p></section>";
   }
 
   // ---------- Méthode, lexique ----------
@@ -586,7 +612,7 @@
       case "debat": html = debate(); break;
       case "sujets": case "themes": html = parts[1] ? topic(parts[1]) : topics(); break;
       case "candidats": html = parts[1] ? candidate(parts[1]) : candidates(); break;
-      case "programmes": html = parts[1] ? programme(parts[1]) : programmes(); break;
+      case "programmes": html = parts[1] ? programme(parts[1], parts[2]) : programmes(); break;
       case "quiz": html = quizScreen(); break;
       case "methode": html = method(); break;
       case "lexique": html = lexicon(); break;
