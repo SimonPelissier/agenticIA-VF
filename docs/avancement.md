@@ -10,3 +10,4 @@ Mis à jour à la fin de chaque tâche.
 | Nouvelle DA « V4 » de l'application | Simon | Terminé | Texte « Qui on est » (équipe, financement) ; signalement d'erreur sans compte GitHub ; règles de scoring à publier avant d'afficher « Tient parole ? » |
 | Agent de veille : médias généralistes | Simon | Terminé | Créer la routine quotidienne /veille-medias (relevé des déclarations par Claude) ; ajouter débats télévisés et fact-checkeurs |
 | Application à 4 pages : Accueil, Actualité, Programmes, Qui a voté quoi ? | Simon | Terminé | Valider en groupe les décisions de Kevan sur Programmes (publier avec 4 partis, droit de citation) ; vérifier l'ordre des groupes de 2022-2024 ; affiner le classement des votes (72 en « Autres ») ; créer docs/spec.md |
+| Routine quotidienne de veille médias (/veille-medias) | Simon | Terminé | Relire chaque jour la pull request « Veille médias du … » |
