@@ -1,0 +1,2 @@
+# Sources archivees : octet pour octet, sinon leur empreinte SHA-256 change (docs/programmes.md).
+contenu/programmes/sources/** -text
