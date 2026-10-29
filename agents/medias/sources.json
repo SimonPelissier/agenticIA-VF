@@ -1,0 +1,26 @@
+{
+  "_note": "Médias généralistes suivis par l'agent de veille, choisis pour équilibrer les lignes éditoriales. 'motifs' : formes du nom reconnues dans les titres et chapôs (un nom de famille seul n'est accepté que s'il est sans ambiguïté). Les 'id' de candidats sont ceux de js/data.js.",
+  "medias": [
+    { "id": "franceinfo", "nom": "franceinfo", "flux": "https://www.francetvinfo.fr/politique.rss" },
+    { "id": "lemonde", "nom": "Le Monde", "flux": "https://www.lemonde.fr/politique/rss_full.xml" },
+    { "id": "lefigaro", "nom": "Le Figaro", "flux": "https://www.lefigaro.fr/rss/figaro_politique.xml" },
+    { "id": "liberation", "nom": "Libération", "flux": "https://www.liberation.fr/arc/outboundfeeds/rss-all/category/politique/?outputType=xml" },
+    { "id": "ouestfrance", "nom": "Ouest-France", "flux": "https://www.ouest-france.fr/rss/france" },
+    { "id": "20minutes", "nom": "20 Minutes", "flux": "https://www.20minutes.fr/feeds/rss-politique.xml" },
+    { "id": "lacroix", "nom": "La Croix", "flux": "https://www.la-croix.com/RSS/UNIVERS_WFRA" },
+    { "id": "leparisien", "nom": "Le Parisien", "flux": "https://feeds.leparisien.fr/leparisien/rss/politique" },
+    { "id": "bfmtv", "nom": "BFMTV", "flux": "https://www.bfmtv.com/rss/politique/" },
+    { "id": "lexpress", "nom": "L'Express", "flux": "https://www.lexpress.fr/arc/outboundfeeds/rss/politique.xml" }
+  ],
+  "candidats": [
+    { "id": "attal", "nom": "Gabriel Attal", "motifs": ["Gabriel Attal", "Attal"] },
+    { "id": "faure", "nom": "Olivier Faure", "motifs": ["Olivier Faure"] },
+    { "id": "glucksmann", "nom": "Raphaël Glucksmann", "motifs": ["Raphaël Glucksmann", "Raphael Glucksmann", "Glucksmann"] },
+    { "id": "le-pen", "nom": "Marine Le Pen", "motifs": ["Marine Le Pen"] },
+    { "id": "melenchon", "nom": "Jean-Luc Mélenchon", "motifs": ["Jean-Luc Mélenchon", "Mélenchon", "Melenchon"] },
+    { "id": "philippe", "nom": "Édouard Philippe", "motifs": ["Édouard Philippe", "Edouard Philippe"] },
+    { "id": "retailleau", "nom": "Bruno Retailleau", "motifs": ["Bruno Retailleau", "Retailleau"] },
+    { "id": "roussel", "nom": "Fabien Roussel", "motifs": ["Fabien Roussel"] },
+    { "id": "tondelier", "nom": "Marine Tondelier", "motifs": ["Marine Tondelier", "Tondelier"] }
+  ]
+}

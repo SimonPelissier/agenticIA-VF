@@ -2,3 +2,4 @@
 agents/collecte/.cache/
 __pycache__/
 .DS_Store
+agents/medias/.cache/
