@@ -1,14 +1,14 @@
 {
-  "_note": "Candidats suivis par l'agent de collecte. 'acteur' est l'identifiant du député sur data.assemblee-nationale.fr (null : jamais député). Les mandats et les groupes sont lus dans les données officielles, pas ici.",
+  "_note": "Candidats suivis par l'agent de collecte. 'acteur' : identifiant du député sur data.assemblee-nationale.fr (null : jamais député). 'famille' : famille de groupe à l'Assemblée (codes de js/data.js), utilisée quand le candidat ne siégeait pas. Les mandats et les groupes sont lus dans les données officielles, pas ici.",
   "candidats": [
-    { "id": "attal", "nom": "Gabriel Attal", "acteur": "PA722190" },
-    { "id": "faure", "nom": "Olivier Faure", "acteur": "PA609332" },
-    { "id": "glucksmann", "nom": "Raphaël Glucksmann", "acteur": null },
-    { "id": "le-pen", "nom": "Marine Le Pen", "acteur": "PA720614" },
-    { "id": "melenchon", "nom": "Jean-Luc Mélenchon", "acteur": "PA2150" },
-    { "id": "philippe", "nom": "Édouard Philippe", "acteur": "PA345619" },
-    { "id": "retailleau", "nom": "Bruno Retailleau", "acteur": null },
-    { "id": "roussel", "nom": "Fabien Roussel", "acteur": "PA720692" },
-    { "id": "tondelier", "nom": "Marine Tondelier", "acteur": null }
+    {"id": "attal", "nom": "Gabriel Attal", "acteur": "PA722190", "parti": "Renaissance", "famille": "EPR"},
+    {"id": "faure", "nom": "Olivier Faure", "acteur": "PA609332", "parti": "Parti socialiste", "famille": "SOC"},
+    {"id": "glucksmann", "nom": "Raphaël Glucksmann", "acteur": null, "parti": "Place publique", "famille": "SOC"},
+    {"id": "le-pen", "nom": "Marine Le Pen", "acteur": "PA720614", "parti": "Rassemblement national", "famille": "RN"},
+    {"id": "melenchon", "nom": "Jean-Luc Mélenchon", "acteur": "PA2150", "parti": "La France insoumise", "famille": "LFI"},
+    {"id": "philippe", "nom": "Édouard Philippe", "acteur": "PA345619", "parti": "Horizons", "famille": "HOR"},
+    {"id": "retailleau", "nom": "Bruno Retailleau", "acteur": null, "parti": "Les Républicains", "famille": "LR"},
+    {"id": "roussel", "nom": "Fabien Roussel", "acteur": "PA720692", "parti": "PCF", "famille": "GDR"},
+    {"id": "tondelier", "nom": "Marine Tondelier", "acteur": null, "parti": "Les Écologistes", "famille": "ECO"}
   ]
 }

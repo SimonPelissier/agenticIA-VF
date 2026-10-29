@@ -1,10 +1,13 @@
-// MarIAn — design « V4 ». Sans compte ni serveur : tout est calculé dans le navigateur.
+// MarIAn — 4 pages : Accueil, Actualité, Programmes, Qui a voté quoi ?
+// Sans compte ni serveur : tout est calculé dans le navigateur, à partir des fichiers produits par les agents.
 (function () {
   "use strict";
 
   var D = window.DATA;
-  // Données officielles produites par l'agent de collecte (data/app.js).
-  var MD = window.MARIAN_DONNEES || { votesCles: [], candidats: {} };
+  var MD = window.MARIAN_DONNEES || { candidats: {} };          // agent de collecte : votes clés, participation
+  var MV = window.MARIAN_VOTES || { lois: [], categories: [], candidats: [], noms: {} }; // agent de collecte : grands votes
+  var MA = window.MARIAN_ACTU || { medias: {}, articles: [], declarations: [] };          // veille médias
+  var PR = window.MARIAN_PROGRAMMES || { partis: [] };          // programmes vérifiés (Kevan)
   var app = document.getElementById("app");
 
   // ---------- Outils ----------
@@ -14,535 +17,581 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-
   function byId(list, id) {
     for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
     return null;
   }
-
   var MONTHS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
   function fmtDate(iso) {
-    var p = iso.split("-");
+    var p = iso.slice(0, 10).split("-");
     return parseInt(p[2], 10) + " " + MONTHS[parseInt(p[1], 10) - 1] + " " + p[0];
   }
-  function fmtMonth(iso) {
-    var p = iso.split("-");
-    return MONTHS[parseInt(p[1], 10) - 1] + " " + p[0];
+  function when(iso) {
+    var d = new Date(iso.length > 10 ? iso : iso + "T12:00"), h = (Date.now() - d) / 3600000;
+    if (h < 1) return "à l’instant";
+    if (h < 24) return "il y a " + Math.floor(h) + " h";
+    if (h < 48) return "hier";
+    if (h < 24 * 7) return "il y a " + Math.floor(h / 24) + " j";
+    return fmtDate(iso);
   }
-  function pct(x) { return String(x).replace(".", ",") + " %"; }
-
   function daysLeft() {
     var p = D.electionDate.split("-");
-    var target = new Date(+p[0], +p[1] - 1, +p[2]);
-    var now = new Date();
-    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    return Math.max(0, Math.round((target - today) / 86400000));
+    var target = new Date(+p[0], +p[1] - 1, +p[2]), now = new Date();
+    return Math.max(0, Math.round((target - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000));
   }
-
-  function initials(name) {
-    var w = name.split(/\s+/);
-    return (w[0][0] + w[w.length - 1][0]).toUpperCase();
-  }
-
+  function initials(name) { var w = name.split(/\s+/); return (w[0][0] + w[w.length - 1][0]).toUpperCase(); }
   function icon(d, size) {
     return '<svg width="' + (size || 22) + '" height="' + (size || 22) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"/></svg>';
   }
   var I = {
     back: "M19 12H5M11 6l-6 6 6 6",
     arrow: "M5 12h14M13 6l6 6-6 6",
-    chat: "M4 5h16v11H9l-5 4z",
-    grid: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",
-    person: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6",
-    list: "M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01",
-    share: "M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13",
-    flame: "M12 22c4 0 7-3 7-7 0-4-3-6-4-10-2 2-3 4-3 6-1-1-2-2-2-4-2 2-5 5-5 8 0 4 3 7 7 7z",
-    lock: "M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4"
+    out: "M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5",
+    doc: "M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6",
+    news: "M4 5h13v14H6a2 2 0 0 1-2-2zM17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6",
+    vote: "M4 11h16v9H4zM9 11V4h6v7M8 15h8",
+    sliders: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4",
+    search: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3",
+    spark: "M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"
   };
 
-  // Stockage local, uniquement sur l'appareil, pour les sujets explorés.
-  var STORE_KEY = "marian:themes-vus";
-  function seenThemes() {
-    var ids = D.themes.map(function (t) { return t.id; });
-    try {
-      return (JSON.parse(localStorage.getItem(STORE_KEY)) || []).filter(function (id) { return ids.indexOf(id) !== -1; });
-    } catch (e) { return []; }
-  }
-  function markSeen(id) {
-    var seen = seenThemes();
-    if (seen.indexOf(id) === -1) {
-      seen.push(id);
-      try { localStorage.setItem(STORE_KEY, JSON.stringify(seen)); } catch (e) { /* navigation privée */ }
-    }
-  }
+  // Stockage local, uniquement sur l'appareil : préférences du fil d'actualité.
+  function load(key, def) { try { return JSON.parse(localStorage.getItem(key)) || def; } catch (e) { return def; } }
+  function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) { /* navigation privée */ } }
 
-  // Lexique : rend cliquables les mots compliqués.
-  var termIndex = {};
-  var termWords = [];
-  D.glossary.forEach(function (g, i) {
-    g.match.forEach(function (m) { termIndex[m.toLowerCase()] = i; termWords.push(m); });
-  });
-  termWords.sort(function (a, b) { return b.length - a.length; });
-  var termRe = new RegExp("(" + termWords.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("|") + ")", "gi");
-
-  function withTerms(text) {
-    return esc(text).replace(termRe, function (m) {
-      var i = termIndex[m.toLowerCase()];
-      return i === undefined ? m : '<button type="button" class="term" data-term="' + i + '">' + m + "</button>";
-    });
-  }
-
-  // ---------- Données des votes ----------
-
-  // Transforme un vote clé (texte de l'équipe + chiffres officiels) en objet prêt à afficher.
-  function normalizeVote(v) {
-    var o = v.officiel;
-    var m = v.manuel;
-    var base = { id: v.id, theme: v.theme, title: v.title, context: v.context, summary: v.summary, after: v.after, source: v.source };
-    if (o) {
-      base.date = o.date;
-      base.chamber = "Assemblée nationale";
-      base.official = o.url;
-      base.result = o.sort === "adopté" ? "Adopté" : "Rejeté";
-      // Une motion de censure ne compte que les voix pour : on montre alors le seuil à atteindre.
-      base.count = o.contre === 0 && o.abstentions === 0
-        ? o.pour + " voix pour, il en fallait " + o.requis
-        : o.pour + " pour, " + o.contre + " contre, " + o.abstentions + " abstentions";
-      base.groups = o.groupes.map(function (g) {
-        var votants = g.pour + g.contre + g.abstentions;
-        return {
-          label: g.nom, groupe: g.groupe, famille: g.famille, pos: g.position, cohesion: g.cohesion,
-          detail: votants ? g.pour + " pour, " + g.contre + " contre, " + g.abstentions + " abst." : "aucun votant"
-        };
-      });
-    } else if (m) {
-      base.date = m.date;
-      base.chamber = m.chamber;
-      base.result = m.result;
-      base.count = m.count;
-      base.groups = m.positions.map(function (p) {
-        return { label: p.familles.map(function (f) { return D.groups[f] || f; }).join(", "), familles: p.familles, pos: p.pos };
-      });
-    }
-    return base;
-  }
-  D.votes = MD.votesCles.map(normalizeVote).filter(function (v) { return v.date; });
-
-  var POS_LABEL = {
-    pour: "Pour", contre: "Contre", abstention: "Abstention", divise: "Divisé", partage: "Partagé",
-    "non-votant": "Non-votant", absent: "Absent", aucun: "N’a pas voté", autre: "Inconnu"
-  };
-  var POS_CLASS = { pour: "pour", contre: "contre", abstention: "abstention", divise: "divise", partage: "divise" };
-
-  function posPill(pos) {
-    var key = pos || "aucun";
-    return '<span class="pos pos-' + (POS_CLASS[key] || "autre") + '">' + (POS_LABEL[key] || key) + "</span>";
-  }
-
-  // Un groupe est présenté comme divisé quand moins des deux tiers de ses votants ont suivi la position.
-  function divided(g) { return g.cohesion !== null && g.cohesion !== undefined && g.cohesion < 67; }
-
-  function groupPos(v, family) {
-    for (var i = 0; i < v.groups.length; i++) {
-      var g = v.groups[i];
-      if (g.famille === family || (g.familles && g.familles.indexOf(family) !== -1)) return g;
-    }
-    return null;
-  }
-
-  function candData(c) { return MD.candidats[c.id] || { depute: false, votesCles: {}, mandats: [] }; }
-
-  // Rôle affiché sous le nom : tiré des données officielles pour les députés.
-  function role(c) {
-    var cd = candData(c);
-    if (cd.depute) {
-      var last = cd.mandats[cd.mandats.length - 1];
-      return last && !last.fin ? "Siège à l’Assemblée" : "A siégé (" + cd.mandats[0].debut.slice(0, 4) + "-" + (last.fin || "").slice(0, 4) + ")";
-    }
-    return { PE: "Parlement européen", "Sénat": "Sénat" }[c.filter] || "Sans mandat de député";
-  }
-
-  // Son vote s'il siégeait, sinon celui de son groupe (toujours signalé comme tel).
-  function candVote(v, c) {
-    var perso = candData(c).votesCles[v.id];
-    if (perso && perso.siegeait) return { pos: perso.position, who: "Son vote", personal: true };
-    var g = groupPos(v, c.group);
-    return { pos: g ? g.pos : "autre", who: "Vote du groupe" + (g && g.groupe ? " " + g.groupe : "") + (g && divided(g) ? ", divisé" : ""), personal: false };
-  }
-
-  function voteItem(v, c) {
-    var cv = candVote(v, c);
-    return '<a class="vote-item" href="' + esc(v.official || v.source.url) + '" target="_blank" rel="noopener"><span><span class="t">' + esc(v.title) + "</span>" +
-      '<span class="m">' + fmtDate(v.date) + " · " + esc(cv.who) + " ↗</span></span>" + posPill(cv.pos) + "</a>";
-  }
-
-  function groupNote(c) {
-    var g = D.groups[c.group];
-    return candData(c).depute
-      ? "Quand " + c.name + " siégeait à l’Assemblée, c’est son vote personnel qui est affiché. Sinon, celui du groupe " + g + ", à titre de contexte."
-      : c.name + " n’a pas siégé à l’Assemblée nationale depuis 2022 : ce sont les votes du groupe " + g + ", donnés comme contexte, pas ses votes.";
-  }
-
-  function voteCard(v) {
-    var rows = v.groups.map(function (g) {
-      return "<div>" + posPill(g.pos) + "<span>" + esc(g.label) +
-        (g.detail ? " <em>(" + esc(g.detail) + (divided(g) ? ", divisé" : "") + ")</em>" : "") + "</span></div>";
-    }).join("");
-    return '<article class="box flat">' +
-      '<p class="eb">' + esc(v.chamber) + " · " + fmtDate(v.date) + "</p>" +
-      '<h3 class="vote-title">' + esc(v.title) + '</h3><p class="cap">' + withTerms(v.context) + "</p>" +
-      '<p class="vote-summary">' + withTerms(v.summary) + "</p>" +
-      '<span class="result">' + esc(v.result) + " · " + esc(v.count) + "</span>" +
-      '<div class="groups">' + rows + "</div>" +
-      (v.after ? '<p class="note">' + withTerms(v.after) + "</p>" : "") +
-      (v.official ? '<a class="link" href="' + esc(v.official) + '" target="_blank" rel="noopener">Scrutin officiel (Assemblée nationale) ↗</a>' : "") +
-      '<a class="link" href="' + esc(v.source.url) + '" target="_blank" rel="noopener">Pour comprendre : ' + esc(v.source.label) + " ↗</a>" +
-      "</article>";
-  }
-
-  // ---------- Briques d'écran ----------
+  // ---------- Briques communes ----------
 
   function foot() {
-    return '<p class="foot">Sans compte. Aucune donnée personnelle collectée. Chaque information renvoie à sa source officielle.<br>' +
-      "Votes à jour au " + (MD.dernierScrutin ? fmtDate(MD.dernierScrutin) : esc(D.updatedAt)) + ' · <a href="#/methode">Comment on décide</a> · <a href="#/lexique">Lexique</a></p>';
+    return '<p class="foot">Sans compte. Aucune donnée personnelle collectée. Chaque information renvoie à sa source.<br>' +
+      (MD.dernierScrutin ? "Votes à jour au " + fmtDate(MD.dernierScrutin) + " · " : "") +
+      '<a href="#/methode">Comment on travaille</a> · <a href="#/lexique">Lexique</a></p>';
   }
-
   function topbar(back, title, right) {
     return '<div class="topbar"><div style="display:flex;align-items:center;gap:12px">' +
       (back ? '<a class="round-btn" href="' + back + '" aria-label="Retour">' + icon(I.back, 20) + "</a>" : "") +
       (title ? '<span class="topbar-title">' + title + "</span>" : "") + "</div>" + (right || "") + "</div>";
   }
-
-  function pending(label) { return '<span class="verdict">' + (label || "En attente") + "</span>"; }
-
-  // ---------- Accueil ----------
-
-  var debateChoice = null; // réponse au débat du jour : en mémoire seulement, jamais enregistrée
-
-  function debateButtons(prefix) {
-    return '<div class="choice3" role="group" aria-label="Ta réponse">' +
-      [["pour", "Pour", " dark"], ["contre", "Contre", ""], ["nsp", "Je ne sais pas", " unsure"]].map(function (o) {
-        return '<button type="button" class="choice' + o[2] + '" data-debate="' + o[0] + '"' + (prefix ? ' data-go="debat"' : "") +
-          ' aria-pressed="' + (debateChoice === o[0]) + '">' + o[1] + "</button>";
-      }).join("") + "</div>";
+  function brandBar() {
+    return '<div class="topbar"><a class="brand" href="#/">Mar<span>(IA)</span>n</a><span class="pill-dark" title="1er tour le ' +
+      fmtDate(D.electionDate) + (D.electionDateProvisional ? ", date provisoire" : "") + '">J–' + daysLeft() + "<span>avant le vote</span></span></div>";
   }
+  function candidate(id) { return byId(D.candidates, id); }
+
+  // ======================================================================
+  // ACCUEIL
+  // ======================================================================
 
   function home() {
-    var seen = seenThemes();
-    var topics = D.themes.map(function (t) {
-      var done = seen.indexOf(t.id) !== -1;
-      return '<a class="topic' + (done ? " done" : "") + '" href="#/sujets/' + t.id + '">' + esc(t.label) + '<span aria-hidden="true">' + (done ? "✓" : "+") + "</span></a>";
-    }).join("");
-    return '<div class="screen enter">' +
-      topbar(null, null, "").replace('<div style="display:flex;align-items:center;gap:12px"></div>',
-        '<a class="brand" href="#/">' + esc(D.appName) + '</a><span class="pill-dark" title="1er tour le ' + fmtDate(D.electionDate) + (D.electionDateProvisional ? ", date provisoire" : "") + '">J–' + daysLeft() + "<span>avant le vote</span></span>") +
-      '<section class="box" aria-label="Débat du jour">' +
-      '<span class="tag plain" style="align-self:flex-start;padding:4px 10px;font-size:12px">' + icon(I.chat, 14) + "Débat du jour</span>" +
-      '<p class="debate-q">' + esc(D.debate.question) + "</p>" + debateButtons(true) + "</section>" +
-      '<a class="quiz-hero" href="#/quiz"><span class="quiz-chip">' + icon(I.list, 14) + D.quiz.length + " questions</span>" +
-      '<span class="quiz-title">Qui a voté ça ?</span>' +
-      '<span class="quiz-row"><span>Voyons si tu connais bien les candidats pour 2027.</span><span class="play-btn">Jouer' + icon(I.arrow, 18) + "</span></span></a>" +
-      '<section style="display:flex;flex-direction:column;gap:10px"><div class="section-head"><h2 class="h2" style="font-size:18px">Complète 3 sujets</h2><span>' + Math.min(seen.length, 3) + " / 3</span></div>" +
-      '<div class="topics">' + topics + "</div></section>" +
-      '<nav class="nav-tiles" aria-label="Comparer">' +
-      '<a class="nav-tile dark" href="#/sujets">' + icon(I.grid) + "<span>Par sujet</span></a>" +
-      '<a class="nav-tile" href="#/candidats">' + icon(I.person) + "<span>Par candidat</span></a></nav>" +
+    var semaine = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+    var recents = MA.articles.filter(function (a) { return a.date >= semaine; });
+    var publies = PR.partis.filter(function (p) { return p.statut === "publie"; });
+    var dernier = MV.lois[0];
+    return '<div class="screen enter">' + brandBar() +
+      '<h1 class="headline">Ce qu’ils promettent.<br><span>Ce qu’ils ont voté.</span></h1>' +
+      '<a class="home-card dark" href="#/actu"><span class="hc-top"><span class="hc-ic">' + icon(I.news) + '</span><span class="hc-n">' + recents.length + " article" + (recents.length > 1 ? "s" : "") + " cette semaine</span></span>" +
+      '<span class="hc-title">L’actu qui te parle</span>' +
+      MA.articles.slice(0, 2).map(function (a) { return '<span class="hc-line">' + esc(MA.medias[a.media] || a.media) + " · " + esc(a.titre) + "</span>"; }).join("") +
+      '<span class="hc-go">Voir l’actualité' + icon(I.arrow, 18) + "</span></a>" +
+      '<a class="home-card" href="#/programmes"><span class="hc-top"><span class="hc-ic">' + icon(I.doc) + '</span><span class="hc-n">' + publies.length + " partis</span></span>" +
+      '<span class="hc-title">Ce qu’ils proposent</span><span class="hc-line">Les mesures de leurs programmes, recopiées mot pour mot.</span>' +
+      '<span class="hc-go">Voir les programmes' + icon(I.arrow, 18) + "</span></a>" +
+      '<a class="home-card accent" href="#/votes"><span class="hc-top"><span class="hc-ic">' + icon(I.vote) + '</span><span class="hc-n">' + MV.lois.length + " grands votes</span></span>" +
+      '<span class="hc-title">Qui a voté quoi ?</span>' +
+      (dernier ? '<span class="hc-line">Dernier : ' + esc(dernier.titre) + " · " + (dernier.sort === "adopté" ? "adopté" : "rejeté") + " le " + fmtDate(dernier.date) + "</span>" : "") +
+      '<span class="hc-go">Voir les votes' + icon(I.arrow, 18) + "</span></a>" +
       foot() + "</div>";
   }
 
-  // ---------- Débat du jour ----------
+  // ======================================================================
+  // ACTUALITÉ (maquette d'Anaïs) — données : veille médias (data/actu.js)
+  // ======================================================================
 
-  function debate() {
-    var v = byId(D.votes, D.debate.vote);
-    var labels = { pour: "Pour", contre: "Contre", nsp: "Je ne sais pas" };
-    var html = '<div class="screen enter">' +
-      '<section style="display:flex;flex-direction:column;gap:16px"><span class="tag plain" style="align-self:flex-start">Débat du jour</span>' +
-      '<h1 class="debate-title">' + esc(D.debate.question) + "</h1>" + debateButtons(false) + "</section>";
-    if (!debateChoice) {
-      return html + '<p class="note">Réponds pour voir comment les candidats ont voté sur ce sujet.</p>' + foot() + "</div>";
+  var actu = { mode: "cand", pick: "all" };
+  var FIL_KEY = "marian:fil";
+  function prefs() { return load(FIL_KEY, { cands: [], sujets: [], medias: null }); }
+  function declsOf(a) { return MA.declarations.filter(function (d) { return d.url === a.url; }); }
+  function themeLabel(id) { var t = byId(D.themes, id); return t ? t.label : null; }
+  // Programme du parti d'un candidat (section de Kevan), quand il existe.
+  var PROG_DU_PARTI = { "La France insoumise": "lfi", "Parti socialiste": "ps", "Place publique": "place-publique", "Les Républicains": "lr", "Les Écologistes": "ecologistes", "Horizons": "horizons", "PCF": "pcf", "Rassemblement national": "rn", "Renaissance": "renaissance" };
+
+  function articlesVisibles() {
+    var p = prefs();
+    return MA.articles.filter(function (a) { return !p.medias || p.medias.indexOf(a.media) !== -1; });
+  }
+
+  function newsCard(a) {
+    var ds = declsOf(a);
+    var sujet = ds.length && ds[0].theme ? themeLabel(ds[0].theme) : null;
+    return '<article class="news">' +
+      '<div class="news-top"><span><b>' + esc(MA.medias[a.media] || a.media) + "</b> · " + when(a.date) + "</span>" +
+      '<span class="ntag' + (ds.length ? " decl" : "") + '">' + (ds.length ? "Déclaration" : "Article") + "</span></div>" +
+      '<a class="news-title" href="#/actu/a/' + a.id + '">' + esc(a.titre) + "</a>" +
+      (ds.length ? '<div class="essentiel"><span class="eb">L’essentiel</span>' + ds.slice(0, 2).map(function (d) {
+        var c = candidate(d.candidat);
+        return '<span class="pt">' + esc((c ? c.name + " : " : "") + d.resume) + "</span>";
+      }).join("") + "</div>" : "") +
+      '<div class="news-foot"><span class="news-tags">' + a.candidats.slice(0, 2).map(function (id) {
+        var c = candidate(id);
+        return c ? '<span class="ctag">' + esc(c.name) + "</span>" : "";
+      }).join("") + (sujet ? '<span class="stag">' + esc(sujet) + "</span>" : "") + "</span>" +
+      '<a class="link" href="' + esc(a.url) + '" target="_blank" rel="noopener">Article complet ↗</a></div></article>';
+  }
+
+  function actuFeed() {
+    var p = prefs(), list = articlesVisibles();
+    var chips = actu.mode === "cand"
+      ? [{ id: "all", label: "Tous les candidats" }].concat(D.candidates.map(function (c) { return { id: c.id, label: c.name }; }))
+      : [{ id: "all", label: "Tous les sujets" }].concat(D.themes.map(function (t) { return { id: t.id, label: t.label }; }));
+    if (actu.pick !== "all") {
+      list = list.filter(function (a) {
+        return actu.mode === "cand" ? a.candidats.indexOf(actu.pick) !== -1
+          : declsOf(a).some(function (d) { return d.theme === actu.pick; });
+      });
+    } else if (p.cands.length || p.sujets.length) {
+      // « Mon fil » : les articles qui concernent ce que je suis passent en premier.
+      var score = function (a) {
+        return (a.candidats.some(function (c) { return p.cands.indexOf(c) !== -1; }) ? 2 : 0) +
+          (declsOf(a).some(function (d) { return p.sujets.indexOf(d.theme) !== -1; }) ? 1 : 0);
+      };
+      list = list.slice().sort(function (x, y) { return score(y) - score(x) || (y.date > x.date ? 1 : -1); });
     }
-    html += '<div class="private-note">' + icon(I.lock, 20) + "<span>Ta réponse : <b>" + labels[debateChoice] +
-      "</b>. Elle reste sur ton téléphone : on ne l’enregistre nulle part et on ne publie aucun résultat.</span></div>";
-    if (v) {
-      html += '<section style="display:flex;flex-direction:column;gap:12px">' +
-        '<div class="section-head"><h2 class="h2">Et les candidats ?</h2><span>Tient parole ?</span></div>' +
-        '<div class="text-card"><span class="eb">Le texte voté</span><span class="t">' + esc(v.title) + "</span>" +
-        '<span class="m">' + esc(v.chamber) + " · " + fmtDate(v.date) + " · " + esc(v.result) + ", " + esc(v.count) +
-        (v.official ? ' · <a href="' + esc(v.official) + '" target="_blank" rel="noopener" style="font-weight:700">Source ↗</a>' : "") + "</span></div>" +
-        D.candidates.map(function (c) {
-          var cv = candVote(v, c);
-          return '<article class="cand-line"><span><span class="n">' + esc(c.name) + '</span><span class="d">Promet <b>—</b> · ' +
-            (cv.personal ? "Vote <b>" + POS_LABEL[cv.pos || "aucun"] + "</b>" : esc(cv.who) + " : <b>" + POS_LABEL[cv.pos || "aucun"] + "</b>") +
-            "</span></span>" + pending() + "</article>";
-        }).join("") +
-        '<p class="cap">« Tient parole ? » s’affichera quand les programmes 2027 seront publiés : on comparera alors chaque promesse aux votes.</p></section>';
-    }
-    return html + '<button type="button" class="btn-dark" data-share-debate>' + icon(I.share, 20) + "Partager</button>" + foot() + "</div>";
-  }
-
-  // ---------- Sujets ----------
-
-  function topics() {
-    var seen = seenThemes();
-    return '<div class="screen enter">' + topbar(null, "Par sujet") +
-      '<h1 class="h1" style="font-size:34px">Quel sujet <span>te parle</span> ?</h1>' +
-      '<div class="tiles stagger">' + D.themes.map(function (t) {
-        return '<a class="tile' + (seen.indexOf(t.id) !== -1 ? " seen" : "") + '" href="#/sujets/' + t.id + '"><span class="tile-icon">' + icon(t.icon) + '</span><span class="tile-label">' + esc(t.label) + "</span></a>";
-      }).join("") + "</div>" + foot() + "</div>";
-  }
-
-  var sortBy = null;
-  var MANDATE_ORDER = ["AN", "AN (2022-2024)", "PE", "Sénat", "Pas de mandat"];
-  function sortedCandidates() {
-    var list = D.candidates.slice();
-    if (sortBy === "nom") list.sort(function (a, b) { return a.name.localeCompare(b.name, "fr"); });
-    if (sortBy === "parti") list.sort(function (a, b) { return a.party.localeCompare(b.party, "fr"); });
-    if (sortBy === "mandat") list.sort(function (a, b) { return MANDATE_ORDER.indexOf(a.filter) - MANDATE_ORDER.indexOf(b.filter); });
-    return list;
-  }
-
-  function topic(id) {
-    var t = byId(D.themes, id);
-    if (!t) return notFound();
-    markSeen(t.id);
-    var votes = D.votes.filter(function (v) { return v.theme === t.id; });
-    var seg = [["nom", "Nom"], ["parti", "Parti"], ["mandat", "Mandat"]].map(function (s) {
-      return '<button type="button" data-sort="' + s[0] + '" aria-pressed="' + (sortBy === s[0]) + '">' + s[1] + "</button>";
-    }).join("");
-    var cards = sortedCandidates().map(function (c) {
-      return '<article class="box">' +
-        '<div class="cand-head"><span class="avatar" aria-hidden="true">' + initials(c.name) + "</span><div>" +
-        '<a class="name-tag" href="#/candidats/' + c.id + '" style="text-decoration:none">' + esc(c.name) + '</a><span class="meta">' + esc(c.party) + " · " + esc(role(c)) + "</span></div></div>" +
-        '<div class="promise"><div class="promise-row"><span>Promesse 2027 : pas encore publiée</span>' + pending() + "</div>" +
-        (votes.length ? '<div class="vote-list">' + votes.map(function (v) { return voteItem(v, c); }).join("") + "</div>"
-          : '<div class="vote-list"><p class="cap">Aucun vote clé sur ce sujet pour l’instant.</p></div>') +
-        "</div></article>";
-    }).join("");
-    return '<div class="screen enter">' +
-      topbar("#/sujets", null, "").replace("</a></div>", '</a><span class="tag">' + icon(t.icon, 18) + esc(t.label) + "</span></div>") +
-      '<h1 class="h1">Qui vote quoi sur<br><span>' + esc(t.sur) + "</span> ?</h1>" +
-      '<p class="note">' + esc(t.questions) + "</p>" +
-      '<div class="segmented" role="group" aria-label="Trier les candidats">' + seg + "</div>" +
-      cards +
-      '<h2 class="h2">Les votes en détail</h2>' +
-      (votes.length ? votes.map(voteCard).join("") : '<div class="empty"><strong>Aucun vote clé sur ce sujet pour l’instant.</strong>Les votes de l’Assemblée sont collectés chaque nuit ; l’équipe choisit ceux qui comptent pour chaque sujet.</div>') +
+    var cur = byId(chips, actu.pick) || chips[0];
+    var nomsMedias = Object.keys(MA.medias).filter(function (m) { return !p.medias || p.medias.indexOf(m) !== -1; }).map(function (m) { return MA.medias[m]; });
+    return '<div class="screen enter">' + brandBar() +
+      '<div class="actu-head"><h1 class="h1">L’actu <span>qui te parle</span></h1><a class="square-btn" href="#/actu/perso" aria-label="Personnaliser mon fil">' + icon(I.sliders) + "</a></div>" +
+      '<div class="tabs2" role="tablist"><button type="button" role="tab" data-amode="cand" aria-selected="' + (actu.mode === "cand") + '">Par candidat</button>' +
+      '<button type="button" role="tab" data-amode="sujet" aria-selected="' + (actu.mode === "sujet") + '">Par sujet</button></div>' +
+      '<div class="chips">' + chips.map(function (c) { return '<button type="button" class="chip" data-apick="' + c.id + '" aria-pressed="' + (actu.pick === c.id) + '">' + esc(c.label) + "</button>"; }).join("") + "</div>" +
+      '<p class="cap"><b style="color:var(--ink)">' + list.length + " news</b> · " + esc(cur.label) + (p.cands.length || p.sujets.length ? " · mon fil d’abord" : "") +
+      "<br>Sources : " + esc(nomsMedias.join(", ")) + "</p>" +
+      (list.length ? list.slice(0, 40).map(newsCard).join("")
+        : '<div class="empty"><strong>Pas encore de news sur ce filtre.</strong>' + (actu.mode === "sujet" ? "Le sujet d’un article vient des déclarations relevées par la veille ; elles arrivent après relecture." : "On te prévient dès qu’il y a du nouveau.") + "</div>") +
+      '<p class="cap">Titres et liens des articles d’origine : MarIAn ne reproduit pas les articles. « L’essentiel » reprend les déclarations relevées et vérifiées mot pour mot.</p>' +
       foot() + "</div>";
   }
 
-  // ---------- Candidats ----------
+  function actuDetail(id) {
+    var a = byId(MA.articles, id);
+    if (!a) return notFound();
+    var ds = declsOf(a), cands = a.candidats.map(candidate).filter(Boolean);
+    var sujet = ds.length && ds[0].theme ? themeLabel(ds[0].theme) : null;
+    var plus = cands.map(function (c) {
+      var prog = PROG_DU_PARTI[c.party], pp = prog && byId(PR.partis, prog);
+      return (pp ? '<a class="go-row" href="#/programmes/' + prog + '"><span><b>Ce que propose son parti</b><small>' + esc(c.party) + " · Programmes</small></span>" + icon(I.arrow, 18) + "</a>" : "") +
+        '<a class="go-row" href="#/votes/personnes/' + c.id + '"><span><b>Ce qu’a voté ' + esc(c.name) + "</b><small>" + (candVoteData(c.id).mandats.length ? "Ses votes, ou ceux de son groupe" : "Les votes de son groupe") + " · Qui a voté quoi</small></span>" + icon(I.arrow, 18) + "</a>";
+    }).join("");
+    return '<div class="screen enter">' +
+      '<div class="topbar"><a class="round-btn" href="#/actu" aria-label="Retour au fil">' + icon(I.back, 20) + '</a><span class="news-tags">' +
+      cands.slice(0, 2).map(function (c) { return '<span class="ctag">' + esc(c.name) + "</span>"; }).join("") + (sujet ? '<span class="stag">' + esc(sujet) + "</span>" : "") + "</span></div>" +
+      '<span class="ntag' + (ds.length ? " decl" : "") + '" style="align-self:flex-start">' + (ds.length ? "Déclaration" : "Article") + "</span>" +
+      '<h1 class="h1" style="font-size:26px">' + esc(a.titre) + "</h1>" +
+      '<div class="source-card"><span><span class="eb muted">Source</span><b>' + esc(MA.medias[a.media] || a.media) + "</b><small>Publié le " + fmtDate(a.date) + "</small></span>" +
+      '<a class="btn-dark small" href="' + esc(a.url) + '" target="_blank" rel="noopener">Lire l’article' + icon(I.out, 16) + "</a></div>" +
+      (ds.length
+        ? '<section class="thirty"><span class="eb">' + icon(I.spark, 14) + " En 30 secondes</span>" +
+          ds.map(function (d) { var c = candidate(d.candidat); return "<p>" + esc((c ? c.name : "") + " : " + d.resume) + "</p>"; }).join("") + "</section>" +
+          '<section style="display:flex;flex-direction:column;gap:10px"><h2 class="h2">Ses mots exacts</h2>' + ds.map(function (d) {
+            var c = candidate(d.candidat);
+            return '<div class="quote-card"><blockquote>« ' + esc(d.citation) + " »</blockquote>" +
+              '<div class="keys"><span>Qui</span><b>' + esc(c ? c.name : d.candidat) + "</b><span>Quoi</span><b>" + (d.type === "engagement" ? "Un engagement" : "Une position") + "</b>" +
+              (d.theme ? "<span>Sujet</span><b>" + esc(themeLabel(d.theme) || d.theme) + "</b>" : "") +
+              "<span>Vérifié</span><b>" + (d.statut === "verifiee" ? "Mot pour mot dans l’article" : "À la main (article payant)") + "</b></div></div>";
+          }).join("") + "</section>"
+        : '<div class="empty"><strong>Pas encore de déclaration relevée dans cet article.</strong>La veille lit les articles chaque jour et relève les citations directes des candidats ; elles apparaissent ici une fois vérifiées et relues.</div>') +
+      (plus ? '<section style="display:flex;flex-direction:column;gap:10px"><h2 class="h2">Pour aller plus loin</h2>' + plus + "</section>" : "") +
+      '<p class="cap">MarIAn affiche le titre et le lien de l’article, sans le reproduire. Une erreur ? <a href="https://github.com/SimonPelissier/agenticIA-VF/issues/new" target="_blank" rel="noopener">Signale-la</a>.</p>' +
+      foot() + "</div>";
+  }
 
-  function candidates() {
-    return '<div class="screen enter">' + topbar(null, "Par candidat") +
-      '<h1 class="h1" style="font-size:34px">Qui veux-tu <span>checker</span> ?</h1>' +
-      '<div class="people stagger">' + D.candidates.map(function (c) {
-        return '<a class="person" href="#/candidats/' + c.id + '"><span class="avatar" aria-hidden="true">' + initials(c.name) + '</span><span class="n">' + esc(c.name) + '</span><span class="p">' + esc(c.party) + "<br>" + esc(role(c)) + "</span></a>";
+  function actuPerso() {
+    var p = prefs(), medias = p.medias || Object.keys(MA.medias);
+    var nc = p.cands.length, ns = p.sujets.length;
+    return '<div class="screen enter">' + topbar("#/actu", null) +
+      '<h1 class="h1">Ton fil, <span>à ta façon</span></h1><p class="note">Choisis qui et quoi suivre : on te montre d’abord ces news-là. Tes choix restent sur ton téléphone.</p>' +
+      '<div class="section-head"><h2 class="h2" style="font-size:18px">Mes candidats</h2><span>' + nc + " suivi" + (nc > 1 ? "s" : "") + "</span></div>" +
+      '<div class="follow-grid">' + D.candidates.map(function (c) {
+        var on = p.cands.indexOf(c.id) !== -1;
+        return '<button type="button" class="follow' + (on ? " on" : "") + '" data-follow="' + c.id + '" aria-pressed="' + on + '"><span class="avatar sm">' + initials(c.name) + "</span><span><b>" + esc(c.name) + "</b><small>" + esc(c.party) + "</small></span></button>";
       }).join("") + "</div>" +
-      '<p class="cap">Principaux candidats déclarés ou pressentis au ' + esc(D.updatedAt) + ". Ordre alphabétique, aucune couleur de parti. La liste officielle viendra au printemps 2027, après les <button type=\"button\" class=\"term\" data-term=\"6\">parrainages</button>.</p>" +
+      '<h2 class="h2" style="font-size:18px">Les sujets qui me tiennent à cœur</h2><div class="chips wrap">' + D.themes.map(function (t) {
+        var on = p.sujets.indexOf(t.id) !== -1;
+        return '<button type="button" class="chip" data-fsujet="' + t.id + '" aria-pressed="' + on + '">' + (on ? "✓ " : "+ ") + esc(t.label) + "</button>";
+      }).join("") + "</div>" +
+      '<h2 class="h2" style="font-size:18px">Mes journaux</h2><div class="box flat" style="padding:0;gap:0">' + Object.keys(MA.medias).map(function (m) {
+        return '<label class="check-row"><b>' + esc(MA.medias[m]) + '</b><input type="checkbox" data-fmedia="' + m + '"' + (medias.indexOf(m) !== -1 ? " checked" : "") + "></label>";
+      }).join("") + "</div>" +
+      '<a class="btn-dark" href="#/actu">Voir mon fil · ' + nc + " candidat" + (nc > 1 ? "s" : "") + ", " + ns + " sujet" + (ns > 1 ? "s" : "") + "</a>" +
       foot() + "</div>";
   }
 
-  var openTopic = null;
+  // ======================================================================
+  // PROGRAMMES (section de Kevan, reprise telle quelle)
+  // Des mesures recopiées mot pour mot, sans lien avec les candidats ni les votes.
+  // Le texte vient de data/programmes.js, écrit par agents/verification/programmes.py après vérification.
+  // ======================================================================
 
-  function candidate(id) {
-    var c = byId(D.candidates, id);
-    if (!c) return notFound();
-    var cd = candData(c);
-    var sol = cd.participation ? cd.participation.solennels : null;
-    var all = cd.participation ? cd.participation.tous : null;
-    var med = MD.medianeSolennels && MD.medianeSolennels.taux;
-    var ring = '<div class="ring"><svg viewBox="0 0 128 128" aria-hidden="true"><circle cx="64" cy="64" r="52" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="14" stroke-dasharray="6 7"/></svg><span class="ring-center">—</span></div>';
+  var PARTIS = PR.partis.slice().sort(function (a, b) { return a.nom.localeCompare(b.nom, "fr"); });
 
-    var assemblee = cd.depute
-      ? '<div class="stats"><div class="stat"><b class="accent">' + (sol && sol.taux !== null ? pct(sol.taux) : "—") + "</b><span>des grands votes</span></div>" +
-        '<div class="stat"><b>' + (all ? all.votes : "—") + "</b><span>votes à l’Assemblée</span></div></div>" +
-        (sol && sol.taux !== null ? '<div class="bar" aria-hidden="true"><div class="bar-fill" style="width:' + sol.taux + '%"></div>' +
-          (med ? '<span class="bar-median" style="left:' + med + '%"></span>' : "") + "</div>" : "") +
-        '<p class="cap">Participation aux scrutins solennels pendant son mandat : ' + (sol ? sol.votes + " sur " + sol.scrutins : "—") +
-        (med ? ". Le trait noir marque la médiane de l’hémicycle (" + pct(med) + ")" : "") + ".</p>" +
-        cd.mandats.map(function (m) {
-          return '<div class="kv"><span>Mandat de député, ' + esc(m.legislature) + "e législature</span><span>" + fmtDate(m.debut) + " – " + (m.fin ? fmtDate(m.fin) : "auj.") + "</span></div>";
-        }).join("") + '<p class="cap">Source : Assemblée nationale. Un député qui entre au gouvernement quitte son siège.</p>'
-      : '<p class="note">Pas de mandat de député depuis 2022 : pas de votes à l’Assemblée à afficher.</p>' +
-        '<div class="kv"><span>' + esc(c.mandate) + '<span class="flag">à vérifier</span></span><span>' + esc(c.filter) + "</span></div>";
-
-    var acc = D.themes.map(function (t) {
-      var votes = D.votes.filter(function (v) { return v.theme === t.id; });
-      var open = openTopic === t.id;
-      return '<div class="acc"><button type="button" class="acc-head" data-acc="' + t.id + '" aria-expanded="' + open + '">' +
-        '<span class="tile-icon">' + icon(t.icon, 18) + '</span><span class="l">' + esc(t.label) + '</span><span class="c">' +
-        (votes.length ? votes.length + " vote" + (votes.length > 1 ? "s" : "") : "—") + " " + (open ? "▴" : "▾") + "</span></button>" +
-        (open ? '<div class="acc-body"><div class="promise-row" style="padding:4px 0"><span>Promesse 2027 : pas encore publiée</span>' + pending() + "</div>" +
-          (votes.length ? votes.map(function (v) { return voteItem(v, c); }).join("") : '<p class="cap">Aucun vote clé sur ce sujet pour l’instant.</p>') + "</div>" : "") +
-        "</div>";
-    }).join("");
-
-    var related = D.votes.filter(function (v) {
-      var perso = cd.votesCles[v.id];
-      return (perso && perso.siegeait) || groupPos(v, c.group);
-    });
-
-    return '<div class="screen enter">' + topbar("#/candidats", "Son bilan") +
-      '<section class="bilan"><div class="cand-head"><span class="avatar lg" aria-hidden="true">' + initials(c.name) + '</span><div><span class="name-tag">' + esc(c.name) + '</span><span class="meta">' + esc(c.party) + " · " + esc(role(c)) + "</span></div></div>" +
-      '<div class="ring-row">' + ring + '<div class="ring-text"><b>Promesses tenues</b><span>En attente : son programme 2027 n’est pas encore publié. On comparera chaque promesse à ses votes.</span></div></div></section>' +
-      '<section class="box flat"><p class="eb">À l’Assemblée nationale</p>' + assemblee + "</section>" +
-      '<section style="display:flex;flex-direction:column;gap:10px"><h2 class="h2">Sujet par sujet</h2><div class="stagger" style="display:flex;flex-direction:column;gap:10px">' + acc + "</div></section>" +
-      '<section class="box flat"><p class="eb">' + (cd.depute ? "Ses votes clés" : "Votes clés de son groupe") + '</p><p class="group-note">' + esc(groupNote(c)) + "</p>" +
-      '<div style="display:flex;flex-direction:column;gap:6px">' + related.map(function (v) { return voteItem(v, c); }).join("") + "</div>" +
-      (D.votes.length - related.length ? '<p class="cap">' + (D.votes.length - related.length) + " vote(s) clé(s) sans position connue pour ce groupe.</p>" : "") +
-      "</section>" + foot() + "</div>";
+  function progStatus(p) {
+    if (p.statut === "publie") return p.mesures.length + " mesure" + (p.mesures.length > 1 ? "s" : "");
+    if (p.statut === "pas-publie") return "Programme pas encore publié";
+    if (p.statut === "en-cours") return "En cours d’ajout";
+    return "Pas encore ajouté";
   }
 
-  // ---------- Quiz ----------
+  function programmes() {
+    return '<div class="screen enter">' + topbar(null, "Programmes") +
+      '<h1 class="h1" style="font-size:34px">Ce qu’ils <span>proposent</span></h1>' +
+      '<p class="note">Les mesures sont recopiées mot pour mot depuis le programme de chaque parti. On ne résume pas et on ne choisit pas : ce sont les mesures que le parti met lui-même en avant, ou, s’il n’en désigne pas, celle qu’il présente en premier dans chaque partie de son programme.</p>' +
+      '<div class="people stagger">' + PARTIS.map(function (p) {
+        return '<a class="person' + (p.statut === "publie" ? "" : " off") + '" href="#/programmes/' + p.id + '"><span class="n">' + esc(p.nom) + '</span><span class="p">' + esc(progStatus(p)) + "</span></a>";
+      }).join("") + "</div>" +
+      '<p class="cap">Ordre alphabétique, aucune couleur de parti.</p>' + foot() + "</div>";
+  }
 
-  var quiz = null;
+  var openChapter = null;
 
-  function shuffle(a) {
-    a = a.slice();
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var t = a[i]; a[i] = a[j]; a[j] = t;
+  // Ce qui est affiché et pourquoi : la sélection vient toujours du parti, jamais de MarIAn.
+  function progRule(p) {
+    if (p.structure === "mesures-cles") {
+      return "<b>" + esc(p.nom) + " présente lui-même ces mesures comme « " + esc(p.libelle) + " ».</b> On les recopie telles quelles, dans son ordre, sans en choisir ni en reformuler aucune.";
     }
-    return a;
+    var u = p.unite || "chapitre";
+    return "<b>" + esc(p.nom) + " ne met pas de mesures en avant.</b> Pour chaque " + esc(u) +
+      ", on affiche donc celle qui ouvre sa liste dans le programme : c’est l’ordre choisi par le parti, pas une sélection de MarIAn. Les autres mesures sont dans le programme.";
   }
 
-  function newQuiz() { quiz = { order: shuffle(D.quiz), i: 0, results: [], picked: null, streak: 0, points: 0 }; }
+  function openMeasure(ref) {
+    var k = ref.lastIndexOf(":"), p = byId(PARTIS, ref.slice(0, k)), n = +ref.slice(k + 1);
+    var m = p && p.mesures.filter(function (x) { return x.ordre === n; })[0];
+    if (!m) return;
+    var eb = p.structure === "mesures-cles" ? p.libelle + (m.repere ? " · " + m.repere : "")
+      : (m.repere ? m.repere + " · " : "") + "1re mesure de la liste";
+    var extra = (m.chapitre ? '<p class="cap">' + esc(m.chapitre) + "</p>" : "") +
+      (p.structure === "mesures-cles" ? "" : '<p class="group-note">C’est la première mesure que ' + esc(p.nom) + " présente pour ce " + esc(p.unite || "chapitre") + ". Elle n’a pas été choisie par MarIAn.</p>") +
+      '<a class="link" href="' + esc(m.url) + '" target="_blank" rel="noopener">Lire dans le programme' + (m.page ? ", page " + m.page : "") + " ↗</a>" +
+      '<p class="cap">Texte reproduit mot pour mot.</p>';
+    showSheet(eb, m.titre || p.nom, m.texte, extra, true);
+  }
 
-  function confetti() {
-    var colors = ["#FFEF9F", "#FFFFFF", "#E3F4E9", "#FFE8D6", "#1D4ED8", "#E5484D"];
-    var s = "";
-    for (var i = 0; i < 14; i++) {
-      s += '<span class="qz-conf" style="left:' + (6 + i * 6.6) + "%;background:" + colors[i % colors.length] + ";animation-delay:" + ((i % 5) * 0.12) + 's"></span>';
+  function programme(id) {
+    var p = byId(PARTIS, id);
+    if (!p) return notFound();
+    var head = '<section class="box flat"><p class="eb">Programme</p><span class="name-tag">' + esc(p.nom) + "</span>" +
+      (p.programme ? '<span class="meta">' + esc(p.programme) + "</span>" : "") + "</section>";
+    if (p.statut !== "publie") {
+      return '<div class="screen enter">' + topbar("#/programmes", "Programme") + head +
+        '<div class="empty"><strong>' + esc(progStatus(p)) + "</strong>" +
+        (p.statut === "pas-publie" ? "Ce parti n’a pas encore publié de programme pour 2027."
+          : "Ses mesures s’afficheront ici une fois recopiées et vérifiées mot pour mot.") + "</div>" + foot() + "</div>";
     }
-    return '<div class="confetti" aria-hidden="true">' + s + "</div>";
-  }
-
-  function quizScreen() {
-    if (!quiz) newQuiz();
-    if (quiz.i >= quiz.order.length) return quizEnd();
-    var q = quiz.order[quiz.i];
-    var v = byId(D.votes, q.vote);
-    var picked = quiz.picked;
-    var answered = picked !== null;
-    var win = answered && picked === q.answer;
-    var slips = quiz.order.map(function (x, n) {
-      var cls = n < quiz.results.length ? (quiz.results[n] ? "done" : "miss") : n === quiz.i ? "now" : "";
-      return '<span class="' + cls + '"></span>';
-    }).join("");
-    var opts = q.options.map(function (label, k) {
-      var cls = "option", stamp = "";
-      if (answered) {
-        if (k === q.answer) { cls += " right"; stamp = '<span class="stamp ok qz-pop">Bingo</span>'; }
-        else if (k === picked) { cls += " wrong"; stamp = '<span class="stamp ko qz-pop">Raté</span>'; }
-        else cls += " dim";
+    // Par chapitre, dans l'ordre du programme ; une partie s'affiche en titre quand elle change.
+    var html = "", partie = null, groupe = null, groupes = [];
+    p.mesures.forEach(function (m) {
+      if (!groupe || groupe.chapitre !== m.chapitre || groupe.partie !== m.partie) {
+        groupe = { partie: m.partie, chapitre: m.chapitre, mesures: [] };
+        groupes.push(groupe);
       }
-      return '<button type="button" class="' + cls + '" data-pick="' + k + '"' + (answered ? " disabled" : "") + ">" + esc(label) + stamp + "</button>";
-    }).join("");
-    return '<div class="screen enter">' +
-      '<div class="quiz-top"><div class="quiz-slips" aria-label="Question ' + (quiz.i + 1) + " sur " + quiz.order.length + '">' + slips + "</div>" +
-      '<span class="streak">' + icon(I.flame, 16) + quiz.streak + " d’affilée</span></div>" +
-      '<div class="question"><span class="eb">' + esc(v.chamber) + " · " + fmtMonth(v.date) + "</span>" +
-      "<blockquote>« " + esc(v.title) + ' »</blockquote><p class="vote-summary">' + withTerms(v.summary) + "</p>" +
-      '<p class="ask">' + esc(q.prompt) + "</p></div>" +
-      '<div class="options">' + opts + "</div>" +
-      (answered ? '<div class="feedback qz-pop" style="transform:none;animation-name:mx-in" role="status"><span><span class="v">' + (win ? "Bien vu !" : "Presque ! C’était : " + esc(q.options[q.answer])) + "</span>" +
-        "<p>" + esc(q.explain) + ' <a class="link" href="' + esc(v.official || v.source.url) + '" target="_blank" rel="noopener">' + (v.official ? "Scrutin officiel ↗" : "Source ↗") + "</a></p></span>" +
-        '<span class="points">' + (win ? "+10" : "+0") + "</span></div>" : "") +
-      '<button type="button" class="next-btn" data-next>' + (answered ? (quiz.i + 1 < quiz.order.length ? "Question suivante" : "Voir mon score") : "Passer") + "</button>" +
-      (win ? confetti() : "") +
-      "</div>";
-  }
-
-  function quizEnd() {
-    var n = quiz.order.length;
-    var score = quiz.results.filter(Boolean).length;
-    var ballots = quiz.results.map(function (ok, i) {
-      var rot = [-4, 3, -2, 5, -3, 2, -5, 3, -2, 4][i % 10];
-      return ok
-        ? '<div class="ballot" style="transform:rotate(' + rot + 'deg)"><i style="width:80%"></i><i style="width:55%"></i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>'
-        : '<div class="ballot ko" style="transform:rotate(' + rot + 'deg)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></div>';
-    }).join("");
-    return '<div class="screen enter">' + topbar(null, "Ton score") +
-      '<div class="story" id="story">' +
-      '<div class="story-top"><span class="tag">Qui a voté ça ?</span><span style="font-weight:800">' + quiz.points + " pts</span></div>" +
-      '<div class="score-card"><span>J’ai trouvé</span><span class="score-num">' + score + "<small>/ " + n + "</small></span><span>votes de l’Assemblée.</span></div>" +
-      '<div class="ballots" aria-label="' + score + " bonnes réponses sur " + n + '">' + ballots + "</div>" +
-      '<p class="story-line">Qui dit mieux ?</p>' +
-      '<div class="story-foot"><span>' + esc(D.appName) + "</span><span>" + esc(location.host || "marian.fr") + "</span></div>" +
-      "</div>" +
-      '<button type="button" class="btn-dark" data-share>' + icon(I.share, 20) + "Partager</button>" +
-      '<button type="button" class="next-btn" data-restart>Rejouer</button>' +
-      '<p class="cap">Fais une capture de la carte pour la poster en story. Ton score n’est enregistré nulle part.</p>' +
-      "</div>";
-  }
-
-  // ---------- Méthode, lexique ----------
-
-  function method() {
-    return '<div class="screen enter">' + topbar("#/", "Comment on décide") +
-      '<p class="note" style="font-size:16px">On compare sa promesse à ses votes depuis 2022. C’est tout.</p>' +
-      '<div class="rules">' +
-      '<div class="rule"><span class="verdict oui">Oui</span><span>La plupart de ses votes vont dans le sens de sa promesse.</span></div>' +
-      '<div class="rule"><span class="verdict non">Non</span><span>La plupart de ses votes vont contre.</span></div>' +
-      '<div class="rule"><span class="verdict">Pas de vote</span><span>Moins de 3 votes, ou pas de mandat. On ne juge pas.</span></div>' +
-      '<div class="rule"><span class="verdict">En attente</span><span>Le programme 2027 n’est pas encore publié : c’est le cas de tous les candidats aujourd’hui.</span></div>' +
-      "</div>" +
-      '<section class="box flat"><p class="eb">Nos règles</p><ul class="list">' +
-      "<li>Une source par information, cliquable. Pas de source, pas de publication.</li>" +
-      "<li>Aucune consigne de vote. On compare chaque candidat à ses propres promesses, jamais les candidats entre eux.</li>" +
-      "<li>Ordre alphabétique, jamais par sondage. Aucune couleur de parti.</li>" +
-      "<li>Quand un candidat a siégé, on affiche son vote personnel. Sinon, on l’écrit : les votes de son groupe sont du contexte, pas ses votes.</li>" +
-      "<li>Les chiffres des votes viennent des données ouvertes de l’Assemblée nationale, collectées chaque nuit et relues avant publication.</li>" +
-      "<li>Les textes préparés avec l’IA sont relus et validés par l’équipe.</li>" +
-      "<li>Sans compte. Le quiz et le débat se jouent dans ton navigateur : rien n’est envoyé, aucun résultat n’est publié.</li>" +
-      "</ul></section>" +
+      groupe.mesures.push(m);
+    });
+    groupes.forEach(function (g, i) {
+      if (g.partie && g.partie !== partie) {
+        partie = g.partie;
+        html += '<p class="eb muted" style="margin-top:8px">' + esc(g.partie) + "</p>";
+      }
+      var key = p.id + ":" + i, open = openChapter === key;
+      html += '<div class="acc"><button type="button" class="acc-head" data-chap="' + esc(key) + '" aria-expanded="' + open + '">' +
+        '<span class="l">' + esc(g.chapitre || "Mesures") + '</span><span class="c">' + g.mesures.length + " " + (open ? "▴" : "▾") + "</span></button>" +
+        (open ? '<div class="acc-body">' + g.mesures.map(function (m) {
+          return '<button type="button" class="vote-item" data-mesure="' + p.id + ":" + m.ordre + '"><span>' +
+            (m.repere ? '<span class="m" style="margin:0 0 2px">' + esc(m.repere) + "</span>" : "") +
+            '<span class="t">' + esc(m.titre || m.texte) + "</span></span>" + icon(I.arrow, 18) + "</button>";
+        }).join("") + "</div>" : "") + "</div>";
+    });
+    return '<div class="screen enter">' + topbar("#/programmes", "Programme") + head +
+      '<p class="group-note">' + progRule(p) + "</p>" +
+      '<p class="cap">Touche un titre pour lire la mesure en entier.</p>' +
+      '<div class="stagger" style="display:flex;flex-direction:column;gap:10px">' + html + "</div>" +
+      '<section class="box flat"><p class="eb">Sources</p>' + p.sources.map(function (s) {
+        return '<div class="kv"><a class="link" href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.titre) + " ↗</a><span>consulté le " + fmtDate(s.consulte_le) + "</span></div>";
+      }).join("") +
+      '<p class="cap">Texte reproduit sans modification. Vérifié par un programme le ' + fmtDate(PR.verifieLe) +
+      " : chaque mesure a été retrouvée mot pour mot dans la source archivée.</p></section>" +
       '<a class="btn-dark" href="https://github.com/SimonPelissier/agenticIA-VF/issues/new" target="_blank" rel="noopener">Signaler une erreur</a>' +
       foot() + "</div>";
   }
 
+  // ======================================================================
+  // QUI A VOTÉ QUOI ? — données : grands votes de l'agent de collecte (data/votes.js)
+  // ======================================================================
+
+  var COL = { p: "#2E9D57", a: "#8C9BB5", c: "#D9480F", n: "#E6DFC6" };
+  var PV = { p: "Pour", c: "Contre", a: "Abstention", n: "Non-votant", x: "Absent", aucun: "N’a pas voté" };
+  var CAT_ICON = { institutions: "🏛", retraites: "⏳", immigration: "🛂", securite: "🛡", logement: "⌂", sante: "✚", economie: "€", travail: "💼", climat: "🌿", ecole: "✎", numerique: "📱", societe: "⚖", culture: "🎭", international: "🌍", autres: "…" };
+  var catLabel = {};
+  MV.categories.forEach(function (c) { catLabel[c.id] = c.label; });
+  var vs = { filter: "tout", limit: 12, q: "", g: null };
+
+  function loi(id) { return byId(MV.lois, id); }
+  function candVoteData(id) { return byId(MV.candidats, id) || { mandats: [], votes: {}, famille: null }; }
+  function siegeait(cv, date) { return cv.mandats.some(function (m) { return m.debut <= date && (!m.fin || date <= m.fin); }); }
+  function groupVote(cv, l) {
+    var g = l.groupes.filter(function (x) { return x.f === cv.famille; })[0];
+    if (!g) return null;
+    var max = Math.max(g.p, g.c, g.a);
+    return { pos: max === 0 ? "aucun" : g.p === max ? "p" : g.c === max ? "c" : "a", g: g.g, coh: g.coh };
+  }
+  // Son vote s'il siégeait ce jour-là ; absent : son groupe en contexte ; pas député : le vote de son groupe.
+  function candVote(id, l) {
+    var cv = candVoteData(id), gv = groupVote(cv, l);
+    if (siegeait(cv, l.date)) {
+      var mine = cv.votes[l.id];
+      return mine ? { perso: true, pos: mine, g: gv && gv.g } : { perso: true, pos: "x", g: gv && gv.g, gpos: gv && gv.pos, coh: gv && gv.coh };
+    }
+    return gv ? { perso: false, pos: gv.pos, g: gv.g, coh: gv.coh } : { perso: false, pos: null };
+  }
+  function candRole(c) {
+    var cv = candVoteData(c.id);
+    if (!cv.mandats.length) return "Pas de mandat de député : votes de son groupe";
+    var last = cv.mandats[cv.mandats.length - 1];
+    return last.fin ? "A siégé " + cv.mandats[0].debut.slice(0, 4) + "-" + last.fin.slice(0, 4) : "Siège à l’Assemblée";
+  }
+
+  function miniBar(l) {
+    var t = l.pour + l.contre + l.abst || 1;
+    return '<span class="mini"><i style="width:' + (100 * l.pour / t) + "%;background:" + COL.p + '"></i><i style="width:' + (100 * l.abst / t) + "%;background:" + COL.a + '"></i><i style="width:' + (100 * l.contre / t) + "%;background:" + COL.c + '"></i></span>';
+  }
+  function resPill(l) { return '<span class="res ' + (l.sort === "adopté" ? "ok" : "ko") + '">' + (l.sort === "adopté" ? "Adopté" : "Rejeté") + "</span>"; }
+  function lawRow(l, query, extra) {
+    return '<a class="law" href="#/votes/loi/' + l.id + (query || "") + '"><span class="m"><span>' + fmtDate(l.date) + (l.lecture ? " · " + esc(l.lecture) : "") + "</span>" + resPill(l) + "</span>" +
+      "<b>" + esc(l.titre) + "</b>" + (extra || miniBar(l)) + "</a>";
+  }
+
+  function votesStart() {
+    return '<div class="screen enter">' + topbar(null, "Qui a voté quoi ?") +
+      '<h1 class="h1">Qui a voté <span>quoi</span> ?</h1><p class="note">Les ' + MV.lois.length + " grands votes de l’Assemblée depuis 2022 : le vote final des lois, les motions de censure, les déclarations du gouvernement. Données officielles, mises à jour chaque nuit.</p>" +
+      '<div class="modes"><a class="mode dark" href="#/votes/sujets"><span class="mode-ic">🗂</span><span><b>Par sujet</b><small>Économie, sécurité, logement… puis les dernières lois</small></span></a>' +
+      '<a class="mode" href="#/votes/personnes"><span class="mode-ic">👤</span><span><b>Par personne</b><small>Comment chaque candidat a voté, ou son groupe s’il n’était pas député</small></span></a></div>' +
+      '<p class="eb">Les derniers votes</p>' + MV.lois.slice(0, 3).map(function (l) { return lawRow(l); }).join("") + foot() + "</div>";
+  }
+
+  function votesSujets() {
+    var counts = {}, last = {};
+    MV.lois.forEach(function (l) { counts[l.cat] = (counts[l.cat] || 0) + 1; if (!last[l.cat]) last[l.cat] = l.date; });
+    var q = vs.q.trim().toLowerCase();
+    var res = q ? MV.lois.filter(function (l) { return l.titre.toLowerCase().indexOf(q) !== -1; }).slice(0, 20) : null;
+    return '<div class="screen enter">' + topbar("#/votes", "Par sujet") +
+      '<label class="search">' + icon(I.search, 18) + '<input id="q" type="search" placeholder="Chercher une loi (ex. « logement »)" value="' + esc(vs.q) + '"></label>' +
+      (res ? '<p class="eb">' + res.length + " résultat" + (res.length > 1 ? "s" : "") + "</p>" + (res.map(function (l) { return lawRow(l); }).join("") || '<p class="cap">Aucune loi trouvée.</p>')
+        : '<p class="eb">Choisis une catégorie</p><div class="cat-tiles">' + MV.categories.filter(function (c) { return counts[c.id]; }).map(function (c) {
+          return '<a class="cat-tile" href="#/votes/sujets/' + c.id + '"><span class="cat-ic">' + CAT_ICON[c.id] + "</span><b>" + esc(c.label) + "</b><small>" + counts[c.id] + " votes · dernier le " + fmtDate(last[c.id]) + "</small></a>";
+        }).join("") + "</div>" +
+        '<p class="cap">Classement automatique d’après le titre du texte (règles publiques dans agents/collecte/grands_votes.py).</p>') +
+      foot() + "</div>";
+  }
+
+  function votesCat(cat) {
+    if (!catLabel[cat]) return notFound();
+    var list = MV.lois.filter(function (l) {
+      return l.cat === cat && (vs.filter === "tout" || (vs.filter === "adopte" ? l.sort === "adopté" : vs.filter === "rejete" ? l.sort !== "adopté" : l.leg === vs.filter));
+    });
+    var f = [["tout", "Tout"], ["17", "Depuis 2024"], ["16", "2022-2024"], ["adopte", "Adoptés"], ["rejete", "Rejetés"]];
+    return '<div class="screen enter">' + topbar("#/votes/sujets", null).replace("</a></div>", '</a><span class="tag">' + CAT_ICON[cat] + " " + esc(catLabel[cat]) + "</span></div>") +
+      '<h1 class="h1">Les derniers votes<br><span>' + esc(catLabel[cat].toLowerCase()) + "</span></h1>" +
+      '<div class="chips wrap">' + f.map(function (x) { return '<button type="button" class="chip" data-vfilter="' + x[0] + '" aria-pressed="' + (vs.filter === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
+      '<p class="cap">' + list.length + " vote" + (list.length > 1 ? "s" : "") + ", du plus récent au plus ancien. Touche une loi pour voir son hémicycle.</p>" +
+      list.slice(0, vs.limit).map(function (l) { return lawRow(l, "?c=" + cat); }).join("") +
+      (list.length > vs.limit ? '<button type="button" class="next-btn" data-vmore="1">Voir plus</button>' : "") + foot() + "</div>";
+  }
+
+  // Positions des sièges d'un hémicycle de n places, de gauche à droite.
+  function seats(n) {
+    var ROWS = 11, R0 = 62, R1 = 172, CX = 200, CY = 192, radii = [], tot = 0;
+    for (var r = 0; r < ROWS; r++) { var rad = R0 + (R1 - R0) * r / (ROWS - 1); radii.push(rad); tot += rad; }
+    var per = radii.map(function (rad) { return Math.round(n * rad / tot); });
+    per[ROWS - 1] += n - per.reduce(function (a, b) { return a + b; }, 0);
+    var pts = [];
+    radii.forEach(function (rad, i) {
+      for (var k = 0; k < per[i]; k++) {
+        var a = Math.PI * (1 - (per[i] > 1 ? k / (per[i] - 1) : 0.5));
+        pts.push({ x: CX + rad * Math.cos(a), y: CY - rad * Math.sin(a), a: a });
+      }
+    });
+    pts.sort(function (p, q) { return q.a - p.a || Math.hypot(p.x - CX, p.y - CY) - Math.hypot(q.x - CX, q.y - CY); });
+    return { pts: pts, cx: CX, cy: CY, r1: R1 };
+  }
+
+  function votesLoi(id, query) {
+    var l = loi(id);
+    if (!l) return notFound();
+    var person = query.p && candidate(query.p), banner = "";
+    var gs = l.groupes.filter(function (g) { return g.m > 0; });
+    if (person) {
+      var v = candVote(person.id, l), gp = v.g || (groupVote(candVoteData(person.id), l) || {}).g;
+      if (vs.g === null && gp) vs.g = gp;
+      banner = '<div class="banner"><span class="avatar sm">' + initials(person.name) + "</span><p><b>" + esc(person.name) + "</b><br>" +
+        (v.perso ? (v.pos === "x" ? "Siégeait mais <b>n’a pas voté</b>" + (v.gpos ? ". Son groupe " + v.g + " : <b>" + PV[v.gpos] + "</b>" : "") : "Son vote : <b>" + PV[v.pos] + "</b>")
+          : v.pos ? "Pas député à cette date. Son groupe " + v.g + " : <b>" + PV[v.pos] + "</b>" + (v.coh !== null ? " (cohésion " + v.coh + " %)" : "") : "Pas député à cette date, et son groupe n’existait pas.") +
+        (gp ? " · son groupe est allumé" : "") + "</p></div>";
+    }
+    var n = gs.reduce(function (a, g) { return a + g.m; }, 0), H = seats(n), pts = H.pts, i = 0, dots = "", labels = "";
+    gs.forEach(function (g) {
+      var nv = Math.max(0, g.m - g.p - g.c - g.a), seq = [];
+      [["p", g.p], ["a", g.a], ["c", g.c], ["n", nv]].forEach(function (x) { for (var j = 0; j < x[1]; j++) seq.push(x[0]); });
+      var start = i;
+      seq.slice(0, g.m).forEach(function (k) {
+        var p = pts[i++];
+        if (p) dots += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="3.9" fill="' + COL[k] + '" opacity="' + (vs.g && vs.g !== g.g ? 0.15 : 1) + '"/>';
+      });
+      var mid = pts[Math.floor((start + i - 1) / 2)];
+      if (g.m >= 12 && mid) {
+        labels += '<text data-vg="' + g.g + '" x="' + (H.cx + (H.r1 + 15) * Math.cos(mid.a)).toFixed(1) + '" y="' + (H.cy - (H.r1 + 15) * Math.sin(mid.a)).toFixed(1) +
+          '" text-anchor="middle" dominant-baseline="middle" font-size="9.5" font-weight="800" fill="' + (vs.g === g.g ? "#6D28D9" : "#4C426C") + '" style="cursor:pointer">' + g.g + "</text>";
+      }
+    });
+    var sel = vs.g && gs.filter(function (g) { return g.g === vs.g; })[0];
+    var back = person ? "#/votes/personnes/" + person.id : query.c ? "#/votes/sujets/" + query.c : "#/votes";
+    return '<div class="screen enter">' + topbar(back, null).replace("</a></div>", '</a><span class="tag">' + CAT_ICON[l.cat] + " " + esc(catLabel[l.cat]) + "</span></div>") + banner +
+      '<div class="box"><p class="cap">' + fmtDate(l.date) + (l.lecture ? " · " + esc(l.lecture) : "") + (l.solennel ? " · scrutin solennel" : "") + " · " + l.leg + "e législature</p>" +
+      '<h1 class="vote-title">' + esc(l.titre) + "</h1>" +
+      '<span class="result">' + (l.sort === "adopté" ? "Adopté" : "Rejeté") + " · " + l.pour + " pour, " + l.contre + " contre, " + l.abst + " abst.</span>" +
+      '<svg class="hemi" viewBox="0 0 400 205" role="img" aria-label="Hémicycle : ' + l.pour + " pour, " + l.contre + ' contre">' + dots + labels +
+      '<text x="200" y="172" text-anchor="middle" font-size="24" font-weight="800" fill="#1D1836">' + l.pour + " / " + l.requis + '</text><text x="200" y="190" text-anchor="middle" font-size="10.5" font-weight="600" fill="#796F91">voix pour / voix nécessaires</text></svg>' +
+      '<div class="legend"><span><i style="background:' + COL.p + '"></i>Pour</span><span><i style="background:' + COL.a + '"></i>Abstention</span><span><i style="background:' + COL.c + '"></i>Contre</span><span><i style="background:' + COL.n + '"></i>N’a pas voté (' + (n - l.pour - l.contre - l.abst) + ")</span></div>" +
+      '<div class="tbar"><i style="width:' + (100 * l.pour / n) + "%;background:" + COL.p + '"></i><i style="width:' + (100 * l.abst / n) + "%;background:" + COL.a + '"></i><i style="width:' + (100 * l.contre / n) + "%;background:" + COL.c + '"></i><span class="thr" style="left:' + (100 * l.requis / n) + '%"></span></div>' +
+      '<p class="cap">Trait noir : seuil de ' + l.requis + " voix. " + (l.leg === "16" ? "Ordre des groupes de 2022-2024 à vérifier." : "Groupes placés de gauche à droite comme dans l’hémicycle (d’après les numéros de siège officiels).") + " Dans un groupe, la place de chaque député est indicative.</p>" +
+      (sel ? '<div class="gdetail"><b>' + esc(MV.noms[sel.g] || sel.g) + "</b>" + sel.p + " pour, " + sel.c + " contre, " + sel.a + " abstention, " + Math.max(0, sel.m - sel.p - sel.c - sel.a) + " n’ont pas voté, sur " + sel.m + " députés" + (sel.coh !== null ? " · cohésion " + sel.coh + " %" + (sel.coh < 67 ? " (groupe divisé)" : "") : "") + ".</div>"
+        : '<p class="cap">Touche un groupe pour allumer ses sièges.</p>') +
+      '<a class="link" href="' + esc(l.url) + '" target="_blank" rel="noopener">Voir le scrutin officiel ↗</a></div>' +
+      '<p class="eb">Groupe par groupe, de gauche à droite</p><div>' + gs.map(function (g) {
+        return '<button type="button" class="grow" data-vg="' + g.g + '" aria-pressed="' + (vs.g === g.g) + '" title="' + esc(MV.noms[g.g] || g.g) + '"><span>' + g.g + '</span><span class="stack"><i style="width:' + (100 * g.p / g.m) + "%;background:" + COL.p + '"></i><i style="width:' + (100 * g.a / g.m) + "%;background:" + COL.a + '"></i><i style="width:' + (100 * g.c / g.m) + "%;background:" + COL.c + '"></i></span><span class="gn">' + (g.p + g.c + g.a) + "/" + g.m + "</span></button>";
+      }).join("") + "</div>" + foot() + "</div>";
+  }
+
+  function votesPersonnes() {
+    return '<div class="screen enter">' + topbar("#/votes", "Par personne") +
+      '<h1 class="h1">Qui veux-tu <span>checker</span> ?</h1><div class="people stagger">' + D.candidates.map(function (c) {
+        return '<a class="person" href="#/votes/personnes/' + c.id + '"><span class="avatar" aria-hidden="true">' + initials(c.name) + '</span><span class="n">' + esc(c.name) + '</span><span class="p">' + esc(c.party) + "<br>" + esc(candRole(c)) + "</span></a>";
+      }).join("") + '</div><p class="cap">Ordre alphabétique, aucune couleur de parti.</p>' + foot() + "</div>";
+  }
+
+  function votesPersonne(id) {
+    var c = candidate(id);
+    if (!c) return notFound();
+    var cv = candVoteData(id), fam = D.groups[c.group] || c.group;
+    var all = MV.lois.map(function (l) { return { l: l, v: candVote(id, l) }; }).filter(function (x) { return x.v.pos; });
+    var perso = all.filter(function (x) { return x.v.perso; }), grp = all.filter(function (x) { return !x.v.perso; });
+    var voted = perso.filter(function (x) { return x.v.pos !== "x"; });
+    function dist(arr, title) {
+      if (!arr.length) return "";
+      var n = {};
+      arr.forEach(function (x) { n[x.v.pos] = (n[x.v.pos] || 0) + 1; });
+      return '<div class="dist"><p class="eb muted">' + title + " · " + arr.length + " votes</p>" + ["p", "c", "a", "n", "aucun"].filter(function (k) { return n[k]; }).map(function (k) {
+        return '<div class="drow"><span>' + PV[k] + '</span><span class="dbar"><i style="width:' + (100 * n[k] / arr.length) + "%;background:" + (COL[k] || COL.n) + '"></i></span><span>' + n[k] + "</span></div>";
+      }).join("") + "</div>";
+    }
+    // Participation aux scrutins solennels, la mesure juste (agent de collecte, data/app.js).
+    var part = MD.candidats[id] && MD.candidats[id].participation, sol = part && part.solennels;
+    var med = MD.medianeSolennels && MD.medianeSolennels.taux;
+    var last = cv.mandats[cv.mandats.length - 1];
+    var note = cv.mandats.length
+      ? (last.fin ? c.name + " a siégé à l’Assemblée de " + fmtDate(cv.mandats[0].debut) + " à " + fmtDate(last.fin) + ". Pour les votes en dehors de cette période, on montre ceux de son groupe (" + fam + ")."
+        : "Quand " + c.name + " siégeait, c’est son vote personnel. Sinon (avant son élection, ou pendant un passage au gouvernement), c’est celui de son groupe (" + fam + ").")
+      : c.name + " n’a pas été député depuis 2022 (" + c.mandate + ", à vérifier). On montre les votes de son groupe à l’Assemblée (" + fam + "), à titre de contexte : ce ne sont pas ses votes.";
+    var counts = {};
+    all.forEach(function (x) { counts[x.l.cat] = (counts[x.l.cat] || 0) + 1; });
+    var cats = [["tout", "Tous"]].concat(MV.categories.filter(function (k) { return counts[k.id]; }).map(function (k) { return [k.id, k.label]; }));
+    var list = all.filter(function (x) { return vs.filter === "tout" || x.l.cat === vs.filter; });
+    return '<div class="screen enter">' + topbar("#/votes/personnes", "Par personne") +
+      '<section class="box"><div class="cand-head"><span class="avatar lg" aria-hidden="true">' + initials(c.name) + '</span><div><span class="name-tag">' + esc(c.name) + '</span><span class="meta">' + esc(c.party) + " · " + esc(candRole(c)) + "</span></div></div>" +
+      '<p class="group-note">' + esc(note) + "</p>" +
+      (sol && sol.taux !== null ? '<div class="stats"><div class="stat"><b class="accent">' + String(sol.taux).replace(".", ",") + ' %</b><span>des scrutins solennels</span></div><div class="stat"><b>' + voted.length + "/" + perso.length + "</b><span>grands votes où il a voté</span></div></div>" +
+        '<p class="cap">Médiane de l’hémicycle aux scrutins solennels : ' + String(med).replace(".", ",") + " %. Beaucoup de lois sont votées dans un hémicycle peu rempli : c’est courant, d’où l’intérêt des scrutins solennels, annoncés à l’avance.</p>" : "") +
+      dist(voted, "Quand il a voté") + dist(grp, "Votes de son groupe") + "</section>" +
+      '<div class="chips">' + cats.map(function (x) { return '<button type="button" class="chip" data-vfilter="' + x[0] + '" aria-pressed="' + (vs.filter === x[0]) + '">' + esc(x[1]) + "</button>"; }).join("") + "</div>" +
+      list.slice(0, vs.limit).map(function (x) {
+        var v = x.v;
+        var who = v.perso ? (v.pos === "x" ? "Absent" + (v.gpos ? " · son groupe " + v.g + " : " + PV[v.gpos] : "") : "Son vote") : "Vote du groupe " + v.g + (v.coh !== null && v.coh < 67 ? " (divisé)" : "");
+        return lawRow(x.l, "?p=" + id, '<span class="m" style="align-items:center"><span class="who">' + esc(who) + '</span><span class="pv ' + v.pos + '">' + PV[v.pos] + "</span></span>");
+      }).join("") +
+      (list.length > vs.limit ? '<button type="button" class="next-btn" data-vmore="1">Voir plus</button>' : "") + foot() + "</div>";
+  }
+
+  // ======================================================================
+  // MÉTHODE, LEXIQUE
+  // ======================================================================
+
+  function method() {
+    return '<div class="screen enter">' + topbar("#/", "Comment on travaille") +
+      '<section class="box flat"><p class="eb">Nos règles</p><ul class="list">' +
+      "<li>Une source par information, cliquable. Pas de source, pas de publication.</li>" +
+      "<li>Aucune consigne de vote, aucune comparaison entre candidats. Ordre alphabétique, aucune couleur de parti.</li>" +
+      "<li><b>Actualité</b> : titres et liens des articles de 10 médias généralistes ; les déclarations des candidats sont relevées en citation directe, vérifiées mot pour mot dans l’article, puis relues par l’équipe.</li>" +
+      "<li><b>Programmes</b> : recopiés mot pour mot, jamais résumés. Un programme vérifie que chaque mesure se trouve telle quelle dans la source.</li>" +
+      "<li><b>Qui a voté quoi ?</b> : votes officiels de l’Assemblée nationale, collectés chaque nuit et relus avant publication. Quand un candidat a siégé, c’est son vote ; sinon, celui de son groupe, toujours écrit comme tel.</li>" +
+      "<li>Les textes préparés avec l’IA sont relus et validés par l’équipe.</li>" +
+      "<li>Sans compte : tes préférences restent sur ton téléphone, rien n’est envoyé.</li>" +
+      "</ul></section>" +
+      '<a class="btn-dark" href="https://github.com/SimonPelissier/agenticIA-VF/issues/new" target="_blank" rel="noopener">Signaler une erreur</a>' +
+      foot() + "</div>";
+  }
   function lexicon() {
-    return '<div class="screen enter">' + topbar("#/methode", "Lexique") +
-      '<h1 class="h1">Les mots <span>compliqués</span></h1>' +
-      '<section class="box flat"><dl class="gloss">' + D.glossary.map(function (g) {
-        return "<div><dt>" + esc(g.term) + "</dt><dd>" + esc(g.def) + "</dd></div>";
-      }).join("") + "</dl></section>" + foot() + "</div>";
+    return '<div class="screen enter">' + topbar("#/methode", "Lexique") + '<h1 class="h1">Les mots <span>compliqués</span></h1>' +
+      '<section class="box flat"><dl class="gloss">' + D.glossary.map(function (g) { return "<div><dt>" + esc(g.term) + "</dt><dd>" + esc(g.def) + "</dd></div>"; }).join("") + "</dl></section>" + foot() + "</div>";
   }
+  function notFound() { return '<div class="screen">' + topbar("#/", "Page introuvable") + '<a class="btn-dark" href="#/">Retour à l’accueil</a></div>'; }
 
-  function notFound() {
-    return '<div class="screen">' + topbar("#/", "Page introuvable") + '<a class="btn-dark" href="#/">Retour à l’accueil</a></div>';
+  // ======================================================================
+  // ROUTEUR
+  // ======================================================================
+
+  var TAB = { "": "accueil", actu: "actu", programmes: "programmes", votes: "votes" };
+  var lastRoute = null;
+
+  function parse() {
+    var h = location.hash.replace(/^#\/?/, ""), q = {}, k = h.indexOf("?");
+    if (k !== -1) {
+      h.slice(k + 1).split("&").forEach(function (kv) { var p = kv.split("="); q[p[0]] = decodeURIComponent(p[1] || ""); });
+      h = h.slice(0, k);
+    }
+    return { parts: h.split("/"), q: q, key: h };
   }
-
-  // ---------- Routeur ----------
-
-  var TAB = { "": "accueil", debat: "debat", quiz: "quiz", sujets: "sujets", themes: "sujets", candidats: "candidats" };
 
   function route() {
-    var parts = location.hash.replace(/^#\/?/, "").split("/");
-    var html;
-    switch (parts[0]) {
+    var r = parse(), p = r.parts, html;
+    if (r.key !== lastRoute) {
+      // Nouvel écran : on oublie le groupe allumé et, hors fiche loi, les filtres de liste.
+      vs.g = null;
+      if (p[1] !== "loi") { vs.filter = "tout"; vs.limit = 12; }
+      lastRoute = r.key;
+    }
+    switch (p[0]) {
       case "": html = home(); break;
-      case "debat": html = debate(); break;
-      case "sujets": case "themes": html = parts[1] ? topic(parts[1]) : topics(); break;
-      case "candidats": html = parts[1] ? candidate(parts[1]) : candidates(); break;
-      case "quiz": html = quizScreen(); break;
+      case "actu": html = p[1] === "a" ? actuDetail(p[2]) : p[1] === "perso" ? actuPerso() : actuFeed(); break;
+      case "programmes": html = p[1] ? programme(p[1]) : programmes(); break;
+      case "votes":
+        html = p[1] === "sujets" ? (p[2] ? votesCat(p[2]) : votesSujets())
+          : p[1] === "personnes" ? (p[2] ? votesPersonne(p[2]) : votesPersonnes())
+          : p[1] === "loi" ? votesLoi(p[2], r.q) : votesStart();
+        break;
       case "methode": html = method(); break;
       case "lexique": html = lexicon(); break;
       default: html = notFound();
     }
     app.innerHTML = html;
-    var tab = TAB[parts[0]] || "";
-    var links = document.querySelectorAll(".tabbar a");
+    var tab = TAB[p[0]] || "", links = document.querySelectorAll(".tabbar a");
     for (var i = 0; i < links.length; i++) {
-      if (links[i].getAttribute("data-tab") === tab) links[i].setAttribute("aria-current", "page");
-      else links[i].removeAttribute("aria-current");
+      if (links[i].getAttribute("data-tab") === tab) links[i].setAttribute("aria-current", "page"); else links[i].removeAttribute("aria-current");
     }
   }
 
-  function rerender() {
+  function rerender(focusSearch) {
     var y = window.scrollY;
     route();
-    // Pas d'animation d'entrée quand on met seulement à jour l'écran en cours.
     var e = app.querySelector(".enter");
     if (e) e.classList.remove("enter");
     window.scrollTo(0, y);
+    if (focusSearch) { var q = app.querySelector("#q"); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } }
   }
 
   window.addEventListener("hashchange", function () { route(); window.scrollTo(0, 0); });
@@ -552,65 +601,52 @@
   var sheet = document.getElementById("sheet");
   var lastFocus = null;
 
-  function openTerm(i) {
-    var g = D.glossary[i];
-    if (!g) return;
+  // Feuille du bas : lexique, ou une mesure de programme (texte posé en textContent, donc jamais interprété).
+  function showSheet(eb, title, body, extraHtml, measure) {
     lastFocus = document.activeElement;
-    document.getElementById("sheet-title").textContent = g.term;
-    document.getElementById("sheet-body").textContent = g.def;
+    document.getElementById("sheet-eb").textContent = eb;
+    document.getElementById("sheet-title").textContent = title;
+    document.getElementById("sheet-body").textContent = body;
+    document.getElementById("sheet-extra").innerHTML = extraHtml || "";
+    sheet.classList.toggle("measure-sheet", !!measure);
     sheet.hidden = false;
+    sheet.querySelector(".sheet-panel").scrollTop = 0;
     sheet.querySelector(".btn-dark").focus();
   }
+  function openTerm(i) { var g = D.glossary[i]; if (g) showSheet("Lexique", g.term, g.def); }
+  function closeSheet() { sheet.hidden = true; if (lastFocus) lastFocus.focus(); }
 
-  function closeSheet() {
-    sheet.hidden = true;
-    if (lastFocus) lastFocus.focus();
-  }
-
-  function share(text, btn) {
-    var url = location.href.split("#")[0];
-    if (navigator.share) {
-      navigator.share({ title: D.appName, text: text, url: url }).catch(function () {});
-    } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(text + " " + url).then(function () { btn.textContent = "Lien copié"; }, function () {});
-    }
-  }
+  function toggleIn(list, v) { var i = list.indexOf(v); if (i === -1) list.push(v); else list.splice(i, 1); return list; }
 
   document.addEventListener("click", function (e) {
-    var t = e.target.closest("[data-term],[data-close],[data-debate],[data-sort],[data-acc],[data-pick],[data-next],[data-restart],[data-share],[data-share-debate]");
+    var t = e.target.closest("[data-term],[data-close],[data-chap],[data-mesure],[data-amode],[data-apick],[data-follow],[data-fsujet],[data-vfilter],[data-vmore],[data-vg]");
     if (!t) return;
-    if (t.hasAttribute("data-term")) openTerm(+t.getAttribute("data-term"));
+    var d = t.dataset;
+    if (d.term !== undefined) openTerm(+d.term);
     else if (t.hasAttribute("data-close")) closeSheet();
-    else if (t.hasAttribute("data-debate")) {
-      var choice = t.getAttribute("data-debate");
-      debateChoice = debateChoice === choice && !t.hasAttribute("data-go") ? null : choice;
-      if (t.hasAttribute("data-go")) location.hash = "#/debat"; else rerender();
-    }
-    else if (t.hasAttribute("data-sort")) { var s = t.getAttribute("data-sort"); sortBy = sortBy === s ? null : s; rerender(); }
-    else if (t.hasAttribute("data-acc")) { var a = t.getAttribute("data-acc"); openTopic = openTopic === a ? null : a; rerender(); }
-    else if (t.hasAttribute("data-pick")) {
-      if (quiz.picked !== null) return;
-      quiz.picked = +t.getAttribute("data-pick");
-      var ok = quiz.picked === quiz.order[quiz.i].answer;
-      quiz.results.push(ok);
-      quiz.streak = ok ? quiz.streak + 1 : 0;
-      quiz.points += ok ? 10 : 0;
-      rerender();
-    }
-    else if (t.hasAttribute("data-next")) {
-      if (quiz.picked === null) { quiz.results.push(false); quiz.streak = 0; } // « Passer » compte comme raté
-      quiz.i++; quiz.picked = null; route(); window.scrollTo(0, 0);
-    }
-    else if (t.hasAttribute("data-restart")) { newQuiz(); route(); window.scrollTo(0, 0); }
-    else if (t.hasAttribute("data-share")) {
-      share("J’ai trouvé " + quiz.results.filter(Boolean).length + "/" + quiz.order.length + " à « Qui a voté ça ? » sur " + D.appName + ". Qui dit mieux ?", t);
-    }
-    else if (t.hasAttribute("data-share-debate")) share(D.debate.question + " Regarde comment les candidats ont voté sur " + D.appName + ".", t);
+    else if (d.chap) { openChapter = openChapter === d.chap ? null : d.chap; rerender(); }
+    else if (d.mesure) openMeasure(d.mesure);
+    else if (d.amode) { actu.mode = d.amode; actu.pick = "all"; rerender(); }
+    else if (d.apick) { actu.pick = d.apick; rerender(); }
+    else if (d.follow) { var p = prefs(); toggleIn(p.cands, d.follow); save(FIL_KEY, p); rerender(); }
+    else if (d.fsujet) { var p2 = prefs(); toggleIn(p2.sujets, d.fsujet); save(FIL_KEY, p2); rerender(); }
+    else if (d.vfilter) { vs.filter = d.vfilter; vs.limit = 12; rerender(); }
+    else if (d.vmore) { vs.limit += 12; rerender(); }
+    else if (d.vg) { vs.g = vs.g === d.vg ? null : d.vg; rerender(); }
   });
 
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && !sheet.hidden) closeSheet();
+  document.addEventListener("change", function (e) {
+    var m = e.target.getAttribute && e.target.getAttribute("data-fmedia");
+    if (!m) return;
+    var p = prefs(), all = Object.keys(MA.medias), cur = p.medias || all.slice();
+    p.medias = e.target.checked ? cur.concat([m]).filter(function (x, i, a) { return a.indexOf(x) === i; }) : cur.filter(function (x) { return x !== m; });
+    if (p.medias.length === all.length) p.medias = null;
+    save(FIL_KEY, p);
+    rerender();
   });
+
+  document.addEventListener("input", function (e) { if (e.target.id === "q") { vs.q = e.target.value; rerender(true); } });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !sheet.hidden) closeSheet(); });
 
   // Écran de chargement : une fois par visite, retiré au bout d'un instant ou au toucher.
   var splash = document.getElementById("splash");
@@ -629,6 +665,11 @@
       setTimeout(hideSplash, 1600);
     }
   }
+
+  // Anciennes adresses : pages retirées (gardées dans la branche archive/v4-avant-4-pages).
+  var anciennes = { sujets: "#/votes/sujets", themes: "#/votes/sujets", candidats: "#/votes/personnes", quiz: "#/", debat: "#/" };
+  var p0 = parse().parts[0];
+  if (anciennes[p0]) location.replace(anciennes[p0]);
 
   route();
 })();

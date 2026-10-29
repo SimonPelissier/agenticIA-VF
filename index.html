@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MarIAn · Présidentielle 2027</title>
-  <meta name="description" content="Ce qu’ils promettent. Ce qu’ils ont voté. Les candidats à la présidentielle 2027 face à leurs votes, sujet par sujet, avec une source pour chaque information.">
+  <meta name="description" content="L’actualité des candidats à la présidentielle 2027, leurs programmes mot pour mot et qui a voté quoi à l’Assemblée, avec une source pour chaque information.">
   <meta name="theme-color" content="#FFF8D7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,10 +16,9 @@
 
   <nav class="tabbar" aria-label="Navigation principale">
     <a href="#/" data-tab="accueil"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Accueil</a>
-    <a href="#/debat" data-tab="debat"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Débat</a>
-    <a href="#/quiz" data-tab="quiz"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.5V14M12 17.5v.01"/></svg>Quiz</a>
-    <a href="#/sujets" data-tab="sujets"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Sujets</a>
-    <a href="#/candidats" data-tab="candidats"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Candidats</a>
+    <a href="#/actu" data-tab="actu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h13v14H6a2 2 0 0 1-2-2zM17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6"/></svg>Actualité</a>
+    <a href="#/programmes" data-tab="programmes"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6"/></svg>Programmes</a>
+    <a href="#/votes" data-tab="votes"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4zM9 11V4h6v7M8 15h8"/></svg>Qui a voté quoi ?</a>
   </nav>
 
   <div id="splash" class="splash" role="button" tabindex="0" aria-label="Entrer dans MarIAn">
@@ -60,14 +59,18 @@
   <div id="sheet" class="sheet" hidden>
     <div class="sheet-backdrop" data-close></div>
     <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
-      <p class="eb">Lexique</p>
+      <p class="eb" id="sheet-eb">Lexique</p>
       <h2 id="sheet-title" class="sheet-title"></h2>
       <p id="sheet-body" class="sheet-body"></p>
+      <div id="sheet-extra" class="sheet-extra"></div>
       <button type="button" class="btn-dark" data-close>Fermer</button>
     </div>
   </div>
 
   <script src="data/app.js"></script>
+  <script src="data/votes.js"></script>
+  <script src="data/actu.js"></script>
+  <script src="data/programmes.js"></script>
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
 </body>
