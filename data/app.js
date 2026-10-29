@@ -54,8 +54,8 @@ window.MARIAN_DONNEES = {
      "votes": 71
     },
     "tous": {
-     "scrutins": 8837,
-     "taux": 20.0,
+     "scrutins": 9291,
+     "taux": 19.1,
      "votes": 1770
     }
    },
@@ -150,9 +150,9 @@ window.MARIAN_DONNEES = {
      "votes": 101
     },
     "tous": {
-     "scrutins": 12852,
-     "taux": 8.3,
-     "votes": 1070
+     "scrutins": 13306,
+     "taux": 8.1,
+     "votes": 1074
     }
    },
    "votesCles": {
@@ -236,7 +236,7 @@ window.MARIAN_DONNEES = {
     {
      "abrege": "RN",
      "debut": "2024-07-19",
-     "fin": null,
+     "fin": "2026-10-27",
      "legislature": "17"
     }
    ],
@@ -259,8 +259,8 @@ window.MARIAN_DONNEES = {
      "votes": 105
     },
     "tous": {
-     "scrutins": 12852,
-     "taux": 10.9,
+     "scrutins": 13306,
+     "taux": 10.6,
      "votes": 1406
     }
    },
@@ -404,7 +404,7 @@ window.MARIAN_DONNEES = {
    "votesCles": {}
   }
  },
- "dernierScrutin": "2026-10-15",
+ "dernierScrutin": "2026-10-28",
  "medianeSolennels": {
   "deputes": 819,
   "taux": 87.8
