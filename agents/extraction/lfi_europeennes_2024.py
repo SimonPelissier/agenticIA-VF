@@ -74,6 +74,7 @@ def main():
         "structure": "mesures-cles",
         "libelle": "Mesure-clé",
         "regle": None,
+        "unite": "sous-partie",
         "sources": sources,
         "mesures": mesures,
     })

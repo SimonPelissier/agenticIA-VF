@@ -334,6 +334,8 @@ button:active, a:active { transform: translateY(2px) scale(0.98); }
 .acc-head .c { font: 700 12px var(--sans); color: var(--mute); }
 .acc-body { display: flex; flex-direction: column; gap: 6px; padding: 0 14px 14px; }
 .acc-body .vote-item { background: var(--cream); }
+button.vote-item { width: 100%; border: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+button.vote-item svg { flex: none; color: var(--accent); }
 
 .group-note { padding: 12px 14px; border-radius: 16px; background: var(--yellow); font-size: 13px; margin: 0; }
 
@@ -434,6 +436,11 @@ button:active, a:active { transform: translateY(2px) scale(0.98); }
   width: 100%; max-width: 430px; display: flex; flex-direction: column; gap: 8px;
   background: var(--white); border-top: var(--edge); border-radius: 24px 24px 0 0;
   padding: 22px 16px calc(20px + env(safe-area-inset-bottom));
+  max-height: 88vh; overflow-y: auto;
 }
+.sheet-extra { display: flex; flex-direction: column; gap: 8px; }
+.sheet-extra:empty { display: none; }
+.sheet.measure-sheet .sheet-title { font-size: 21px; line-height: 1.2; }
+.sheet.measure-sheet .sheet-body { color: var(--ink); font-size: 16px; line-height: 1.5; white-space: pre-line; }
 .sheet-title { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
 .sheet-body { margin: 0 0 8px; color: var(--ink-2); }

@@ -493,11 +493,36 @@
   function programmes() {
     return '<div class="screen enter">' + topbar(null, "Programmes") +
       '<h1 class="h1" style="font-size:34px">Ce qu’ils <span>proposent</span></h1>' +
-      '<p class="note">Les mesures sont recopiées mot pour mot depuis le programme de chaque parti. On ne résume pas et on ne choisit pas : ce sont les mesures clés désignées par le parti, ou, s’il n’en désigne pas, la première mesure de chaque chapitre.</p>' +
+      '<p class="note">Les mesures sont recopiées mot pour mot depuis le programme de chaque parti. On ne résume pas et on ne choisit pas : ce sont les mesures que le parti met lui-même en avant, ou, s’il n’en désigne pas, celle qu’il présente en premier dans chaque partie de son programme.</p>' +
       '<div class="people stagger">' + PARTIS.map(function (p) {
         return '<a class="person' + (p.statut === "publie" ? "" : " off") + '" href="#/programmes/' + p.id + '"><span class="n">' + esc(p.nom) + '</span><span class="p">' + esc(progStatus(p)) + "</span></a>";
       }).join("") + "</div>" +
       '<p class="cap">Ordre alphabétique, aucune couleur de parti.</p>' + foot() + "</div>";
+  }
+
+  var openChapter = null;
+
+  // Ce qui est affiché et pourquoi : la sélection vient toujours du parti, jamais de MarIAn.
+  function progRule(p) {
+    if (p.structure === "mesures-cles") {
+      return "<b>" + esc(p.nom) + " présente lui-même ces mesures comme « " + esc(p.libelle) + " ».</b> On les recopie telles quelles, dans son ordre, sans en choisir ni en reformuler aucune.";
+    }
+    var u = p.unite || "chapitre";
+    return "<b>" + esc(p.nom) + " ne met pas de mesures en avant.</b> Pour chaque " + esc(u) +
+      ", on affiche donc celle qui ouvre sa liste dans le programme : c’est l’ordre choisi par le parti, pas une sélection de MarIAn. Les autres mesures sont dans le programme.";
+  }
+
+  function openMeasure(ref) {
+    var k = ref.lastIndexOf(":"), p = byId(PARTIS, ref.slice(0, k)), n = +ref.slice(k + 1);
+    var m = p && p.mesures.filter(function (x) { return x.ordre === n; })[0];
+    if (!m) return;
+    var eb = p.structure === "mesures-cles" ? p.libelle + (m.repere ? " · " + m.repere : "")
+      : (m.repere ? m.repere + " · " : "") + "1re mesure de la liste";
+    var extra = (m.chapitre ? '<p class="cap">' + esc(m.chapitre) + "</p>" : "") +
+      (p.structure === "mesures-cles" ? "" : '<p class="group-note">C’est la première mesure que ' + esc(p.nom) + " présente pour ce " + esc(p.unite || "chapitre") + ". Elle n’a pas été choisie par MarIAn.</p>") +
+      '<a class="link" href="' + esc(m.url) + '" target="_blank" rel="noopener">Lire dans le programme' + (m.page ? ", page " + m.page : "") + " ↗</a>" +
+      '<p class="cap">Texte reproduit mot pour mot.</p>';
+    showSheet(eb, m.titre || p.nom, m.texte, extra, true);
   }
 
   function programme(id) {
@@ -511,23 +536,33 @@
         (p.statut === "pas-publie" ? "Ce parti n’a pas encore publié de programme pour 2027."
           : "Ses mesures s’afficheront ici une fois recopiées et vérifiées mot pour mot.") + "</div>" + foot() + "</div>";
     }
-    var srcs = {};
-    p.sources.forEach(function (s) { srcs[s.id] = s; });
-    var rule = p.structure === "mesures-cles"
-      ? "Les mesures que le parti présente lui-même comme « " + esc(p.libelle) + " », dans son ordre."
-      : "Ce parti ne désigne pas de mesures prioritaires. On affiche <b>la première mesure de chaque chapitre</b> de son programme, dans l’ordre. Ce n’est pas un choix de l’équipe." +
-        (p.regle ? "<br>" + esc(p.regle) : "");
-    var items = p.mesures.map(function (m) {
-      return '<article class="box flat measure">' +
-        '<p class="eb">' + (m.chapitre ? esc(m.chapitre) : "Mesure " + m.ordre) + "</p>" +
-        (m.titre ? '<h3 class="vote-title">' + esc(m.titre) + "</h3>" : "") +
-        '<p class="measure-text">' + esc(m.texte) + "</p>" +
-        '<a class="link" href="' + esc(m.url) + '" target="_blank" rel="noopener">Lire dans le programme' +
-        (m.page ? ", page " + m.page : "") + " ↗</a></article>";
-    }).join("");
+    // Par chapitre, dans l'ordre du programme ; une partie s'affiche en titre quand elle change.
+    var html = "", partie = null, groupe = null, groupes = [];
+    p.mesures.forEach(function (m) {
+      if (!groupe || groupe.chapitre !== m.chapitre || groupe.partie !== m.partie) {
+        groupe = { partie: m.partie, chapitre: m.chapitre, mesures: [] };
+        groupes.push(groupe);
+      }
+      groupe.mesures.push(m);
+    });
+    groupes.forEach(function (g, i) {
+      if (g.partie && g.partie !== partie) {
+        partie = g.partie;
+        html += '<p class="eb muted" style="margin-top:8px">' + esc(g.partie) + "</p>";
+      }
+      var key = p.id + ":" + i, open = openChapter === key;
+      html += '<div class="acc"><button type="button" class="acc-head" data-chap="' + esc(key) + '" aria-expanded="' + open + '">' +
+        '<span class="l">' + esc(g.chapitre || "Mesures") + '</span><span class="c">' + g.mesures.length + " " + (open ? "▴" : "▾") + "</span></button>" +
+        (open ? '<div class="acc-body">' + g.mesures.map(function (m) {
+          return '<button type="button" class="vote-item" data-mesure="' + p.id + ":" + m.ordre + '"><span>' +
+            (m.repere ? '<span class="m" style="margin:0 0 2px">' + esc(m.repere) + "</span>" : "") +
+            '<span class="t">' + esc(m.titre || m.texte) + "</span></span>" + icon(I.arrow, 18) + "</button>";
+        }).join("") + "</div>" : "") + "</div>";
+    });
     return '<div class="screen enter">' + topbar("#/programmes", "Programme") + head +
-      '<p class="group-note">' + rule + "</p>" +
-      '<div class="stagger" style="display:flex;flex-direction:column;gap:12px">' + items + "</div>" +
+      '<p class="group-note">' + progRule(p) + "</p>" +
+      '<p class="cap">Touche un titre pour lire la mesure en entier.</p>' +
+      '<div class="stagger" style="display:flex;flex-direction:column;gap:10px">' + html + "</div>" +
       '<section class="box flat"><p class="eb">Sources</p>' + p.sources.map(function (s) {
         return '<div class="kv"><a class="link" href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.titre) + " ↗</a><span>consulté le " + fmtDate(s.consulte_le) + "</span></div>";
       }).join("") +
@@ -617,14 +652,22 @@
   var sheet = document.getElementById("sheet");
   var lastFocus = null;
 
+  // Feuille du bas : lexique, ou une mesure de programme (texte posé en textContent, donc jamais interprété).
+  function showSheet(eb, title, body, extraHtml, measure) {
+    lastFocus = document.activeElement;
+    document.getElementById("sheet-eb").textContent = eb;
+    document.getElementById("sheet-title").textContent = title;
+    document.getElementById("sheet-body").textContent = body;
+    document.getElementById("sheet-extra").innerHTML = extraHtml || "";
+    sheet.classList.toggle("measure-sheet", !!measure);
+    sheet.hidden = false;
+    sheet.querySelector(".sheet-panel").scrollTop = 0;
+    sheet.querySelector(".btn-dark").focus();
+  }
+
   function openTerm(i) {
     var g = D.glossary[i];
-    if (!g) return;
-    lastFocus = document.activeElement;
-    document.getElementById("sheet-title").textContent = g.term;
-    document.getElementById("sheet-body").textContent = g.def;
-    sheet.hidden = false;
-    sheet.querySelector(".btn-dark").focus();
+    if (g) showSheet("Lexique", g.term, g.def);
   }
 
   function closeSheet() {
@@ -642,9 +685,11 @@
   }
 
   document.addEventListener("click", function (e) {
-    var t = e.target.closest("[data-term],[data-close],[data-debate],[data-sort],[data-acc],[data-pick],[data-next],[data-restart],[data-share],[data-share-debate]");
+    var t = e.target.closest("[data-term],[data-close],[data-debate],[data-sort],[data-acc],[data-chap],[data-mesure],[data-pick],[data-next],[data-restart],[data-share],[data-share-debate]");
     if (!t) return;
     if (t.hasAttribute("data-term")) openTerm(+t.getAttribute("data-term"));
+    else if (t.hasAttribute("data-chap")) { var c = t.getAttribute("data-chap"); openChapter = openChapter === c ? null : c; rerender(); }
+    else if (t.hasAttribute("data-mesure")) openMeasure(t.getAttribute("data-mesure"));
     else if (t.hasAttribute("data-close")) closeSheet();
     else if (t.hasAttribute("data-debate")) {
       var choice = t.getAttribute("data-debate");

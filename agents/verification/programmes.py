@@ -48,12 +48,22 @@ def blocs_html(brut):
 
 
 class Source:
-    """Une source archivée. Page HTML : on connaît ses blocs. Texte de PDF : ses pages (saut de page)."""
+    """Une source archivée. Page HTML : on connaît ses blocs. PDF (ou son texte, pages séparées par
+    un saut de page) : on connaît ses pages."""
 
     def __init__(self, chemin):
+        suffixe = chemin.suffix.lower()
+        self.blocs = self.pages = None
+        if suffixe == ".pdf":
+            import pymupdf  # pip install pymupdf : seule dépendance, pour les programmes en PDF
+            with pymupdf.open(chemin) as doc:
+                self.pages = [normaliser(p.get_text()) for p in doc]
+            return
         brut = chemin.read_text(encoding="utf-8")
-        self.blocs = blocs_html(brut) if chemin.suffix.lower() in (".html", ".htm") else None
-        self.pages = None if self.blocs is not None else [normaliser(p) for p in brut.split("\f")]
+        if suffixe in (".html", ".htm"):
+            self.blocs = blocs_html(brut)
+        else:
+            self.pages = [normaliser(p) for p in brut.split("\f")]
 
     def contient(self, valeur, page=None):
         """HTML : la valeur doit être un bloc entier, ou plusieurs blocs qui se suivent (pas de coupe).
@@ -128,8 +138,13 @@ def verifier_parti(dossier, prog):
             erreurs.append("%s : %s introuvable tel quel dans la source%s : « %s »"
                            % (nom, champ, " (page %s)" % page if page else "", valeur[:80]))
 
-        if m.get("chapitre") and not src.contient(m["chapitre"], page):
-            absent("chapitre", m["chapitre"])
+        # Partie et chapitre : leur titre est souvent sur une autre page que la mesure.
+        # Un titre en plusieurs morceaux (titre et sous-titre) est une liste : chaque morceau est vérifié.
+        for champ in ("partie", "chapitre"):
+            valeur = m.get(champ)
+            for morceau in (valeur if isinstance(valeur, list) else [valeur] if valeur else []):
+                if not src.contient(morceau):
+                    erreurs.append("%s : %s introuvable tel quel dans la source : « %s »" % (nom, champ, morceau[:80]))
         titre, texte = m.get("titre"), m["texte"]
         if titre and src.blocs is not None:
             # Le titre en gras peut ouvrir le même paragraphe que le texte, ou former son propre bloc.
@@ -151,14 +166,17 @@ def publier(prog):
         "programme": prog.get("programme"),
         "libelle": prog.get("libelle"),
         "regle": prog.get("regle"),
+        "unite": prog.get("unite"),
         "sources": [{k: s[k] for k in ("id", "titre", "url", "consulte_le")} for s in prog.get("sources", [])],
         "mesures": [{
             "ordre": m["ordre"],
-            "chapitre": m.get("chapitre"),
+            "partie": m.get("partie"),
+            "chapitre": " ".join(m["chapitre"]) if isinstance(m.get("chapitre"), list) else m.get("chapitre"),
+            "repere": m.get("repere"),
             "titre": m.get("titre"),
             "texte": m["texte"],
             "page": m.get("page"),
-            "url": m.get("url") or sources[m["source"]]["url"],
+            "url": m.get("url") or sources[m["source"]]["url"] + ("#page=%d" % m["page"] if m.get("page") else ""),
             "source": m["source"],
         } for m in prog.get("mesures", [])],
     }

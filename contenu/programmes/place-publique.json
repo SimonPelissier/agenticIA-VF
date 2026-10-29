@@ -1,0 +1,457 @@
+{
+  "_note": "Projet de Place publique, « Acte un ». Pas de mesures prioritaires désignées par le parti : première mesure de chaque chantier, dans l'ordre du document. Produit par agents/extraction/place_publique_acte1.py, vérifié par agents/verification/programmes.py.",
+  "id": "place-publique",
+  "parti": "Place publique",
+  "programme": "Acte un : notre vision pour la France, les chantiers de Place publique",
+  "structure": "premiere-par-chapitre",
+  "libelle": null,
+  "unite": "chantier",
+  "regle": "Pour chaque chantier, la première mesure de sa liste « Nous voulons : », telle qu’elle apparaît dans le document.",
+  "sources": [
+    {
+      "id": "acte1",
+      "titre": "Acte un : notre vision pour la France (PDF)",
+      "url": "https://place-publique.eu/document/6J8wjk3EW8dBCLwKxa7J96/projet-placepublique-acte1.pdf",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/place-publique/projet-placepublique-acte1.pdf",
+      "sha256": "3898722a862a3ecef7d5481f7fc04ad7c329cd7e4070ed6f8de7a57cef4b1e7e"
+    }
+  ],
+  "mesures": [
+    {
+      "ordre": 1,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Défendre la France et l’Europe",
+      "repere": "Chantier 1",
+      "titre": "Adapter la défense française à la guerre contemporaine",
+      "texte": "Accélérer enfin la production industrielle pour faire face à un conflit de haute intensité sur le sol européen, signer des contrats de moyen et long terme avec nos industriels, mobiliser l’ensemble du tissu industriel, des grands groupes aux PME et start-ups.",
+      "source": "acte1",
+      "page": 10
+    },
+    {
+      "ordre": 2,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Défendre la France et l’Europe",
+      "repere": "Chantier 2",
+      "titre": "Bâtir la défense européenne",
+      "texte": "Oeuvrer à la mise en place rapide d’un fonds européen de défense de 500 milliards d’euros via un emprunt commun. Ce fonds permettra d’investir massivement dans nos capacités industrielles, réservant les investissements européens aux productions européennes (EDIP).",
+      "source": "acte1",
+      "page": 11
+    },
+    {
+      "ordre": 3,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Défendre la France et l’Europe",
+      "repere": "Chantier 3",
+      "titre": "Pour une Europe Fédérale",
+      "texte": "Augmenter massivement le budget de l’Union pour lui permettre de lancer des politiques publiques et dépasser le rôle de puissance exclusivement normative qui lui a été assigné, et attribuer à l’Union des ressources propres nouvelles.",
+      "source": "acte1",
+      "page": 12
+    },
+    {
+      "ordre": 4,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Mener la révolution énergétique, écologique et industrielle",
+      "repere": "Chantier 4",
+      "titre": "Mener le combat du “Fabriqué en France”",
+      "texte": "Défendre le «Fabriqué en France», en orientant la commande publique française avec des critères durables et souverains et un indice d’achat local.",
+      "source": "acte1",
+      "page": 14
+    },
+    {
+      "ordre": 5,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Mener la révolution énergétique, écologique et industrielle",
+      "repere": "Chantier 5",
+      "titre": "Construire l’industrie de la sobriété",
+      "texte": "Faire de la France le leader mondial de l’économie circulaire: concevoir la sobriété, instaurer un droit à la réparabilité garantissant la possibilité de réparer, réutiliser et recycler nos biens de consommation, former des milliers de techniciens pour faire naître des filières de la réparation des objets du quotidien partout en France.",
+      "source": "acte1",
+      "page": 16
+    },
+    {
+      "ordre": 6,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Mener la révolution énergétique, écologique et industrielle",
+      "repere": "Chantier 6",
+      "titre": "Réussir la révolution énergétique pour tous",
+      "texte": "Bâtir une véritable politique française de sobriété énergétique en encourageant les comportements sobres en énergie, en favorisant les modes de transport peu énergivore et en favorisant la fabrication de produits sobre en énergie et en matériaux, facilement réparables, et facilement recyclables.",
+      "source": "acte1",
+      "page": 17
+    },
+    {
+      "ordre": 7,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Embrasser et maîtriser la révolution technologique",
+      "repere": "Chantier 7",
+      "titre": "”I.A, 2030” faire de la France la locomotive d’une I.A. plus sûre",
+      "texte": "Créer une grande Agence industrielle du numérique et de l’I.A., avec un budget financé par France 2030, la BPI et une hausse ciblée de la taxe GAFAM, qui pilotera un plan national d’investissement dans les infrastructures algorithmiques d’intérêt général : logiciels libres, données ouvertes, IA souveraine, gouvernance partagée…",
+      "source": "acte1",
+      "page": 20
+    },
+    {
+      "ordre": 8,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Embrasser et maîtriser la révolution technologique",
+      "repere": "Chantier 8",
+      "titre": "Reprendre le contrôle sur les grandes plateformes",
+      "texte": "Sortir de la dépendance aux GAFAM en 5 ans, en créant un fonds souverain européen pour investir dans les alternatives numériques libres et européennes et faire émerger des champions européens de l’innovation et de l’I.A., en contrecarrant les monopoles technologiques des GAFAM et BATX par une régulation renforcée et des sanctions contre les abus de position dominante.",
+      "source": "acte1",
+      "page": 21
+    },
+    {
+      "ordre": 9,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Libérer la puissance de la science et de la recherche",
+      "repere": "Chantier 9",
+      "titre": "Remettre la science et la recherche au cœur de la société",
+      "texte": "Garantir une recherche libre, mieux rémunérer les chercheurs, ingénieurs et techniciens de la recherche publique, en finir avec les appels à projets court-termistes qui épuisent les chercheurs et affaiblissent la recherche et instaurer un financement durable garantissant l’autonomie des laboratoires.",
+      "source": "acte1",
+      "page": 24
+    },
+    {
+      "ordre": 10,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Libérer la puissance de la science et de la recherche",
+      "repere": "Chantier 10",
+      "titre": "Bâtir l’université du XXIème siècle",
+      "texte": "Repenser en profondeur Parcoursup à travers une concertation réunissant parents, étudiants, universités et acteurs de l’éducation. Renforcer parallèlement l’accompagnement personnalisé à l’orientation des élèves en amont..",
+      "source": "acte1",
+      "page": 25
+    },
+    {
+      "ordre": 11,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Réaliser la transformation écologique et sociale des territoires",
+      "repere": "Chantier 11",
+      "titre": "Une révolution écologique par et pour les citoyens",
+      "texte": "Créer une Assemblée citoyenne du futur, composée de citoyens tirés au sort, pour veiller à ce que chaque loi prenne en compte l’environnement et les générations futures.",
+      "source": "acte1",
+      "page": 28
+    },
+    {
+      "ordre": 12,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Réaliser la transformation écologique et sociale des territoires",
+      "repere": "Chantier 12",
+      "titre": "Relier les territoires par des transports durables",
+      "texte": "Lancer un Plan Rail national en lien avec les régions, en démultipliant les aides à SNCF Réseau afin de moderniser les infrastructures, développer les trains légers en zones rurales, relancer les Trains d’Équilibre du Territoire, ouvrir de nouvelles liaisons intercommunales et inter-régionales et mettre en place un plan d’accessibilité des gares et trains.",
+      "source": "acte1",
+      "page": 29
+    },
+    {
+      "ordre": 13,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Réaliser la transformation écologique et sociale des territoires",
+      "repere": "Chantier 13",
+      "titre": "Prendre à bras le corps la question de la condition animale",
+      "texte": "Lancer un plan de défense des animaux de compagnie en renforçant leur traçabilité, en encadrant strictement leur commerce, et en favorisant la stérilisation et les accueils par les collectivités pendant les vacances.",
+      "source": "acte1",
+      "page": 30
+    },
+    {
+      "ordre": 14,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Défendre une agriculture forte au service du vivant",
+      "repere": "Chantier 14",
+      "titre": "Soutenir celles et ceux qui nourrissent la France",
+      "texte": "Réformer la PAC pour soutenir l’emploi et le revenu agricole, l’utilité écologique et l’agriculture familiale, en rompant avec le modèle des aides à l’hectare qui accroît les inégalités de revenus, en soutenant la conversion au bio, en plafonnant les aides comme en Espagne pour rediriger les fonds vers les petites fermes, les jeunes installés, les éleveurs ou l’agroécologie. Instaurer un revenu de transition écologique pour soutenir agriculteurs et pêcheurs passant au bio ou à des pratiques durables.",
+      "source": "acte1",
+      "page": 34
+    },
+    {
+      "ordre": 15,
+      "partie": "Une France puissante grâce à une Europe souveraine",
+      "chapitre": "Défendre une agriculture forte au service du vivant",
+      "repere": "Chantier 15",
+      "titre": "L’eau et les forêts, symboles et biens communs essentiels aux français",
+      "texte": "Lancer un grand plan national pour renforcer la résilience des forêts : régénération naturelle et plantation d’essences adaptées au climat futur, lutte active contre les incendies, et fin progressive des coupes rases au profit de forêts mélangées.",
+      "source": "acte1",
+      "page": 35
+    },
+    {
+      "ordre": 16,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Remettre les travailleurs au coeur du contrat social",
+      "repere": "Chantier 16",
+      "titre": "Pour que le travail paie à nouveau",
+      "texte": "Organiser immédiatement des conférences salariales dans tout le pays, visant d’abord les métiers utiles marqués par la précarité et la pénibilité, pour renégocier avec les branches professionnelles les grilles de rémunération et les hausses de salaire.",
+      "source": "acte1",
+      "page": 40
+    },
+    {
+      "ordre": 17,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Remettre les travailleurs au coeur du contrat social",
+      "repere": "Chantier 17",
+      "titre": "Redonner du sens et démocratiser le travail",
+      "texte": "Créer une agence de financement de l’ESS, pour y créer massivement des emplois, favoriser la conversion d’entreprises classiques en structures de l’ESS, assurer un plan de financement à long terme.",
+      "source": "acte1",
+      "page": 41
+    },
+    {
+      "ordre": 18,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Remettre les travailleurs au coeur du contrat social",
+      "repere": "Chantier 18",
+      "titre": "Assurer un emploi à chacun",
+      "texte": "Instaurer une vraie garantie à l’emploi en généralisant le dispositif Territoires Zéro Chômeur de longue durée, créer un CDI d’insertion harmonisé pour faciliter la transition vers l’emploi durable, et développer partout en France des Comités Locaux pour l’Emploi réunissant habitants, associations et entreprises.",
+      "source": "acte1",
+      "page": 42
+    },
+    {
+      "ordre": 19,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Remettre les travailleurs au coeur du contrat social",
+      "repere": "Chantier 19",
+      "titre": "Des retraites justes pour une solidarité intergénérationnelle",
+      "texte": "Abroger la réforme Macron de 2023.",
+      "source": "acte1",
+      "page": 43
+    },
+    {
+      "ordre": 20,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Régénérer la démocratie",
+      "repere": "Chantier 20",
+      "titre": "Réformer les institutions",
+      "texte": "Investir le premier ministre par un vote de confiance de l’Assemblée nationale (sur proposition préalable du Président de la République) et instaurer la motion de censure “constructive” (censurer un gouvernement exigera de proposer un successeur), ce qui permettra de mettre fin au 49.3.",
+      "source": "acte1",
+      "page": 46
+    },
+    {
+      "ordre": 21,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Régénérer la démocratie",
+      "repere": "Chantier 21",
+      "titre": "Redonner le pouvoir aux citoyens",
+      "texte": "Instaurer un droit d’initiative citoyenne, permettant de déclencher des séquences démocratiques avec des référendums à l’échelle locale et nationale, généraliser des conventions citoyennes.",
+      "source": "acte1",
+      "page": 47
+    },
+    {
+      "ordre": 22,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Régénérer la démocratie",
+      "repere": "Chantier 22",
+      "titre": "Sauver nos services publics",
+      "texte": "Revaloriser les salaires des agents, recruter là où les besoins sont criants et renforcer l’attractivité de la fonction publique en créant des parcours professionnels lisibles, en valorisant les compétences acquises et en favorisant la promotion interne au sein de la fonction publique.",
+      "source": "acte1",
+      "page": 48
+    },
+    {
+      "ordre": 23,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Garantir nos droits à la santé",
+      "repere": "Chantier 23",
+      "titre": "Bien soigner, partout !",
+      "texte": "Bâtir un modèle coopératif de santé piloté localement, à travers un Projet territorial de Santé co-construit par les professionnels, les hôpitaux, les élus, les usagers et l’État, définissant les priorités selon les besoins réels de la population. Repenser la cohérence de la carte sanitaire et l’organisation territoriale du système.",
+      "source": "acte1",
+      "page": 50
+    },
+    {
+      "ordre": 24,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Garantir nos droits à la santé",
+      "repere": "Chantier 24",
+      "titre": "Miser sur la prévention",
+      "texte": "Déployer un plan de prévention d’ampleur en sortant de l’Objectif national de dépense d’assurance maladie (ONDAM), annuel,pour enfin pouvoir développer des politiques de prévention de long terme.",
+      "source": "acte1",
+      "page": 52
+    },
+    {
+      "ordre": 25,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Garantir nos droits à la santé",
+      "repere": "Chantier 25",
+      "titre": "Faire vivre le projet solidaire de protection sociale",
+      "texte": "Ouvrir un grand chantier afin d’aller vers une Sécurité sociale unique, simple et juste, qui fusionne tous les régimes pour garantir une couverture universelle, éliminer les inégalités et simplifier les démarches. Une Sécu pour toutes et tous plus solidaire et efficace qui respecte les réalités professionnelles spécifiques.",
+      "source": "acte1",
+      "page": 53
+    },
+    {
+      "ordre": 26,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Protéger face aux difficultés de la vie",
+      "repere": "Chantier 26",
+      "titre": "Permettre à tous de vieillir dignement",
+      "texte": "Soutenir les proches aidants , renforcer leurs droits, leur statut, créer un service de relais et de répit, avec des solutions concrètes comme le baluchonnage, travailler à une indemnité d’aidant familial pour celles et ceux qui réduisent ou arrêtent leur travail - en majorité des femmes - pour prendre soin de leurs aînés chez eux.",
+      "source": "acte1",
+      "page": 56
+    },
+    {
+      "ordre": 27,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Protéger face aux difficultés de la vie",
+      "repere": "Chantier 27",
+      "titre": "Enfance en péril : mettre fin à l’abandon institutionnel",
+      "texte": "Instaurer un co-pilotage plus fort entre État et départements, avec des objectifs territorialisés, de financements ciblés et une planification à moyen et long terme pour garantir une protection de l’enfance homogène sur tout le territoire.",
+      "source": "acte1",
+      "page": 57
+    },
+    {
+      "ordre": 28,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Protéger face aux difficultés de la vie",
+      "repere": "Chantier 28",
+      "titre": "Adapter la société au handicap",
+      "texte": "Unifier les parcours, simplifier l’accès aux droits sociaux avec un référent social unique, garant de la continuité des droits tout au long de la vie.",
+      "source": "acte1",
+      "page": 58
+    },
+    {
+      "ordre": 29,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Vivre en sécurité dans le respect de la justice et du droit",
+      "repere": "Chantier 29",
+      "titre": "Bâtir une société sûre, prévenir les violences",
+      "texte": "Lancer un programme d’intervention rapide pour prévenir la délinquance avec des équipes mobiles, en appui sur des cellules de veille et en coopération permanente avec la médiation sociale - éducateurs spécialisés, animateurs de rue, médiateurs - dans les quartiers prioritaires.",
+      "source": "acte1",
+      "page": 60
+    },
+    {
+      "ordre": 30,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Vivre en sécurité dans le respect de la justice et du droit",
+      "repere": "Chantier 30",
+      "titre": "Rendre la justice plus proche des citoyens et plus efficace",
+      "texte": "Proposer un choc de la justice de proximité : délits mineurs et infractions du quotidien doivent pouvoir être traités localement grâce à la médiation, aux travaux d’intérêt général et aux sanctions pédagogiques.",
+      "source": "acte1",
+      "page": 61
+    },
+    {
+      "ordre": 31,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Bien vivre sur son territoire",
+      "repere": "Chantier 31",
+      "titre": "Faire un plan Marshall pour le logement",
+      "texte": "Créer un fonds national pour aider les collectivités à acquérir du foncier et y développer du logement abordable, inciter à la densification des zones périurbaines, accélérer la construction de logements sociaux en réhaussant les objectifs nationaux annuels, via des contrats territoriaux adaptés aux besoins réels des territoires et à l’exigence de mixité sociale.",
+      "source": "acte1",
+      "page": 64
+    },
+    {
+      "ordre": 32,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Bien vivre sur son territoire",
+      "repere": "Chantier 32",
+      "titre": "Renouer avec l’égalité en Outres-mer",
+      "texte": "Démanteler les conglomérats et les concentrations qui contribuent à la vie chère, en mobilisant les autorités de concurrence, accompagner la sortie des monocultures et renforcer l’agriculture locale.",
+      "source": "acte1",
+      "page": 65
+    },
+    {
+      "ordre": 33,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": [
+        "Renouer avec la promesse d’émancipation :",
+        "1. Sauver l’École de la République"
+      ],
+      "repere": "Chantier 33",
+      "titre": "Un plan de sauvetage pour l’École",
+      "texte": "Réduire le nombre d’élèves par enseignant en primaire et l’expérimenter dans le second degré, développer à grande échelle l’accompagnement et le tutorat sur temps scolaire avec des adultes formés et correctement rémunérés.",
+      "source": "acte1",
+      "page": 68
+    },
+    {
+      "ordre": 34,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": [
+        "Renouer avec la promesse d’émancipation :",
+        "1. Sauver l’École de la République"
+      ],
+      "repere": "Chantier 34",
+      "titre": "Apprendre à vivre librement et à penser avec les autres",
+      "texte": "Apprendre aux élèves, dès l’école primaire, à se défendre contre la manipulation en enseignant le décryptage des médias, images, algorithmes et mécanismes d’addiction, instaurer au lycée, un module obligatoire « Médias et Influence », inspiré du modèle estonien.",
+      "source": "acte1",
+      "page": 69
+    },
+    {
+      "ordre": 35,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": [
+        "Renouer avec la promesse d’émancipation :",
+        "2. pour une société réellement républicaine"
+      ],
+      "repere": "Chantier 35",
+      "titre": "Retrouver une politique culturelle ambitieuse",
+      "texte": "Lancer un Pacte d’Aménagement Culturel du Territoire (PACT), co-construit avec les collectivités, les acteurs culturels et l’État, pour garantir une présence culturelle de proximité partout en France, développant la déconcentration renforcée du ministère de la Culture des financements décidés à l’échelle locale.",
+      "source": "acte1",
+      "page": 72
+    },
+    {
+      "ordre": 36,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": [
+        "Renouer avec la promesse d’émancipation :",
+        "2. pour une société réellement républicaine"
+      ],
+      "repere": "Chantier 36",
+      "titre": "Faire vivre la laïcité, garantir l’émancipation",
+      "texte": "Garantir la laïcité à l’école, renforcer la prévention et la répression des pratiques sectaires, en redonnant les moyens et le champ d’action octroyés à la MIVILUDES et abolir progressivement les différents régimes dérogatoires à la loi de 1905 et aux lois laïques scolaires.",
+      "source": "acte1",
+      "page": 73
+    },
+    {
+      "ordre": 37,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": [
+        "Renouer avec la promesse d’émancipation :",
+        "2. pour une société réellement républicaine"
+      ],
+      "repere": "Chantier 37",
+      "titre": "Faire du sport un vecteur de citoyenneté et de fierté collective",
+      "texte": "Lancer un plan “Sport pour tous” garantissant un accès inclusif et équitable à la pratique sportive, promouvant notamment la mixité et la lutte contre les discriminations.",
+      "source": "acte1",
+      "page": 74
+    },
+    {
+      "ordre": 38,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Permettre enfin l’égalité !",
+      "repere": "Chantier 38",
+      "titre": "Bâtir un pacte d’égalité pour les droits des femmes",
+      "texte": "Lancer un grand plan contre les violences sexistes et sexuelles inspiré de la politique espagnole, mobiliser un milliard d’euros dans ce cadre, renforcer les unités spécialisées contre les violences conjugales ainsi que la coordination entre le parquet, les services sociaux et les associations, accélérer les ordonnances de protection immédiate, généraliser les bracelets anti-rapprochement et les mécanismes d’alerte.",
+      "source": "acte1",
+      "page": 78
+    },
+    {
+      "ordre": 39,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Permettre enfin l’égalité !",
+      "repere": "Chantier 39",
+      "titre": "Défendre les droits des personnes LGBTQIA+",
+      "texte": "Aligner les droits à la filiation des couples LGBTQIA+ sur ceux des couples hétérosexuels en universalisant les droits",
+      "source": "acte1",
+      "page": 79
+    },
+    {
+      "ordre": 40,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Permettre enfin l’égalité !",
+      "repere": "Chantier 40",
+      "titre": "Éradiquer toutes les formes de racisme et de discrimination",
+      "texte": "Renforcer les pouvoirs, les moyens et l’indépendance du Défenseur des droits qui pourra imposer des injonctions contraignantes, accéder aux données sensibles, prononcer des sanctions sur le modèle de la CNIL.",
+      "source": "acte1",
+      "page": 80
+    },
+    {
+      "ordre": 41,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Bâtir la France humaniste",
+      "repere": "Chantier 41",
+      "titre": "Mieux intégrer les étrangers et garantir l’application du droit",
+      "texte": "Créer une force européenne de sauvetage en mer dotée de moyens suffisants pour porter secours aux embarcations en détresse et reconnaître un « devoir de sauver ».",
+      "source": "acte1",
+      "page": 82
+    },
+    {
+      "ordre": 42,
+      "partie": "Un nouveau contrat social et démocratique pour une France plus juste",
+      "chapitre": "Bâtir la France humaniste",
+      "repere": "Chantier 42",
+      "titre": "Faire de la France le porte-voix de la solidarité entre les peuples",
+      "texte": "Renforcer la loi de développement solidaire en intégrant une programmation budgétaire annuelle pour atteindre progressivement 0,7 % du RNB dédié à l’aide publique au développement.",
+      "source": "acte1",
+      "page": 83
+    }
+  ]
+}
