@@ -503,7 +503,7 @@
   function programme(id) {
     var p = byId(PARTIS, id);
     if (!p) return notFound();
-    var head = '<section class="box flat"><p class="eb">Programme 2027</p><span class="name-tag">' + esc(p.nom) + "</span>" +
+    var head = '<section class="box flat"><p class="eb">Programme</p><span class="name-tag">' + esc(p.nom) + "</span>" +
       (p.programme ? '<span class="meta">' + esc(p.programme) + "</span>" : "") + "</section>";
     if (p.statut !== "publie") {
       return '<div class="screen enter">' + topbar("#/programmes", "Programme") + head +
