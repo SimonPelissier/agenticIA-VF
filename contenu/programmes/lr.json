@@ -1,0 +1,289 @@
+{
+  "_note": "Projet de Bruno Retailleau (Les Républicains), avecretailleau.fr. Pas de mesures prioritaires désignées : première mesure de chaque thème publié. Produit par agents/extraction/lr_retailleau_2027.py, vérifié par agents/verification/programmes.py.",
+  "id": "lr",
+  "parti": "Les Républicains",
+  "programme": "Le projet de Bruno Retailleau pour 2027 (thèmes publiés au 29 octobre 2026)",
+  "structure": "premiere-par-chapitre",
+  "libelle": null,
+  "unite": "thème",
+  "regle": "Pour chaque thème publié sur le site, la première mesure de sa liste ; son texte est le paragraphe « L’engagement » de la page de la mesure. Les thèmes « À venir » ne sont pas repris.",
+  "sources": [
+    {
+      "id": "theme-1",
+      "titre": "Thème : Pour le peuple et par le peuple.",
+      "url": "https://www.avecretailleau.fr/projet/theme/institutions",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-1-institutions.html",
+      "sha256": "9a61831a9f4d00a3ff861524f8f955ed7f3033711dd4295c1db49745e2690e46"
+    },
+    {
+      "id": "mesure-1",
+      "titre": "Ouvrir le référendum à toute la matière législative.",
+      "url": "https://www.avecretailleau.fr/projet/mesure/elargir-le-referendum-a-toute-la-matiere-legislative-et",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-1.html",
+      "sha256": "b2b8f21e674303e98d2f4b338fe480515bf11306b52d93c7d731457e9531d84f"
+    },
+    {
+      "id": "theme-2",
+      "titre": "Thème : Éducation.",
+      "url": "https://www.avecretailleau.fr/projet/theme/education",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-2-education.html",
+      "sha256": "9c2943be9c19853224e3a53c61c69c8330d6b50fa3cd6846ac7d44bdb6909e09"
+    },
+    {
+      "id": "mesure-2",
+      "titre": "Rendre aux familles la liberté de choisir l'école de leurs enfants.",
+      "url": "https://www.avecretailleau.fr/projet/mesure/instaurer-une-veritable-gestion-des-ressources-humaines-et",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-2.html",
+      "sha256": "c52e14d204a3af6350fec288de2104cd100cbe02cc76006566f198453a3e334a"
+    },
+    {
+      "id": "theme-3",
+      "titre": "Thème : Travail.",
+      "url": "https://www.avecretailleau.fr/projet/theme/travail",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-3-travail.html",
+      "sha256": "7a3d1faa4ae13adff6480727e2abe589c2d6b6dbc1d9da9d2b15a370c5da0f08"
+    },
+    {
+      "id": "mesure-3",
+      "titre": "Rendre 500 euros par an à tous les salariés.",
+      "url": "https://www.avecretailleau.fr/projet/mesure/rendre-30-milliards-d-euros-aux-salaries-et-aux-entreprises",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-3.html",
+      "sha256": "f07f738917eb0b3e2ada9045e46cd14626d8fa0dcdc8858e545c210235fdabe5"
+    },
+    {
+      "id": "theme-4",
+      "titre": "Thème : Entreprises.",
+      "url": "https://www.avecretailleau.fr/projet/theme/industrie-entreprises",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-4-industrie-entreprises.html",
+      "sha256": "d806a784095556bfad5fe10e8ca4bf4a85c5ef007ede8619cde34961924c0ed6"
+    },
+    {
+      "id": "mesure-4",
+      "titre": "Supprimer 100 règles qui pénalisent le plus les entreprises.",
+      "url": "https://www.avecretailleau.fr/projet/mesure/supprimer-100-regles-qui-penalisent-le-plus-les-entreprises",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-4.html",
+      "sha256": "cfe53aac429e0d0318c218058af7a829ac88ba2c6c14700043789df274c388ad"
+    },
+    {
+      "id": "theme-5",
+      "titre": "Thème : Agriculture.",
+      "url": "https://www.avecretailleau.fr/projet/theme/agriculture",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-5-agriculture.html",
+      "sha256": "8d78193c3f7ae30211457a46f044081fe03e1452adeb0e7d20ebcea8775a79a0"
+    },
+    {
+      "id": "mesure-5",
+      "titre": "Protéger l'agriculture et les agriculteurs dans la Constitution.",
+      "url": "https://www.avecretailleau.fr/projet/mesure/proteger-l-agriculture-dans-la-constitution",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-5.html",
+      "sha256": "08183e70517930831a9171b482a459be27114b38b740a23920b21af5b99dc82e"
+    },
+    {
+      "id": "theme-6",
+      "titre": "Thème : Logement.",
+      "url": "https://www.avecretailleau.fr/projet/theme/logement",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-6-logement.html",
+      "sha256": "0251f928a6986b8588aa1258a00516dd52216396fd98023d05235752d75a3a77"
+    },
+    {
+      "id": "mesure-6",
+      "titre": "Construire plus vite, avec les maires.",
+      "url": "https://www.avecretailleau.fr/projet/mesure/construire-plus-vite-avec-les-maires",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-6.html",
+      "sha256": "fb998d3a477b4879348221c6e52f6675e1fe2c5416eed084b7343b4284f80bad"
+    },
+    {
+      "id": "theme-7",
+      "titre": "Thème : Famille.",
+      "url": "https://www.avecretailleau.fr/projet/theme/famille",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-7-famille.html",
+      "sha256": "f03534caed60908e96d0eff56cafc8ca78d11a91e03a450b564734551e37f244"
+    },
+    {
+      "id": "mesure-7",
+      "titre": "Verser 240 euros par mois par enfant mineur.",
+      "url": "https://www.avecretailleau.fr/projet/mesure/verser-240-euros-par-mois-par-enfant-mineur",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-7.html",
+      "sha256": "5d431cbc37c428ab9111e90bb7ea756a4a072c21da5bed64132bcfd54b229576"
+    },
+    {
+      "id": "theme-8",
+      "titre": "Thème : Électricité.",
+      "url": "https://www.avecretailleau.fr/projet/theme/electricite",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-8-electricite.html",
+      "sha256": "fa63901156eede38814229837f2f39456e992a4bcd976f3c171cd6f322fc621c"
+    },
+    {
+      "id": "mesure-8",
+      "titre": "Prolonger les centrales nucléaires jusqu'à 80 ans.",
+      "url": "https://www.avecretailleau.fr/projet/mesure/prolonger-les-centrales-nucleaires-jusqu-a-80-ans",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-8.html",
+      "sha256": "712f1632070913d0d103f08c3aba793abe5fd5cfd1e8990db82773f0660004ce"
+    },
+    {
+      "id": "theme-9",
+      "titre": "Thème : Comptes publics.",
+      "url": "https://www.avecretailleau.fr/projet/theme/comptes-publics",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-9-comptes-publics.html",
+      "sha256": "a7f232edb4cf8437f6f848606da2c340484f99e2ccf230f9810d86aedad43448"
+    },
+    {
+      "id": "mesure-9",
+      "titre": "La règle d'or.",
+      "url": "https://www.avecretailleau.fr/projet/mesure/la-regle-d-or-de-2011",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-9.html",
+      "sha256": "a1eaaa1572dbd5dc54cd2dd948a6847376f420c0758144f4df6e81ce9a8810b7"
+    },
+    {
+      "id": "theme-10",
+      "titre": "Thème : L'IA.",
+      "url": "https://www.avecretailleau.fr/projet/theme/l-ia",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-10-l-ia.html",
+      "sha256": "1f87cb539e35c5fb40397329bb67948d6f3191ba3381150908480045a85b7a8a"
+    },
+    {
+      "id": "mesure-10",
+      "titre": "Protéger les données sensibles sous juridiction européenne.",
+      "url": "https://www.avecretailleau.fr/projet/mesure/proteger-les-donnees-sensibles-sous-juridiction-europeenne",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-10.html",
+      "sha256": "b80281ee17b9b7dc520e0f5adcea307376d46c448bee25087f17f3495928b71b"
+    },
+    {
+      "id": "theme-11",
+      "titre": "Thème : Retraites.",
+      "url": "https://www.avecretailleau.fr/projet/theme/retraites",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/theme-11-retraites.html",
+      "sha256": "d52a9e896d409b2c11271dda22667d1833a3a54b0820abcab2cdd0b7a7dba488"
+    },
+    {
+      "id": "mesure-11",
+      "titre": "Pouvoir partir dès 63 ans, à 65 ans pour un taux plein garanti .",
+      "url": "https://www.avecretailleau.fr/projet/mesure/d",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/lr/mesure-11.html",
+      "sha256": "6e090076aec145e820041ca6dc0938c6434c08d4fa8aacb9b2e84eee5622d016"
+    }
+  ],
+  "mesures": [
+    {
+      "ordre": 1,
+      "chapitre": "Pour le peuple et par le peuple.",
+      "repere": "Mesure 1",
+      "titre": "Ouvrir le référendum à toute la matière législative.",
+      "texte": "Ouvrir le référendum législatif à tout sujet, sans exception. Seule la révision constitutionnelle restera hors de sa portée et continuera de suivre la procédure de l'article 89. La loi adoptée par référendum sera à l'abri de toute remise en cause par un juge, quel qu'il soit, sur le fondement de tout texte, quel qu'il soit.",
+      "source": "mesure-1",
+      "page": null
+    },
+    {
+      "ordre": 2,
+      "chapitre": "Éducation.",
+      "repere": "Mesure 13",
+      "titre": "Rendre aux familles la liberté de choisir l'école de leurs enfants.",
+      "texte": "Supprimer la carte scolaire et mettre fin à la règle non écrite du 80-20, qui bride depuis quarante ans un enseignement de plus en plus demandé. Réaffirmer la liberté de choisir comme la liberté constitutionnelle qu'elle est. Rendre aux parents qui le souhaitent la liberté d'instruire leur enfant en famille jusqu'à six ans.",
+      "source": "mesure-2",
+      "page": null
+    },
+    {
+      "ordre": 3,
+      "chapitre": "Travail.",
+      "repere": "Mesure 24",
+      "titre": "Rendre 500 euros par an à tous les salariés.",
+      "texte": "Baisser les cotisations de 30 milliards d'euros par an. La moitié revient directement aux salariés, soit environ 500 euros nets par an au salaire médian, sans qu'ils aient rien à changer à leur organisation. L'autre moitié revient aux entreprises, en baisse durable du coût du travail dès la première heure travaillée, pour restaurer leur compétitivité.**.",
+      "source": "mesure-3",
+      "page": null
+    },
+    {
+      "ordre": 4,
+      "chapitre": "Entreprises.",
+      "repere": "Mesure 30",
+      "titre": "Supprimer 100 règles qui pénalisent le plus les entreprises.",
+      "texte": "Supprimer ou recentrer strictement, dès le lendemain de l'élection, les cent règles qui pénalisent le plus la production. Deux exemples : le seuil de 50 salariés sera relevé à 100 pour toutes les obligations, et le principe de précaution sera remplacé par un principe de responsabilité, par une révision constitutionnelle soumise au référendum. Toutes les autres relèveront de l'ordonnance.",
+      "source": "mesure-4",
+      "page": null
+    },
+    {
+      "ordre": 5,
+      "chapitre": "Agriculture.",
+      "repere": "Mesure 47",
+      "titre": "Protéger l'agriculture et les agriculteurs dans la Constitution.",
+      "texte": "Engager une réforme constitutionnelle inscrivant la notion d'intérêts supérieurs de la Nation, une loi organique précisant que l'agriculture en fait pleinement partie. Le juge devra en tenir compte aux côtés des exigences environnementales, sans que celles-ci puissent être érigées en principe supérieur ou exclusif.",
+      "source": "mesure-5",
+      "page": null
+    },
+    {
+      "ordre": 6,
+      "chapitre": "Logement.",
+      "repere": "Mesure 59",
+      "titre": "Construire plus vite, avec les maires.",
+      "texte": "Passer du contrôle préalable systématique à un cadre clair, une décision assumée et un contrôle a posteriori renforcé. Transformer le plan local d'urbanisme en PLU d'urbanisme harmonieux, lisible et concentré sur l'essentiel. Adopter dès les premiers mois une loi d'urgence, dans l'esprit de la loi Notre-Dame, pour diviser les délais par deux, avec une instruction en guichet unique où le silence vaut accord. Mettre fin aux recours abusifs.",
+      "source": "mesure-6",
+      "page": null
+    },
+    {
+      "ordre": 7,
+      "chapitre": "Famille.",
+      "repere": "Mesure 75",
+      "titre": "Verser 240 euros par mois par enfant mineur.",
+      "texte": "Fusionner douze dispositifs en un Revenu familial de 240 euros par enfant, versé chaque mois à tous, dès le premier enfant, de la naissance à dix-huit ans. Le conditionner à une résidence régulière en France et à l'exercice d'une activité professionnelle depuis au moins cinq ans. En permettre la suspension temporaire par décision de justice en cas de défaillance éducative. Conserver les aides spécifiques pour les moins de trois ans, les parents seuls, le logement et le handicap.",
+      "source": "mesure-7",
+      "page": null
+    },
+    {
+      "ordre": 8,
+      "chapitre": "Électricité.",
+      "repere": "Mesure 83",
+      "titre": "Prolonger les centrales nucléaires jusqu'à 80 ans.",
+      "texte": "Fixer d'emblée un horizon de 80 ans. Les contrôles décennaux de l'autorité de sûreté ne disparaissent pas, mais leur rôle change : au lieu de décider si la centrale peut survivre dix ans de plus, ils vérifient qu'elle reste sur la trajectoire prévue. Aujourd'hui on investit pour dix ans en espérant continuer. Demain on investira pour quatre-vingts.",
+      "source": "mesure-8",
+      "page": null
+    },
+    {
+      "ordre": 9,
+      "chapitre": "Comptes publics.",
+      "repere": "Mesure 115",
+      "titre": "La règle d'or.",
+      "texte": "Demander au Président de la République de soumettre immédiatement au référendum, par l'article 89 de la Constitution, le projet de loi constitutionnelle relatif à l'équilibre des finances publiques adopté dans les mêmes termes par l'Assemblée nationale et le Sénat le 13 juillet 2011 ; élus, nous le ferions dans les cent jours",
+      "source": "mesure-9",
+      "page": null
+    },
+    {
+      "ordre": 10,
+      "chapitre": "L'IA.",
+      "repere": "Mesure 93",
+      "titre": "Protéger les données sensibles sous juridiction européenne.",
+      "texte": "Sanctuariser l'hébergement des usages sensibles : toutes les applications d'IA liées aux fonctions régaliennes, aux fonctions sensibles des opérateurs d'importance vitale et aux infrastructures critiques devront être hébergées sur des offres de type SecNumCloud, intégralement sous juridiction européenne. Créer, sous autorité publique, de grands espaces de données sectoriels souverains dans les domaines stratégiques, consolidés au niveau européen sous une marque unifiée, EuroDatas.",
+      "source": "mesure-10",
+      "page": null
+    },
+    {
+      "ordre": 11,
+      "chapitre": "Retraites.",
+      "repere": "Mesure 108",
+      "titre": "Pouvoir partir dès 63 ans, à 65 ans pour un taux plein garanti .",
+      "texte": "Partir dès 63 ans sera un droit, et chacun connaîtra à l'avance le montant de sa pension selon l'âge qu'il choisit. À 65 ans, le taux plein sera garanti à tous, quels que soient les trimestres cotisés ou validés. Ces deux âges seront les mêmes pour les salariés du privé et pour les agents publics. Ils évolueront ensuite avec l'espérance de vie, selon une formule inscrite dans la loi.",
+      "source": "mesure-11",
+      "page": null
+    }
+  ]
+}

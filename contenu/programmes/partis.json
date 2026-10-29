@@ -2,11 +2,11 @@
   "_note": "Partis affichés dans la section Programmes. 'fichier' : le programme collecté (contenu/programmes/<id>.json). Sans fichier, l'application affiche « pas encore ajouté ». Voir docs/programmes.md.",
   "partis": [
     { "id": "lfi", "nom": "La France insoumise", "fichier": "lfi.json" },
-    { "id": "ecologistes", "nom": "Les Écologistes", "fichier": null },
+    { "id": "ecologistes", "nom": "Les Écologistes", "fichier": "ecologistes.json" },
     { "id": "horizons", "nom": "Horizons", "fichier": null },
-    { "id": "lr", "nom": "Les Républicains", "fichier": null },
+    { "id": "lr", "nom": "Les Républicains", "fichier": "lr.json" },
     { "id": "pcf", "nom": "Parti communiste français", "fichier": null },
-    { "id": "ps", "nom": "Parti socialiste", "fichier": null },
+    { "id": "ps", "nom": "Parti socialiste", "fichier": "ps.json" },
     { "id": "place-publique", "nom": "Place publique", "fichier": "place-publique.json" },
     { "id": "rn", "nom": "Rassemblement national", "fichier": null },
     { "id": "renaissance", "nom": "Renaissance", "fichier": null }

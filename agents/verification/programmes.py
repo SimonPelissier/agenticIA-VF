@@ -138,12 +138,13 @@ def verifier_parti(dossier, prog):
             erreurs.append("%s : %s introuvable tel quel dans la source%s : « %s »"
                            % (nom, champ, " (page %s)" % page if page else "", valeur[:80]))
 
-        # Partie et chapitre : leur titre est souvent sur une autre page que la mesure.
+        # Partie et chapitre : leur titre est souvent sur une autre page que la mesure (sommaire, page du thème),
+        # on le cherche dans toutes les sources archivées du parti.
         # Un titre en plusieurs morceaux (titre et sous-titre) est une liste : chaque morceau est vérifié.
         for champ in ("partie", "chapitre"):
             valeur = m.get(champ)
             for morceau in (valeur if isinstance(valeur, list) else [valeur] if valeur else []):
-                if not src.contient(morceau):
+                if not any(s.contient(morceau) for s in sources.values()):
                     erreurs.append("%s : %s introuvable tel quel dans la source : « %s »" % (nom, champ, morceau[:80]))
         titre, texte = m.get("titre"), m["texte"]
         if titre and src.blocs is not None:

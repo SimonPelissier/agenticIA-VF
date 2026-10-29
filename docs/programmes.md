@@ -51,6 +51,14 @@ Ne jamais modifier `data/programmes.js` à la main.
 | --- | --- | --- | --- |
 | La France insoumise | Programme de l'Union populaire, européennes 2024 (site) | `mesures-cles` : le bloc « Mesure-clé » de chaque sous-partie | 51 |
 | Place publique | « Acte un », PDF | `premiere-par-chapitre` : première puce « Nous voulons : » de chaque chantier. Le « chantier cadre » (financement) n'a pas de telle liste et n'est pas repris | 42 |
+| Parti socialiste | « Vivre libres », projet-socialiste.fr (avril 2026) | `premiere-par-chapitre` : première puce « Propositions » de chaque sous-partie. La page contient 5 chapitres ; l'index du site était injoignable le 29 octobre 2026 pour vérifier s'il en existe d'autres | 18 |
+| Les Républicains | Projet de Bruno Retailleau, avecretailleau.fr (une page par thème, une page par mesure) | `premiere-par-chapitre` : première mesure de chaque thème publié, texte du bloc « L'engagement. ». Thèmes « À venir » non repris | 11 |
+
+Pas encore ajoutés (29 octobre 2026) :
+
+- **Les Écologistes** : « Pour une prospérité écologique » (PDF, 13 juillet 2026). Le site refuse les téléchargements automatiques : enregistrer le PDF depuis le navigateur (voir `contenu/programmes/ecologistes.json`).
+- **Horizons, PCF, Renaissance** : propositions annoncées dans la presse, mais pas de programme complet trouvé sur un site officiel du parti ou du candidat.
+- **RN** : pas de programme 2027 publié, seulement un contre-budget.
 
 ## Ajouter un parti
 

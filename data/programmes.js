@@ -634,7 +634,7 @@ window.MARIAN_PROGRAMMES = {
   {
    "id": "ecologistes",
    "nom": "Les Écologistes",
-   "statut": "a-ajouter"
+   "statut": "en-cours"
   },
   {
    "id": "horizons",
@@ -644,7 +644,269 @@ window.MARIAN_PROGRAMMES = {
   {
    "id": "lr",
    "nom": "Les Républicains",
-   "statut": "a-ajouter"
+   "statut": "publie",
+   "structure": "premiere-par-chapitre",
+   "programme": "Le projet de Bruno Retailleau pour 2027 (thèmes publiés au 29 octobre 2026)",
+   "libelle": null,
+   "regle": "Pour chaque thème publié sur le site, la première mesure de sa liste ; son texte est le paragraphe « L’engagement » de la page de la mesure. Les thèmes « À venir » ne sont pas repris.",
+   "unite": "thème",
+   "sources": [
+    {
+     "id": "theme-1",
+     "titre": "Thème : Pour le peuple et par le peuple.",
+     "url": "https://www.avecretailleau.fr/projet/theme/institutions",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-1",
+     "titre": "Ouvrir le référendum à toute la matière législative.",
+     "url": "https://www.avecretailleau.fr/projet/mesure/elargir-le-referendum-a-toute-la-matiere-legislative-et",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "theme-2",
+     "titre": "Thème : Éducation.",
+     "url": "https://www.avecretailleau.fr/projet/theme/education",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-2",
+     "titre": "Rendre aux familles la liberté de choisir l'école de leurs enfants.",
+     "url": "https://www.avecretailleau.fr/projet/mesure/instaurer-une-veritable-gestion-des-ressources-humaines-et",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "theme-3",
+     "titre": "Thème : Travail.",
+     "url": "https://www.avecretailleau.fr/projet/theme/travail",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-3",
+     "titre": "Rendre 500 euros par an à tous les salariés.",
+     "url": "https://www.avecretailleau.fr/projet/mesure/rendre-30-milliards-d-euros-aux-salaries-et-aux-entreprises",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "theme-4",
+     "titre": "Thème : Entreprises.",
+     "url": "https://www.avecretailleau.fr/projet/theme/industrie-entreprises",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-4",
+     "titre": "Supprimer 100 règles qui pénalisent le plus les entreprises.",
+     "url": "https://www.avecretailleau.fr/projet/mesure/supprimer-100-regles-qui-penalisent-le-plus-les-entreprises",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "theme-5",
+     "titre": "Thème : Agriculture.",
+     "url": "https://www.avecretailleau.fr/projet/theme/agriculture",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-5",
+     "titre": "Protéger l'agriculture et les agriculteurs dans la Constitution.",
+     "url": "https://www.avecretailleau.fr/projet/mesure/proteger-l-agriculture-dans-la-constitution",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "theme-6",
+     "titre": "Thème : Logement.",
+     "url": "https://www.avecretailleau.fr/projet/theme/logement",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-6",
+     "titre": "Construire plus vite, avec les maires.",
+     "url": "https://www.avecretailleau.fr/projet/mesure/construire-plus-vite-avec-les-maires",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "theme-7",
+     "titre": "Thème : Famille.",
+     "url": "https://www.avecretailleau.fr/projet/theme/famille",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-7",
+     "titre": "Verser 240 euros par mois par enfant mineur.",
+     "url": "https://www.avecretailleau.fr/projet/mesure/verser-240-euros-par-mois-par-enfant-mineur",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "theme-8",
+     "titre": "Thème : Électricité.",
+     "url": "https://www.avecretailleau.fr/projet/theme/electricite",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-8",
+     "titre": "Prolonger les centrales nucléaires jusqu'à 80 ans.",
+     "url": "https://www.avecretailleau.fr/projet/mesure/prolonger-les-centrales-nucleaires-jusqu-a-80-ans",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "theme-9",
+     "titre": "Thème : Comptes publics.",
+     "url": "https://www.avecretailleau.fr/projet/theme/comptes-publics",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-9",
+     "titre": "La règle d'or.",
+     "url": "https://www.avecretailleau.fr/projet/mesure/la-regle-d-or-de-2011",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "theme-10",
+     "titre": "Thème : L'IA.",
+     "url": "https://www.avecretailleau.fr/projet/theme/l-ia",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-10",
+     "titre": "Protéger les données sensibles sous juridiction européenne.",
+     "url": "https://www.avecretailleau.fr/projet/mesure/proteger-les-donnees-sensibles-sous-juridiction-europeenne",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "theme-11",
+     "titre": "Thème : Retraites.",
+     "url": "https://www.avecretailleau.fr/projet/theme/retraites",
+     "consulte_le": "2026-10-29"
+    },
+    {
+     "id": "mesure-11",
+     "titre": "Pouvoir partir dès 63 ans, à 65 ans pour un taux plein garanti .",
+     "url": "https://www.avecretailleau.fr/projet/mesure/d",
+     "consulte_le": "2026-10-29"
+    }
+   ],
+   "mesures": [
+    {
+     "ordre": 1,
+     "partie": null,
+     "chapitre": "Pour le peuple et par le peuple.",
+     "repere": "Mesure 1",
+     "titre": "Ouvrir le référendum à toute la matière législative.",
+     "texte": "Ouvrir le référendum législatif à tout sujet, sans exception. Seule la révision constitutionnelle restera hors de sa portée et continuera de suivre la procédure de l'article 89. La loi adoptée par référendum sera à l'abri de toute remise en cause par un juge, quel qu'il soit, sur le fondement de tout texte, quel qu'il soit.",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/elargir-le-referendum-a-toute-la-matiere-legislative-et",
+     "source": "mesure-1"
+    },
+    {
+     "ordre": 2,
+     "partie": null,
+     "chapitre": "Éducation.",
+     "repere": "Mesure 13",
+     "titre": "Rendre aux familles la liberté de choisir l'école de leurs enfants.",
+     "texte": "Supprimer la carte scolaire et mettre fin à la règle non écrite du 80-20, qui bride depuis quarante ans un enseignement de plus en plus demandé. Réaffirmer la liberté de choisir comme la liberté constitutionnelle qu'elle est. Rendre aux parents qui le souhaitent la liberté d'instruire leur enfant en famille jusqu'à six ans.",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/instaurer-une-veritable-gestion-des-ressources-humaines-et",
+     "source": "mesure-2"
+    },
+    {
+     "ordre": 3,
+     "partie": null,
+     "chapitre": "Travail.",
+     "repere": "Mesure 24",
+     "titre": "Rendre 500 euros par an à tous les salariés.",
+     "texte": "Baisser les cotisations de 30 milliards d'euros par an. La moitié revient directement aux salariés, soit environ 500 euros nets par an au salaire médian, sans qu'ils aient rien à changer à leur organisation. L'autre moitié revient aux entreprises, en baisse durable du coût du travail dès la première heure travaillée, pour restaurer leur compétitivité.**.",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/rendre-30-milliards-d-euros-aux-salaries-et-aux-entreprises",
+     "source": "mesure-3"
+    },
+    {
+     "ordre": 4,
+     "partie": null,
+     "chapitre": "Entreprises.",
+     "repere": "Mesure 30",
+     "titre": "Supprimer 100 règles qui pénalisent le plus les entreprises.",
+     "texte": "Supprimer ou recentrer strictement, dès le lendemain de l'élection, les cent règles qui pénalisent le plus la production. Deux exemples : le seuil de 50 salariés sera relevé à 100 pour toutes les obligations, et le principe de précaution sera remplacé par un principe de responsabilité, par une révision constitutionnelle soumise au référendum. Toutes les autres relèveront de l'ordonnance.",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/supprimer-100-regles-qui-penalisent-le-plus-les-entreprises",
+     "source": "mesure-4"
+    },
+    {
+     "ordre": 5,
+     "partie": null,
+     "chapitre": "Agriculture.",
+     "repere": "Mesure 47",
+     "titre": "Protéger l'agriculture et les agriculteurs dans la Constitution.",
+     "texte": "Engager une réforme constitutionnelle inscrivant la notion d'intérêts supérieurs de la Nation, une loi organique précisant que l'agriculture en fait pleinement partie. Le juge devra en tenir compte aux côtés des exigences environnementales, sans que celles-ci puissent être érigées en principe supérieur ou exclusif.",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/proteger-l-agriculture-dans-la-constitution",
+     "source": "mesure-5"
+    },
+    {
+     "ordre": 6,
+     "partie": null,
+     "chapitre": "Logement.",
+     "repere": "Mesure 59",
+     "titre": "Construire plus vite, avec les maires.",
+     "texte": "Passer du contrôle préalable systématique à un cadre clair, une décision assumée et un contrôle a posteriori renforcé. Transformer le plan local d'urbanisme en PLU d'urbanisme harmonieux, lisible et concentré sur l'essentiel. Adopter dès les premiers mois une loi d'urgence, dans l'esprit de la loi Notre-Dame, pour diviser les délais par deux, avec une instruction en guichet unique où le silence vaut accord. Mettre fin aux recours abusifs.",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/construire-plus-vite-avec-les-maires",
+     "source": "mesure-6"
+    },
+    {
+     "ordre": 7,
+     "partie": null,
+     "chapitre": "Famille.",
+     "repere": "Mesure 75",
+     "titre": "Verser 240 euros par mois par enfant mineur.",
+     "texte": "Fusionner douze dispositifs en un Revenu familial de 240 euros par enfant, versé chaque mois à tous, dès le premier enfant, de la naissance à dix-huit ans. Le conditionner à une résidence régulière en France et à l'exercice d'une activité professionnelle depuis au moins cinq ans. En permettre la suspension temporaire par décision de justice en cas de défaillance éducative. Conserver les aides spécifiques pour les moins de trois ans, les parents seuls, le logement et le handicap.",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/verser-240-euros-par-mois-par-enfant-mineur",
+     "source": "mesure-7"
+    },
+    {
+     "ordre": 8,
+     "partie": null,
+     "chapitre": "Électricité.",
+     "repere": "Mesure 83",
+     "titre": "Prolonger les centrales nucléaires jusqu'à 80 ans.",
+     "texte": "Fixer d'emblée un horizon de 80 ans. Les contrôles décennaux de l'autorité de sûreté ne disparaissent pas, mais leur rôle change : au lieu de décider si la centrale peut survivre dix ans de plus, ils vérifient qu'elle reste sur la trajectoire prévue. Aujourd'hui on investit pour dix ans en espérant continuer. Demain on investira pour quatre-vingts.",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/prolonger-les-centrales-nucleaires-jusqu-a-80-ans",
+     "source": "mesure-8"
+    },
+    {
+     "ordre": 9,
+     "partie": null,
+     "chapitre": "Comptes publics.",
+     "repere": "Mesure 115",
+     "titre": "La règle d'or.",
+     "texte": "Demander au Président de la République de soumettre immédiatement au référendum, par l'article 89 de la Constitution, le projet de loi constitutionnelle relatif à l'équilibre des finances publiques adopté dans les mêmes termes par l'Assemblée nationale et le Sénat le 13 juillet 2011 ; élus, nous le ferions dans les cent jours",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/la-regle-d-or-de-2011",
+     "source": "mesure-9"
+    },
+    {
+     "ordre": 10,
+     "partie": null,
+     "chapitre": "L'IA.",
+     "repere": "Mesure 93",
+     "titre": "Protéger les données sensibles sous juridiction européenne.",
+     "texte": "Sanctuariser l'hébergement des usages sensibles : toutes les applications d'IA liées aux fonctions régaliennes, aux fonctions sensibles des opérateurs d'importance vitale et aux infrastructures critiques devront être hébergées sur des offres de type SecNumCloud, intégralement sous juridiction européenne. Créer, sous autorité publique, de grands espaces de données sectoriels souverains dans les domaines stratégiques, consolidés au niveau européen sous une marque unifiée, EuroDatas.",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/proteger-les-donnees-sensibles-sous-juridiction-europeenne",
+     "source": "mesure-10"
+    },
+    {
+     "ordre": 11,
+     "partie": null,
+     "chapitre": "Retraites.",
+     "repere": "Mesure 108",
+     "titre": "Pouvoir partir dès 63 ans, à 65 ans pour un taux plein garanti .",
+     "texte": "Partir dès 63 ans sera un droit, et chacun connaîtra à l'avance le montant de sa pension selon l'âge qu'il choisit. À 65 ans, le taux plein sera garanti à tous, quels que soient les trimestres cotisés ou validés. Ces deux âges seront les mêmes pour les salariés du privé et pour les agents publics. Ils évolueront ensuite avec l'espérance de vie, selon une formule inscrite dans la loi.",
+     "page": null,
+     "url": "https://www.avecretailleau.fr/projet/mesure/d",
+     "source": "mesure-11"
+    }
+   ]
   },
   {
    "id": "pcf",
@@ -654,7 +916,220 @@ window.MARIAN_PROGRAMMES = {
   {
    "id": "ps",
    "nom": "Parti socialiste",
-   "statut": "a-ajouter"
+   "statut": "publie",
+   "structure": "premiere-par-chapitre",
+   "programme": "Vivre libres, le projet socialiste (avril 2026)",
+   "libelle": null,
+   "regle": "Pour chaque sous-partie, la première puce de sa liste « Propositions », telle qu’elle apparaît sur le site.",
+   "unite": "sous-partie",
+   "sources": [
+    {
+     "id": "site",
+     "titre": "Vivre libres, projet-socialiste.fr",
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "consulte_le": "2026-10-29"
+    }
+   ],
+   "mesures": [
+    {
+     "ordre": 1,
+     "partie": null,
+     "chapitre": "Chapitre 1 – Mieux vivre au travail et de son travail",
+     "repere": null,
+     "titre": "Redonner du sens et de la valeur au travail",
+     "texte": "Réhausser le SMIC à 1 690 € net et ouvrir une conférence sociale pour augmenter les salaires au-dessus du SMIC.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 2,
+     "partie": null,
+     "chapitre": "Chapitre 1 – Mieux vivre au travail et de son travail",
+     "repere": null,
+     "titre": "Avoir du temps libre",
+     "texte": "Rendre aux salariés et aux travailleurs indépendants la maîtrise de leur temps. Favoriser, par la négociation sociale, les innovations organisationnelles permettant une meilleure articulation entre vie professionnelle et vie personnelle, notamment l’expérimentation de la semaine de quatre jours et la réduction progressive du temps de travail lorsque les conditions économiques et sociales le permettent.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 3,
+     "partie": null,
+     "chapitre": "Chapitre 1 – Mieux vivre au travail et de son travail",
+     "repere": null,
+     "titre": "Pouvoir profiter de sa retraite",
+     "texte": "Après l’abrogation de la réforme Borne, convoquer une conférence sociale pour définir un nouveau système de retraite par répartition qui permette à chacun de profiter d’une retraite en bonne santé : proposer de construire un droit à la retraite calculé en fonction d’une durée de cotisation fixée à 43 annuités, réductible en fonction de la pénibilité des métiers exercés tout au long de sa vie. Les critères de pénibilité seront les 10 répertoriés dans la réforme Touraine de 2015, incluant les 4 critères de pénibilité supprimés par le gouvernement d’Édouard Philippe en 2018 (charges lourdes, exposition aux vibrations mécaniques, exposition aux agents chimiques dangereux, postures pénibles). L’âge légal de départ, ramené à 62 ans, ne disparaîtra pas pour autant : il continuera de jouer un rôle de protection minimale pour les salariés.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 4,
+     "partie": null,
+     "chapitre": "Chapitre 1 – Mieux vivre au travail et de son travail",
+     "repere": null,
+     "titre": "Défendre les artisans et commerçants",
+     "texte": "Faire baisser les dépenses des artisans-commerçants en encadrant les prix de l’énergie et celui des loyers, comme nous l’avons fait pour le logement avec succès.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 5,
+     "partie": null,
+     "chapitre": "Chapitre 2 – Coût de la vie quotidienne : reprendre le contrôle",
+     "repere": null,
+     "titre": "Se loger",
+     "texte": "Face à la crise du logement, renouer avec une politique ambitieuse de construction de nouveaux logements, dont un tiers de logements sociaux, en mobilisant le foncier disponible, les logements vacants, la rénovation du parc existant et la reconversion des bureaux. Soutenir les innovations favorisant les nouvelles façons de se loger (colocation, résidences intergénérationnelles, foyers, etc.).",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 6,
+     "partie": null,
+     "chapitre": "Chapitre 2 – Coût de la vie quotidienne : reprendre le contrôle",
+     "repere": null,
+     "titre": "Se chauffer et se rafraîchir",
+     "texte": "Réduire la facture d’électricité des Français et les protéger contre la précarité énergétique en investissant massivement dans la production d’énergie propre, sûre et bon marché.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 7,
+     "partie": null,
+     "chapitre": "Chapitre 2 – Coût de la vie quotidienne : reprendre le contrôle",
+     "repere": null,
+     "titre": "Se nourrir",
+     "texte": "Permettre à chacun de se nourrir sainement, à travers une fiscalité favorable (TVA réduite) aux produits alimentaires de base, non transformés pour en diminuer le coût. Soutenir massivement les acteurs de proximité et l’aide alimentaire solidaire.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 8,
+     "partie": null,
+     "chapitre": "Chapitre 2 – Coût de la vie quotidienne : reprendre le contrôle",
+     "repere": null,
+     "titre": "Se déplacer",
+     "texte": "Opérer une nationalisation des autoroutes à travers la création d’un établissement public national (de type EPIC) – « Routes de France » – pour gérer les autoroutes et les routes nationales qui reprendrait progressivement les 9 000 km d’autoroutes concédées, à l’expiration des contrats actuels. Stopper les concessions privées coûteuses, baisser les péages et réinvestir les bénéfices dans l’entretien du réseau et la mobilité durable.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 9,
+     "partie": null,
+     "chapitre": "Chapitre 3 – Réindustrialiser le pays et créer les emplois de demain",
+     "repere": null,
+     "titre": "Investir dans les secteurs stratégiques",
+     "texte": "Planifier la réindustrialisation, avec une loi de programmation 2027-2032 sur la réindustrialisation et la souveraineté, définie par l’État en partenariat avec les Régions et les partenaires sociaux. Fixer sur cinq ans des objectifs quantifiés d’investissement et de production sur une liste ciblée de secteurs stratégiques associés à des moyens budgétaires et des prévisions énergétiques. Définir les technologies stratégiques pour l’avenir, suivant une logique fondée sur les besoins et le respect des limites planétaires.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 10,
+     "partie": null,
+     "chapitre": "Chapitre 3 – Réindustrialiser le pays et créer les emplois de demain",
+     "repere": null,
+     "titre": "Former aux emplois de demain",
+     "texte": "Créer un droit à la reconversion pour les travailleurs des secteurs fragilisés, avec un accompagnement renforcé et une protection des revenus à 100 % du salaire pendant une année de formation ou de reconversion.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 11,
+     "partie": null,
+     "chapitre": "Chapitre 3 – Réindustrialiser le pays et créer les emplois de demain",
+     "repere": null,
+     "titre": "Produire de l’énergie propre, sûre et bon marché",
+     "texte": "Sortir l’électricité de la logique de marché pour garantir l’accès de toutes et tous à une énergie abordable, en étendant les tarifs réglementés pour les particuliers, les services publics et les entreprises. Réserver la logique de marché aux échanges transfrontaliers.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 12,
+     "partie": null,
+     "chapitre": "Chapitre 3 – Réindustrialiser le pays et créer les emplois de demain",
+     "repere": null,
+     "titre": "Faire de l’économie sociale et solidaire un moteur de l’économie de demain",
+     "texte": "Doubler la part de l’ESS dans l’économie et l’emploi d’ici 2050, en réservant certains secteurs aux acteurs de l’ESS (grand âge, petite enfance) en collaboration avec le secteur public, et en renforçant sa place dans les secteurs d’avenir (numérique, énergies renouvelables, construction, mobilités) et non délocalisables (économie circulaire, valorisation des déchets). Créer un réseau national d’incubateurs et de conseil pour les entreprises de l’ESS. Favoriser la reprise d’entreprises par leurs salariés sous forme de l’ESS. Créer un droit de préemption pour les salariés lors de la cession d’une entreprise et un fonds national de financement dédié à la transmission en coopérative, couplé à des dispositifs fiscaux, en privilégiant lorsque cela est possible les modèles ESS.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 13,
+     "partie": null,
+     "chapitre": "Chapitre 4 – Construire la souveraineté européenne",
+     "repere": null,
+     "titre": "Défendre un modèle social, écologique et démocratique européen",
+     "texte": "Faire évoluer les traités européens pour renoncer au modèle néolibéral. Refuser la marchandisation des services publics. Réformer les règles budgétaires européennes pour qu’elles favorisent les investissements d’avenir et la qualité des services publics plutôt que l’austérité comptable. En particulier, les nouvelles règles budgétaires ne se fonderont plus sur des cibles chiffrées sans fondement économique. Elles se concentreront sur la trajectoire de soutenabilité de la dette et les risques d’externalités négatives pour les autres États membres de l’union monétaire. La procédure concernant les déséquilibres macroéconomiques sera appliquée aux pays européens qui entretiennent des excédents courants trop conséquents.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 14,
+     "partie": null,
+     "chapitre": "Chapitre 4 – Construire la souveraineté européenne",
+     "repere": null,
+     "titre": "Construire la défense de demain, pour l’Europe et ses nations",
+     "texte": "Construire une défense européenne autonome Renforcer le pilier européen de l’OTAN, dans l’objectif de construire une nouvelle architecture de sécurité collective du continent européen en redéfinissant les rôles décisionnels entre chefs d’État et de gouvernement européen, Commission européenne et OTAN, pour poursuivre l’européanisation de notre BITD et prendre le chemin de l’intégration européenne de nos armées et de leur commandement.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 15,
+     "partie": null,
+     "chapitre": "Chapitre 4 – Construire la souveraineté européenne",
+     "repere": null,
+     "titre": "Donner à l’Europe les moyens de ses ambitions",
+     "texte": "Donner à l’Europe les moyens de ses ambitions en multipliant le budget européen par trois, à hauteur de 3 % du PIB européen, via de nouvelles ressources propres sans augmenter les impôts des classes moyennes et populaires. Pour parvenir à cet objectif, augmenter les ressources propres de l’Europe grâce au rehaussement des droits de douane sur les filières stratégiques, à une imposition minimale sur le patrimoine des grandes fortunes, à une taxe sur les produits financiers et sur les paris en ligne. Parallèlement, lancer un nouvel emprunt européen commun de 500 milliards d’euros.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 16,
+     "partie": null,
+     "chapitre": "Chapitre 5 – Mettre le progrès technique au service du progrès humain",
+     "repere": null,
+     "titre": "Échapper aux nouvelles servitudes numériques",
+     "texte": "Encadrer « l’économie de l’attention » et la marchandisation des comportements en ligne pour défendre l’autodétermination cognitive et le libre arbitre à l’ère du numérique en interdisant les techniques visant à fabriquer une dépendance aux réseaux sociaux et les dispositifs conçus pour empêcher la déconnexion. Strictement limiter la publicité ciblée, afin de réduire le profilage massif et les manipulations politiques. Rendre les algorithmes transparents et réellement contrôlables, à travers une obligation de transparence algorithmique pour toute grande plateforme, ainsi qu’un accès par défaut à un fil non personnalisé et à une interface non addictive.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 17,
+     "partie": null,
+     "chapitre": "Chapitre 5 – Mettre le progrès technique au service du progrès humain",
+     "repere": null,
+     "titre": "Mettre l’intelligence artificielle au service du bien commun",
+     "texte": "Bâtir une Intelligence Artificielle éthique, souveraine et transparente, en créant un pôle public de l’intelligence artificielle autour de l’INRIA, associant les grands organismes de recherche (CNRS, Max Planck, CNR, etc.), les universités et des entreprises chargé de mettre en œuvre la stratégie nationale en matière d’IA, sur le modèle du CERN. Prioriser les outils d’IA open source et souverains dans les services publics et les entreprises stratégiques, avec une sortie progressive des IA génératives fermées, pour éviter toute dépendance à des solutions opaques ou étrangères.",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    },
+    {
+     "ordre": 18,
+     "partie": null,
+     "chapitre": "Chapitre 5 – Mettre le progrès technique au service du progrès humain",
+     "repere": null,
+     "titre": "Innover pour le bien commun",
+     "texte": "Mentions légales",
+     "page": null,
+     "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+     "source": "site"
+    }
+   ]
   },
   {
    "id": "place-publique",

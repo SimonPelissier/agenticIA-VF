@@ -1,0 +1,166 @@
+{
+  "_note": "Projet du Parti socialiste, « Vivre libres ». Pas de mesures prioritaires désignées par le parti : première proposition de chaque sous-partie. Produit par agents/extraction/ps_vivre_libres.py, vérifié par agents/verification/programmes.py.",
+  "id": "ps",
+  "parti": "Parti socialiste",
+  "programme": "Vivre libres, le projet socialiste (avril 2026)",
+  "structure": "premiere-par-chapitre",
+  "libelle": null,
+  "unite": "sous-partie",
+  "regle": "Pour chaque sous-partie, la première puce de sa liste « Propositions », telle qu’elle apparaît sur le site.",
+  "sources": [
+    {
+      "id": "site",
+      "titre": "Vivre libres, projet-socialiste.fr",
+      "url": "https://projet-socialiste.fr/projet/vivre-libres/",
+      "consulte_le": "2026-10-29",
+      "fichier": "sources/ps/vivre-libres.html",
+      "sha256": "9ca23506b6247a2e66dc1bef1c72529cced2aa8473a037c57210f6d9831e1361"
+    }
+  ],
+  "mesures": [
+    {
+      "ordre": 1,
+      "chapitre": "Chapitre 1 – Mieux vivre au travail et de son travail",
+      "titre": "Redonner du sens et de la valeur au travail",
+      "texte": "Réhausser le SMIC à 1 690 € net et ouvrir une conférence sociale pour augmenter les salaires au-dessus du SMIC.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 2,
+      "chapitre": "Chapitre 1 – Mieux vivre au travail et de son travail",
+      "titre": "Avoir du temps libre",
+      "texte": "Rendre aux salariés et aux travailleurs indépendants la maîtrise de leur temps. Favoriser, par la négociation sociale, les innovations organisationnelles permettant une meilleure articulation entre vie professionnelle et vie personnelle, notamment l’expérimentation de la semaine de quatre jours et la réduction progressive du temps de travail lorsque les conditions économiques et sociales le permettent.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 3,
+      "chapitre": "Chapitre 1 – Mieux vivre au travail et de son travail",
+      "titre": "Pouvoir profiter de sa retraite",
+      "texte": "Après l’abrogation de la réforme Borne, convoquer une conférence sociale pour définir un nouveau système de retraite par répartition qui permette à chacun de profiter d’une retraite en bonne santé : proposer de construire un droit à la retraite calculé en fonction d’une durée de cotisation fixée à 43 annuités, réductible en fonction de la pénibilité des métiers exercés tout au long de sa vie. Les critères de pénibilité seront les 10 répertoriés dans la réforme Touraine de 2015, incluant les 4 critères de pénibilité supprimés par le gouvernement d’Édouard Philippe en 2018 (charges lourdes, exposition aux vibrations mécaniques, exposition aux agents chimiques dangereux, postures pénibles). L’âge légal de départ, ramené à 62 ans, ne disparaîtra pas pour autant : il continuera de jouer un rôle de protection minimale pour les salariés.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 4,
+      "chapitre": "Chapitre 1 – Mieux vivre au travail et de son travail",
+      "titre": "Défendre les artisans et commerçants",
+      "texte": "Faire baisser les dépenses des artisans-commerçants en encadrant les prix de l’énergie et celui des loyers, comme nous l’avons fait pour le logement avec succès.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 5,
+      "chapitre": "Chapitre 2 – Coût de la vie quotidienne : reprendre le contrôle",
+      "titre": "Se loger",
+      "texte": "Face à la crise du logement, renouer avec une politique ambitieuse de construction de nouveaux logements, dont un tiers de logements sociaux, en mobilisant le foncier disponible, les logements vacants, la rénovation du parc existant et la reconversion des bureaux. Soutenir les innovations favorisant les nouvelles façons de se loger (colocation, résidences intergénérationnelles, foyers, etc.).",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 6,
+      "chapitre": "Chapitre 2 – Coût de la vie quotidienne : reprendre le contrôle",
+      "titre": "Se chauffer et se rafraîchir",
+      "texte": "Réduire la facture d’électricité des Français et les protéger contre la précarité énergétique en investissant massivement dans la production d’énergie propre, sûre et bon marché.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 7,
+      "chapitre": "Chapitre 2 – Coût de la vie quotidienne : reprendre le contrôle",
+      "titre": "Se nourrir",
+      "texte": "Permettre à chacun de se nourrir sainement, à travers une fiscalité favorable (TVA réduite) aux produits alimentaires de base, non transformés pour en diminuer le coût. Soutenir massivement les acteurs de proximité et l’aide alimentaire solidaire.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 8,
+      "chapitre": "Chapitre 2 – Coût de la vie quotidienne : reprendre le contrôle",
+      "titre": "Se déplacer",
+      "texte": "Opérer une nationalisation des autoroutes à travers la création d’un établissement public national (de type EPIC) – « Routes de France » – pour gérer les autoroutes et les routes nationales qui reprendrait progressivement les 9 000 km d’autoroutes concédées, à l’expiration des contrats actuels. Stopper les concessions privées coûteuses, baisser les péages et réinvestir les bénéfices dans l’entretien du réseau et la mobilité durable.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 9,
+      "chapitre": "Chapitre 3 – Réindustrialiser le pays et créer les emplois de demain",
+      "titre": "Investir dans les secteurs stratégiques",
+      "texte": "Planifier la réindustrialisation, avec une loi de programmation 2027-2032 sur la réindustrialisation et la souveraineté, définie par l’État en partenariat avec les Régions et les partenaires sociaux. Fixer sur cinq ans des objectifs quantifiés d’investissement et de production sur une liste ciblée de secteurs stratégiques associés à des moyens budgétaires et des prévisions énergétiques. Définir les technologies stratégiques pour l’avenir, suivant une logique fondée sur les besoins et le respect des limites planétaires.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 10,
+      "chapitre": "Chapitre 3 – Réindustrialiser le pays et créer les emplois de demain",
+      "titre": "Former aux emplois de demain",
+      "texte": "Créer un droit à la reconversion pour les travailleurs des secteurs fragilisés, avec un accompagnement renforcé et une protection des revenus à 100 % du salaire pendant une année de formation ou de reconversion.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 11,
+      "chapitre": "Chapitre 3 – Réindustrialiser le pays et créer les emplois de demain",
+      "titre": "Produire de l’énergie propre, sûre et bon marché",
+      "texte": "Sortir l’électricité de la logique de marché pour garantir l’accès de toutes et tous à une énergie abordable, en étendant les tarifs réglementés pour les particuliers, les services publics et les entreprises. Réserver la logique de marché aux échanges transfrontaliers.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 12,
+      "chapitre": "Chapitre 3 – Réindustrialiser le pays et créer les emplois de demain",
+      "titre": "Faire de l’économie sociale et solidaire un moteur de l’économie de demain",
+      "texte": "Doubler la part de l’ESS dans l’économie et l’emploi d’ici 2050, en réservant certains secteurs aux acteurs de l’ESS (grand âge, petite enfance) en collaboration avec le secteur public, et en renforçant sa place dans les secteurs d’avenir (numérique, énergies renouvelables, construction, mobilités) et non délocalisables (économie circulaire, valorisation des déchets). Créer un réseau national d’incubateurs et de conseil pour les entreprises de l’ESS. Favoriser la reprise d’entreprises par leurs salariés sous forme de l’ESS. Créer un droit de préemption pour les salariés lors de la cession d’une entreprise et un fonds national de financement dédié à la transmission en coopérative, couplé à des dispositifs fiscaux, en privilégiant lorsque cela est possible les modèles ESS.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 13,
+      "chapitre": "Chapitre 4 – Construire la souveraineté européenne",
+      "titre": "Défendre un modèle social, écologique et démocratique européen",
+      "texte": "Faire évoluer les traités européens pour renoncer au modèle néolibéral. Refuser la marchandisation des services publics. Réformer les règles budgétaires européennes pour qu’elles favorisent les investissements d’avenir et la qualité des services publics plutôt que l’austérité comptable. En particulier, les nouvelles règles budgétaires ne se fonderont plus sur des cibles chiffrées sans fondement économique. Elles se concentreront sur la trajectoire de soutenabilité de la dette et les risques d’externalités négatives pour les autres États membres de l’union monétaire. La procédure concernant les déséquilibres macroéconomiques sera appliquée aux pays européens qui entretiennent des excédents courants trop conséquents.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 14,
+      "chapitre": "Chapitre 4 – Construire la souveraineté européenne",
+      "titre": "Construire la défense de demain, pour l’Europe et ses nations",
+      "texte": "Construire une défense européenne autonome Renforcer le pilier européen de l’OTAN, dans l’objectif de construire une nouvelle architecture de sécurité collective du continent européen en redéfinissant les rôles décisionnels entre chefs d’État et de gouvernement européen, Commission européenne et OTAN, pour poursuivre l’européanisation de notre BITD et prendre le chemin de l’intégration européenne de nos armées et de leur commandement.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 15,
+      "chapitre": "Chapitre 4 – Construire la souveraineté européenne",
+      "titre": "Donner à l’Europe les moyens de ses ambitions",
+      "texte": "Donner à l’Europe les moyens de ses ambitions en multipliant le budget européen par trois, à hauteur de 3 % du PIB européen, via de nouvelles ressources propres sans augmenter les impôts des classes moyennes et populaires. Pour parvenir à cet objectif, augmenter les ressources propres de l’Europe grâce au rehaussement des droits de douane sur les filières stratégiques, à une imposition minimale sur le patrimoine des grandes fortunes, à une taxe sur les produits financiers et sur les paris en ligne. Parallèlement, lancer un nouvel emprunt européen commun de 500 milliards d’euros.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 16,
+      "chapitre": "Chapitre 5 – Mettre le progrès technique au service du progrès humain",
+      "titre": "Échapper aux nouvelles servitudes numériques",
+      "texte": "Encadrer « l’économie de l’attention » et la marchandisation des comportements en ligne pour défendre l’autodétermination cognitive et le libre arbitre à l’ère du numérique en interdisant les techniques visant à fabriquer une dépendance aux réseaux sociaux et les dispositifs conçus pour empêcher la déconnexion. Strictement limiter la publicité ciblée, afin de réduire le profilage massif et les manipulations politiques. Rendre les algorithmes transparents et réellement contrôlables, à travers une obligation de transparence algorithmique pour toute grande plateforme, ainsi qu’un accès par défaut à un fil non personnalisé et à une interface non addictive.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 17,
+      "chapitre": "Chapitre 5 – Mettre le progrès technique au service du progrès humain",
+      "titre": "Mettre l’intelligence artificielle au service du bien commun",
+      "texte": "Bâtir une Intelligence Artificielle éthique, souveraine et transparente, en créant un pôle public de l’intelligence artificielle autour de l’INRIA, associant les grands organismes de recherche (CNRS, Max Planck, CNR, etc.), les universités et des entreprises chargé de mettre en œuvre la stratégie nationale en matière d’IA, sur le modèle du CERN. Prioriser les outils d’IA open source et souverains dans les services publics et les entreprises stratégiques, avec une sortie progressive des IA génératives fermées, pour éviter toute dépendance à des solutions opaques ou étrangères.",
+      "source": "site",
+      "page": null
+    },
+    {
+      "ordre": 18,
+      "chapitre": "Chapitre 5 – Mettre le progrès technique au service du progrès humain",
+      "titre": "Innover pour le bien commun",
+      "texte": "Mentions légales",
+      "source": "site",
+      "page": null
+    }
+  ]
+}
