@@ -5,7 +5,8 @@ Lit les flux RSS des médias généralistes (sources.json) et garde les articles
 dont le titre ou le chapô cite un candidat. Ne stocke que le titre, la date,
 le média et le lien, jamais le texte de l'article (droit d'auteur).
 
-Sortie : data/medias/articles.json, un article par ligne, gardé 30 jours.
+Sorties : data/medias/articles.json (un article par ligne, gardé 30 jours)
+et data/actu.js, lu par la page Actualité de l'application.
 
 Aucune IA, aucune clé, aucune librairie à installer (Python 3.7 ou plus récent).
 
@@ -125,6 +126,28 @@ def ecrire_articles(articles):
         f.write("\n]\n")
 
 
+def ecrire_actu():
+    """Écrit data/actu.js, lu par la page Actualité : articles des 30 derniers jours et déclarations
+    retenues (vérifiées mot pour mot, ou vérifiées à la main lors de la relecture ; jamais les rejetées)."""
+    sources = charger_sources()
+    declarations = []
+    dossier = os.path.join(RACINE, "contenu", "declarations")
+    if os.path.isdir(dossier):
+        for nom in sorted(os.listdir(dossier)):
+            if nom.endswith(".json"):
+                with open(os.path.join(dossier, nom), encoding="utf-8") as f:
+                    declarations += [d for d in json.load(f).get("declarations", []) if d.get("statut") in ("verifiee", "a-verifier")]
+    # Sans date dans le flux, on prend le jour où l'agent a repéré l'article.
+    articles = [dict({k: a[k] for k in ("id", "media", "titre", "url", "candidats")}, date=a["date"] or a["vuLe"]) for a in charger_articles()]
+    compact = lambda x: json.dumps(x, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    with open(os.path.join(RACINE, "data", "actu.js"), "w", encoding="utf-8") as f:
+        f.write("// Fichier produit par agents/medias/veille.py et verifier.py : ne pas modifier à la main.\n")
+        f.write("window.MARIAN_ACTU = {\n")
+        f.write('"medias": ' + compact({m["id"]: m["nom"] for m in sources["medias"]}) + ",\n")
+        f.write('"articles": [\n' + ",\n".join(compact(a) for a in articles) + "\n],\n")
+        f.write('"declarations": [\n' + ",\n".join(compact(d) for d in sorted(declarations, key=lambda d: d.get("id", ""))) + "\n]\n};\n")
+
+
 def collecter():
     sources = charger_sources()
     motifs = motifs_candidats(sources["candidats"])
@@ -157,6 +180,7 @@ def collecter():
             nouveaux += 1
     gardes = [a for a in articles.values() if (a["date"] or a["vuLe"]) >= limite]
     ecrire_articles(gardes)
+    ecrire_actu()
     a_traiter = sum(1 for a in gardes if not a["traite"])
     print("%d nouvel(s) article(s) ; %d à lire par Claude ; %d gardé(s) sur %d jours." % (nouveaux, a_traiter, len(gardes), CONSERVATION_JOURS))
 
@@ -175,6 +199,7 @@ def marquer_traites(ids):
         if a["id"] in ids:
             a["traite"] = True
     ecrire_articles(articles)
+    ecrire_actu()
     print("%d article(s) marqué(s) comme lus." % len(ids))
 
 

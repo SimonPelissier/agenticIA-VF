@@ -33,6 +33,7 @@ Un candidat est repéré par son nom complet. Le nom de famille seul ne suffit q
 | --- | --- |
 | `data/medias/articles.json` | Articles repérés : média, titre, date, lien, candidats cités, lu ou non. **Ni texte ni chapô** (droit d'auteur). Gardés 30 jours |
 | `contenu/declarations/AAAA-MM.json` | Les déclarations du mois, avec leur statut de vérification |
+| `data/actu.js` | Ce que lit la page Actualité : articles des 30 derniers jours et déclarations retenues (jamais les rejetées). Refait par `veille.py` et `verifier.py` |
 | `agents/medias/.cache/rapport.md` | Rapport du jour (vérification, équilibre), repris dans la pull request. Pas envoyé sur GitHub |
 
 ## Les statuts de vérification
@@ -50,6 +51,10 @@ Un candidat est repéré par son nom complet. Le nom de famille seul ne suffit q
 3. Lire le rapport d'équilibre : un candidat absent ou trop présent ? Un seul média ?
 4. Fusionner, ou supprimer les déclarations douteuses avant.
 
+## Automatique
+
+Chaque nuit, la tâche GitHub « Agent de collecte » lance aussi `veille.py` : les articles (titres et liens) sont mis à jour dans la même pull request que les votes. Le relevé des déclarations par Claude (`/veille-medias`) reste à lancer à la main, ou par une routine Claude Code à créer.
+
 ## Lancer à la main
 
 Dans Claude Code, à la racine du dépôt : `/veille-medias`.
@@ -64,6 +69,5 @@ python3 agents/medias/verifier.py            # vérifie les déclarations ajout�
 
 ## Pas encore fait
 
-- La page « L'actu » de l'application (maquette proposée le 25 octobre 2026).
 - Transcriptions des débats télévisés, discours officiels (vie-publique.fr), fact-checkeurs : sources à ajouter.
 - Réseaux sociaux des candidats : non suivis.

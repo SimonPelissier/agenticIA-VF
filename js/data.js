@@ -1,4 +1,5 @@
-// Données éditoriales de marIAn (thèmes, candidats, quiz, lexique).
+// Données éditoriales de marIAn (sujets, groupes, candidats, lexique).
+// Le débat du jour et le quiz ont été retirés le 29 octobre 2026 (branche archive/v4-avant-4-pages).
 // Les votes et leurs chiffres ne sont plus écrits ici : ils viennent de data/app.js,
 // produit par l'agent de collecte à partir de contenu/votes-cles.json et des données de l'Assemblée.
 // Règle : rien n'est inventé ; quand une donnée manque, l'interface le dit.
@@ -22,12 +23,6 @@ window.DATA = {
     { id: "retraites", label: "Retraites", sur: "les retraites", questions: "Âge de départ, ce que ça change pour ma génération", icon: "M6 3h12M6 21h12M7 3c0 5 10 6 10 9s-10 4-10 9M17 3c0 5-10 6-10 9s10 4 10 9" },
     { id: "numerique", label: "Numérique", sur: "le numérique", questions: "Réseaux sociaux, écrans, données personnelles, IA", icon: "M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM11 18h2" }
   ],
-
-  // Débat du jour : une question simple, reliée à un vote clé vérifié. La réponse n'est enregistrée nulle part.
-  debate: {
-    question: "Faut-il suspendre la réforme des retraites ?",
-    vote: "suspension-retraites"
-  },
 
   // Familles de groupes à l'Assemblée : un même courant change parfois de sigle d'une législature à l'autre.
   groups: {
@@ -58,21 +53,6 @@ window.DATA = {
     { id: "retailleau", name: "Bruno Retailleau", party: "Les Républicains", status: "Déclaré", group: "LR", mandate: "Sénateur jusqu’en 2024, puis ministre de l’Intérieur", filter: "Sénat", mandateVerified: false },
     { id: "roussel", name: "Fabien Roussel", party: "PCF", status: "Déclaré le 6 sept. 2026", group: "GDR", mandate: "Député jusqu’en 2024", filter: "AN (2022-2024)", mandateVerified: false },
     { id: "tondelier", name: "Marine Tondelier", party: "Les Écologistes", status: "Candidature autonome validée en principe", group: "ECO", mandate: "Aucun mandat parlementaire", filter: "Pas de mandat", mandateVerified: false }
-  ],
-
-  // Quiz « Qui a voté ça ? » : une bonne réponse parmi 4, uniquement avec des positions documentées ci-dessus.
-  // Les mauvaises réponses sont des groupes dont la position contraire est sourcée.
-  quiz: [
-    { vote: "zucman", prompt: "Quel groupe a voté pour ?", options: ["La France insoumise", "Rassemblement national", "Horizons", "Droite républicaine (LR)"], answer: 0, explain: "LFI, les socialistes, les Écologistes et GDR ont voté pour. EPR, le MoDem, Horizons, LR et le RN ont voté contre." },
-    { vote: "zucman", prompt: "Quel groupe a voté contre ?", options: ["Socialistes", "Rassemblement national", "Écologistes", "GDR (PCF)"], answer: 1, explain: "Le RN a voté contre, avec EPR, le MoDem, Horizons et LR." },
-    { vote: "ukraine", prompt: "Quel groupe s’est abstenu ?", options: ["La France insoumise", "Socialistes", "Rassemblement national", "EPR (ex-Renaissance)"], answer: 2, explain: "Le RN s’est abstenu. LFI et le PCF ont voté contre, les autres groupes pour." },
-    { vote: "ukraine", prompt: "Quel groupe a voté contre ?", options: ["Rassemblement national", "Écologistes", "Droite républicaine (LR)", "La France insoumise"], answer: 3, explain: "LFI et le PCF ont voté contre. Le RN s’est abstenu." },
-    { vote: "immigration", prompt: "Quel groupe a voté pour ?", options: ["Socialistes", "Rassemblement national", "La France insoumise", "Écologistes"], answer: 1, explain: "Le RN et LR ont voté pour ; la gauche a voté contre." },
-    { vote: "immigration", prompt: "Quel autre groupe a voté pour, avec le RN ?", options: ["Droite républicaine (LR)", "GDR (PCF)", "Socialistes", "La France insoumise"], answer: 0, explain: "LR a voté pour avec le RN. Une partie de la majorité de l’époque a voté contre ou s’est abstenue." },
-    { vote: "aide-a-mourir", prompt: "Combien de députés RN ont voté contre ?", options: ["19", "55", "101", "140"], answer: 2, explain: "101 députés RN ont voté contre, 19 ont voté pour." },
-    { vote: "ivg", prompt: "Avec combien de voix le Congrès l’a-t-il adoptée ?", options: ["349", "512", "780", "289"], answer: 2, explain: "780 voix pour, 72 contre." },
-    { vote: "suspension-retraites", prompt: "Qu’est devenue cette mesure ?", options: ["Adoptée", "Rejetée", "Retirée", "Censurée"], answer: 0, explain: "Adoptée par 255 voix contre 146. EPR et une majorité du MoDem se sont abstenus." },
-    { vote: "duplomb", prompt: "Quel produit le Conseil constitutionnel a-t-il ensuite censuré ?", options: ["Le glyphosate", "L’acétamipride", "Le chlordécone", "L’atrazine"], answer: 1, explain: "Saisi par LFI, les Écologistes et GDR, il a censuré l’acétamipride le 7 août 2025." }
   ],
 
   glossary: [

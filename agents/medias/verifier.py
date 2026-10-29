@@ -162,6 +162,10 @@ def main():
     with open(RAPPORT, "w", encoding="utf-8") as f:
         f.write("\n".join(lignes) + "\n")
     print("\n".join(lignes))
+    # Met à jour le fichier de la page Actualité avec les déclarations retenues.
+    sys.path.insert(0, DOSSIER)
+    import veille
+    veille.ecrire_actu()
     return 1 if problemes else 0
 
 

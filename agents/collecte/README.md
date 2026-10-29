@@ -29,6 +29,7 @@ Source : [data.assemblee-nationale.fr](https://data.assemblee-nationale.fr), sou
 | `candidats-votes.json` | Pour chaque candidat : mandats de député, groupes, chaque vote personnel, taux de participation |
 | `groupes.json` | Les groupes politiques des deux législatures (sigle, nom, dates) |
 | `collecte.json` | Sources, nombre de scrutins, date du dernier scrutin, candidats suivis |
+| `votes.js` | Les **grands votes** (vote final d'un texte, motions de censure, déclarations du gouvernement), classés par catégorie, avec les groupes dans l'ordre de l'hémicycle et les votes des candidats : la page « Qui a voté quoi ? ». Règles de classement et ordre des groupes dans `grands_votes.py` |
 | `app.js` | **Le fichier lu par l'application** (environ 30 Ko) : les votes clés de `contenu/votes-cles.json` complétés par leurs chiffres officiels, les mandats et la participation des candidats, la médiane de l'hémicycle, et le vote personnel de chaque candidat sur chaque vote clé |
 
 ## Règles importantes

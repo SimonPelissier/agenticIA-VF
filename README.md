@@ -8,31 +8,33 @@ Le cadrage complet (objectifs, sources, agents, règles éditoriales) est dans [
 
 **Branche `design-colorful`** : design « V3 Colorful » (crème et jaune, accent violet #6d28d9, Inter et JetBrains Mono, quiz en bulletins de vote). La version éditoriale noir et jaune est sur la branche `marian-v1`.
 
-## Ce que contient cette première version
+## Les 4 pages
 
-| Écran | Contenu |
+| Page | Contenu |
 | --- | --- |
-| Chargement | « On dépouille les votes… », une fois par visite |
-| Accueil | Compte à rebours, débat du jour, quiz, « Complète 3 sujets », entrées Par sujet et Par candidat |
-| Débat | Une question reliée à un vote clé ; après ta réponse (gardée sur ton téléphone), le vote de chaque candidat |
-| Sujets | 8 sujets ; pour chacun, une carte par candidat (promesse en attente, son vote ou celui de son groupe) et le détail des votes |
-| Candidats | Bilan : promesses tenues (en attente), participation aux grands votes face à la médiane, mandats officiels, votes sujet par sujet |
-| Qui a voté ça ? | 10 questions à 4 choix sur de vrais votes, série et points, carte de score au format story |
-| Comment on décide, Lexique | Règles de jugement et règles éditoriales, signalement d'erreur, mots compliqués |
+| Accueil | Compte à rebours et les trois entrées, avec les dernières nouvelles de chacune |
+| Actualité | Fil des articles de 10 médias généralistes qui citent un candidat, par candidat ou par sujet ; « L'essentiel » reprend les déclarations relevées et vérifiées ; détail d'une news ; « Ton fil » (préférences gardées sur le téléphone). Maquette d'Anaïs |
+| Programmes | Les mesures des programmes des partis, recopiées mot pour mot et vérifiées contre la source archivée. Section de Kevan (règles : `docs/programmes.md`) |
+| Qui a voté quoi ? | Les grands votes de l'Assemblée depuis 2022, par sujet (catégories, dernières lois, hémicycle par groupe de gauche à droite) ou par personne (vote du candidat s'il siégeait, sinon celui de son groupe) |
+| Comment on travaille, Lexique | Règles, signalement d'erreur, mots compliqués |
+
+L'ancienne version (Sujets, Candidats, Quiz, Débat du jour) est gardée dans la branche `archive/v4-avant-4-pages`.
 
 Les promesses 2027 ne sont pas encore affichées : les programmes ne sont pas publiés. L'interface l'indique au lieu d'inventer du contenu. Les chiffres des votes et les mandats de député viennent des données ouvertes de l'Assemblée nationale (voir `agents/collecte/`) ; les autres mandats restent « à vérifier ».
 
 ## Structure
 
 ```
-index.html      page unique, barre d'onglets à 5 entrées, écran de chargement
+index.html      page unique, barre d'onglets à 4 entrées, écran de chargement
 css/style.css   style V4 (crème et jaune, accent violet, contours noirs)
-js/data.js      données éditoriales : thèmes, candidats, quiz, lexique
-js/app.js       écrans et navigation (#/sujets, #/candidats, #/debat, #/quiz…)
+js/data.js      données éditoriales : sujets, groupes, candidats, lexique
+js/app.js       écrans et navigation (#/actu, #/programmes, #/votes…)
 contenu/        votes clés choisis par l'équipe (texte + numéro du scrutin officiel)
 contenu/programmes/  mesures des programmes, recopiées mot pour mot (règles : docs/programmes.md)
 data/programmes.js   programmes vérifiés, produit par agents/verification/programmes.py
-data/app.js     données officielles pour l'application, produites par l'agent de collecte
+data/app.js     votes clés et participation des candidats (agent de collecte)
+data/votes.js   grands votes classés par catégorie, pour « Qui a voté quoi ? » (agent de collecte)
+data/actu.js    articles et déclarations, pour l'Actualité (veille médias)
 data/*.json     données brutes collectées (scrutins, votes, groupes)
 agents/         agents : collecte des votes de l'Assemblée, veille médias
 .claude/        commande /veille-medias (consignes d'extraction pour Claude)
@@ -63,7 +65,7 @@ Règle : pas de source, pas de publication.
 ## Prochaines étapes techniques
 
 - Classer les scrutins collectés par thème, pour afficher plus que les votes clés
-- Page « L'actu » : afficher les déclarations relevées par la veille médias
+- Créer la routine quotidienne `/veille-medias` (relevé des déclarations par Claude)
 - Collecte Sénat et Parlement européen
 - Agent de vérification des citations (code, sans IA)
 - Base Supabase et interface de relecture humaine, puis lecture des données depuis Supabase

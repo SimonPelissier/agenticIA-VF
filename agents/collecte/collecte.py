@@ -24,6 +24,8 @@ import time
 import urllib.request
 import zipfile
 
+import grands_votes
+
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DOSSIER_AGENT = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(DOSSIER_AGENT, ".cache")
@@ -447,6 +449,12 @@ def main():
         json.dump(app, f, ensure_ascii=False, sort_keys=True, indent=1)
         f.write(";\n")
     print("Écrit : data/app.js")
+
+    # Grands votes classés par catégorie, pour la page « Qui a voté quoi ? ».
+    n = grands_votes.construire(
+        tous_scrutins, groupes, candidats, votes,
+        {f["id"]: f["mandats"] for f in sortie_candidats}, FAMILLES, os.path.join(SORTIE, "votes.js"))
+    print("Écrit : data/votes.js (%d grands votes)" % n)
 
     # Ni date ni empreinte ici : l'Assemblée régénère ses archives chaque nuit. Le fichier ne change
     # que si les données changent, ce qui évite une pull request chaque nuit pour rien.
