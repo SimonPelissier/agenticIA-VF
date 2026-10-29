@@ -295,6 +295,11 @@ button:active, a:active { transform: translateY(2px) scale(0.98); }
 }
 .person .n { font-size: 17px; font-weight: 800; line-height: 1.15; }
 .person .p { font: 600 12px/1.35 var(--sans); color: var(--ink-2); }
+.person.off { box-shadow: none; border-style: dashed; }
+
+/* Programmes : le texte du parti, tel quel */
+.measure { gap: 8px; }
+.measure-text { margin: 0; font-size: 15px; line-height: 1.5; white-space: pre-line; }
 
 /* Bilan */
 .bilan { display: flex; flex-direction: column; gap: 16px; padding: 18px; border-radius: 24px; background: var(--accent); color: var(--white); box-shadow: 0 18px 44px rgba(29, 24, 54, 0.22); }
@@ -409,7 +414,7 @@ button:active, a:active { transform: translateY(2px) scale(0.98); }
 .tabbar {
   position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
   width: 100%; max-width: 430px; z-index: 10;
-  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
   background: var(--white); border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom);
 }

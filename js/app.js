@@ -56,7 +56,8 @@
     list: "M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01",
     share: "M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13",
     flame: "M12 22c4 0 7-3 7-7 0-4-3-6-4-10-2 2-3 4-3 6-1-1-2-2-2-4-2 2-5 5-5 8 0 4 3 7 7 7z",
-    lock: "M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4"
+    lock: "M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4",
+    doc: "M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6"
   };
 
   // Stockage local, uniquement sur l'appareil, pour les sujets explorés.
@@ -245,7 +246,8 @@
       '<div class="topics">' + topics + "</div></section>" +
       '<nav class="nav-tiles" aria-label="Comparer">' +
       '<a class="nav-tile dark" href="#/sujets">' + icon(I.grid) + "<span>Par sujet</span></a>" +
-      '<a class="nav-tile" href="#/candidats">' + icon(I.person) + "<span>Par candidat</span></a></nav>" +
+      '<a class="nav-tile" href="#/candidats">' + icon(I.person) + "<span>Par candidat</span></a>" +
+      '<a class="nav-tile" href="#/programmes">' + icon(I.doc) + "<span>Programmes</span></a></nav>" +
       foot() + "</div>";
   }
 
@@ -474,6 +476,67 @@
       "</div>";
   }
 
+  // ---------- Programmes ----------
+  // Section à part : des mesures recopiées mot pour mot, sans lien avec les candidats ni les votes.
+  // Le texte vient de data/programmes.js, écrit par agents/verification/programmes.py après vérification.
+
+  var PR = window.MARIAN_PROGRAMMES || { partis: [] };
+  var PARTIS = PR.partis.slice().sort(function (a, b) { return a.nom.localeCompare(b.nom, "fr"); });
+
+  function progStatus(p) {
+    if (p.statut === "publie") return p.mesures.length + " mesure" + (p.mesures.length > 1 ? "s" : "");
+    if (p.statut === "pas-publie") return "Programme pas encore publié";
+    if (p.statut === "en-cours") return "En cours d’ajout";
+    return "Pas encore ajouté";
+  }
+
+  function programmes() {
+    return '<div class="screen enter">' + topbar(null, "Programmes") +
+      '<h1 class="h1" style="font-size:34px">Ce qu’ils <span>proposent</span></h1>' +
+      '<p class="note">Les mesures sont recopiées mot pour mot depuis le programme de chaque parti. On ne résume pas et on ne choisit pas : ce sont les mesures clés désignées par le parti, ou, s’il n’en désigne pas, la première mesure de chaque chapitre.</p>' +
+      '<div class="people stagger">' + PARTIS.map(function (p) {
+        return '<a class="person' + (p.statut === "publie" ? "" : " off") + '" href="#/programmes/' + p.id + '"><span class="n">' + esc(p.nom) + '</span><span class="p">' + esc(progStatus(p)) + "</span></a>";
+      }).join("") + "</div>" +
+      '<p class="cap">Ordre alphabétique, aucune couleur de parti.</p>' + foot() + "</div>";
+  }
+
+  function programme(id) {
+    var p = byId(PARTIS, id);
+    if (!p) return notFound();
+    var head = '<section class="box flat"><p class="eb">Programme 2027</p><span class="name-tag">' + esc(p.nom) + "</span>" +
+      (p.programme ? '<span class="meta">' + esc(p.programme) + "</span>" : "") + "</section>";
+    if (p.statut !== "publie") {
+      return '<div class="screen enter">' + topbar("#/programmes", "Programme") + head +
+        '<div class="empty"><strong>' + esc(progStatus(p)) + "</strong>" +
+        (p.statut === "pas-publie" ? "Ce parti n’a pas encore publié de programme pour 2027."
+          : "Ses mesures s’afficheront ici une fois recopiées et vérifiées mot pour mot.") + "</div>" + foot() + "</div>";
+    }
+    var srcs = {};
+    p.sources.forEach(function (s) { srcs[s.id] = s; });
+    var rule = p.structure === "mesures-cles"
+      ? "Les mesures que le parti présente lui-même comme « " + esc(p.libelle) + " », dans son ordre."
+      : "Ce parti ne désigne pas de mesures prioritaires. On affiche <b>la première mesure de chaque chapitre</b> de son programme, dans l’ordre. Ce n’est pas un choix de l’équipe." +
+        (p.regle ? "<br>" + esc(p.regle) : "");
+    var items = p.mesures.map(function (m) {
+      return '<article class="box flat measure">' +
+        '<p class="eb">' + (m.chapitre ? esc(m.chapitre) : "Mesure " + m.ordre) + "</p>" +
+        (m.titre ? '<h3 class="vote-title">' + esc(m.titre) + "</h3>" : "") +
+        '<p class="measure-text">' + esc(m.texte) + "</p>" +
+        '<a class="link" href="' + esc(m.url) + '" target="_blank" rel="noopener">Lire dans le programme' +
+        (m.page ? ", page " + m.page : "") + " ↗</a></article>";
+    }).join("");
+    return '<div class="screen enter">' + topbar("#/programmes", "Programme") + head +
+      '<p class="group-note">' + rule + "</p>" +
+      '<div class="stagger" style="display:flex;flex-direction:column;gap:12px">' + items + "</div>" +
+      '<section class="box flat"><p class="eb">Sources</p>' + p.sources.map(function (s) {
+        return '<div class="kv"><a class="link" href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.titre) + " ↗</a><span>consulté le " + fmtDate(s.consulte_le) + "</span></div>";
+      }).join("") +
+      '<p class="cap">Texte reproduit sans modification. Vérifié par un programme le ' + fmtDate(PR.verifieLe) +
+      " : chaque mesure a été retrouvée mot pour mot dans la source archivée.</p></section>" +
+      '<a class="btn-dark" href="https://github.com/SimonPelissier/agenticIA-VF/issues/new" target="_blank" rel="noopener">Signaler une erreur</a>' +
+      foot() + "</div>";
+  }
+
   // ---------- Méthode, lexique ----------
 
   function method() {
@@ -492,6 +555,7 @@
       "<li>Quand un candidat a siégé, on affiche son vote personnel. Sinon, on l’écrit : les votes de son groupe sont du contexte, pas ses votes.</li>" +
       "<li>Les chiffres des votes viennent des données ouvertes de l’Assemblée nationale, collectées chaque nuit et relues avant publication.</li>" +
       "<li>Les textes préparés avec l’IA sont relus et validés par l’équipe.</li>" +
+      "<li>Les programmes sont recopiés mot pour mot, jamais résumés. Un programme vérifie que chaque mesure se trouve telle quelle dans la source.</li>" +
       "<li>Sans compte. Le quiz et le débat se jouent dans ton navigateur : rien n’est envoyé, aucun résultat n’est publié.</li>" +
       "</ul></section>" +
       '<a class="btn-dark" href="https://github.com/SimonPelissier/agenticIA-VF/issues/new" target="_blank" rel="noopener">Signaler une erreur</a>' +
@@ -512,7 +576,7 @@
 
   // ---------- Routeur ----------
 
-  var TAB = { "": "accueil", debat: "debat", quiz: "quiz", sujets: "sujets", themes: "sujets", candidats: "candidats" };
+  var TAB = { "": "accueil", debat: "debat", quiz: "quiz", sujets: "sujets", themes: "sujets", candidats: "candidats", programmes: "programmes" };
 
   function route() {
     var parts = location.hash.replace(/^#\/?/, "").split("/");
@@ -522,6 +586,7 @@
       case "debat": html = debate(); break;
       case "sujets": case "themes": html = parts[1] ? topic(parts[1]) : topics(); break;
       case "candidats": html = parts[1] ? candidate(parts[1]) : candidates(); break;
+      case "programmes": html = parts[1] ? programme(parts[1]) : programmes(); break;
       case "quiz": html = quizScreen(); break;
       case "methode": html = method(); break;
       case "lexique": html = lexicon(); break;

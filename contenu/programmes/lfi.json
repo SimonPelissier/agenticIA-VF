@@ -1,0 +1,12 @@
+{
+  "_note": "Programme de La France insoumise. Mesures recopiées au mot près depuis la source archivée ; vérifiées par agents/verification/programmes.py. Voir docs/programmes.md.",
+  "id": "lfi",
+  "parti": "La France insoumise",
+  "programme": "L’Avenir en commun",
+  "structure": null,
+  "libelle": null,
+  "regle": null,
+  "sources": [],
+  "mesures": [],
+  "_a_faire": "Archiver la page ou le document où LFI présente ses « mesures clés » (melenchon2027.fr refuse les téléchargements automatiques : enregistrer la page depuis le navigateur). Puis remplir 'structure', 'libelle', 'sources' et 'mesures'."
+}

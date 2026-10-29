@@ -30,6 +30,8 @@ css/style.css   style V4 (crème et jaune, accent violet, contours noirs)
 js/data.js      données éditoriales : thèmes, candidats, quiz, lexique
 js/app.js       écrans et navigation (#/sujets, #/candidats, #/debat, #/quiz…)
 contenu/        votes clés choisis par l'équipe (texte + numéro du scrutin officiel)
+contenu/programmes/  mesures des programmes, recopiées mot pour mot (règles : docs/programmes.md)
+data/programmes.js   programmes vérifiés, produit par agents/verification/programmes.py
 data/app.js     données officielles pour l'application, produites par l'agent de collecte
 data/*.json     données brutes collectées (scrutins, votes, groupes)
 agents/         agents (collecte des votes de l'Assemblée)
