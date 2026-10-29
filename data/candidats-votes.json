@@ -59,8 +59,8 @@
         "votes": 71
       },
       "tous": {
-        "scrutins": 8837,
-        "taux": 20.0,
+        "scrutins": 9293,
+        "taux": 19.0,
         "votes": 1770
       }
     },
@@ -12524,9 +12524,9 @@
         "votes": 101
       },
       "tous": {
-        "scrutins": 12852,
-        "taux": 8.3,
-        "votes": 1070
+        "scrutins": 13308,
+        "taux": 8.1,
+        "votes": 1074
       }
     },
     "votes": [
@@ -20019,6 +20019,34 @@
         "parDelegation": false,
         "position": "contre",
         "scrutin": "VTANR5L17V8746"
+      },
+      {
+        "date": "2026-10-15",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "contre",
+        "scrutin": "VTANR5L17V8747"
+      },
+      {
+        "date": "2026-10-15",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "contre",
+        "scrutin": "VTANR5L17V8748"
+      },
+      {
+        "date": "2026-10-15",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "contre",
+        "scrutin": "VTANR5L17V8750"
+      },
+      {
+        "date": "2026-10-15",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "contre",
+        "scrutin": "VTANR5L17V8751"
       }
     ]
   },
@@ -20072,7 +20100,7 @@
       {
         "abrege": "RN",
         "debut": "2024-07-19",
-        "fin": null,
+        "fin": "2026-10-27",
         "groupe": "PO845401",
         "legislature": "17"
       }
@@ -20098,8 +20126,8 @@
         "votes": 105
       },
       "tous": {
-        "scrutins": 12852,
-        "taux": 10.9,
+        "scrutins": 13308,
+        "taux": 10.6,
         "votes": 1406
       }
     },
