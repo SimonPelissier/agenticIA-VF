@@ -10,7 +10,6 @@ window.MARIAN_PROGRAMMES = {
    "programme": "Programme de l’Union populaire, élections européennes 2024",
    "libelle": "Mesure-clé",
    "regle": null,
-   "classementRelu": false,
    "sources": [
     {
      "id": "ch1",
@@ -75,10 +74,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Abroger les règles budgétaires absurdes et dangereuses qui imposent l’austérité en limitant le déficit à 3% du PIB et la dette à 60% du PIB (Pacte de stabilité et de croissance)",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-1-sortir-de-lausterite-et-partager-les-richesses/",
-     "source": "ch1",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch1"
     },
     {
      "ordre": 2,
@@ -87,10 +83,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Fixer à la Banque centrale européenne (BCE) de nouveaux objectifs prioritaires comme la lutte contre les inégalités et le chômage et le financement de la bifurcation écologique",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-1-sortir-de-lausterite-et-partager-les-richesses/",
-     "source": "ch1",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch1"
     },
     {
      "ordre": 3,
@@ -99,10 +92,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Séparer strictement les banques de dépôts et les banques d’affaires en interdisant l’exercice simultané (au sein d’une entreprise ou d’un groupe) des activités de banque d’affaires et de banque de détail pour éviter que l’épargne des ménages ne serve à renflouer les pertes des spéculateurs",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-1-sortir-de-lausterite-et-partager-les-richesses/",
-     "source": "ch1",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch1"
     },
     {
      "ordre": 4,
@@ -111,10 +101,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Établir une taxe permanente sur les superprofits étendue à l’ensemble des secteurs d’activité, pas uniquement au secteur énergétique",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-1-sortir-de-lausterite-et-partager-les-richesses/",
-     "source": "ch1",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch1"
     },
     {
      "ordre": 5,
@@ -123,10 +110,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Plafonner la part de profits distribués aux actionnaires pour un meilleur partage des richesses",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-1-sortir-de-lausterite-et-partager-les-richesses/",
-     "source": "ch1",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch1"
     },
     {
      "ordre": 6,
@@ -135,10 +119,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Instaurer un impôt universel sur les entreprises (basant leur taxation sur l’activité effectivement réalisée dans les pays européens) et sur les revenus des particuliers dans les paradis fiscaux pour lutter contre l’évasion fiscale",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-1-sortir-de-lausterite-et-partager-les-richesses/",
-     "source": "ch1",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch1"
     },
     {
      "ordre": 7,
@@ -147,10 +128,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Lancer une directive pour une allocation d’autonomie accessible aux jeunes de moins de 25 ans et située au-dessus du seuil de pauvreté (soit 1158 euros mensuels en France)",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-1-sortir-de-lausterite-et-partager-les-richesses/",
-     "source": "ch1",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch1"
     },
     {
      "ordre": 8,
@@ -159,10 +137,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Reconnaître le modèle généraliste et universaliste du logement public comme légal et légitime, et sortir de la logique d’un logement social résiduel d’où sont exclus une partie des classes moyennes et populaires",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-1-sortir-de-lausterite-et-partager-les-richesses/",
-     "source": "ch1",
-     "themes": [
-      "logement"
-     ]
+     "source": "ch1"
     },
     {
      "ordre": 9,
@@ -171,10 +146,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Mettre un terme au statut de travail détaché : les salariés étrangers, y compris saisonniers, doivent relever intégralement et seulement du droit du pays d’accueil (horaires, salaires, cotisations sociales, indemnités, congés, etc.)",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-2-en-finir-avec-le-dumping-social/",
-     "source": "ch2",
-     "themes": [
-      "travail"
-     ]
+     "source": "ch2"
     },
     {
      "ordre": 10,
@@ -183,10 +155,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Faire de la transition écologique, de l’autonomie énergétique, de l’autonomie alimentaire, du plein emploi, de la lutte contre la vie-chère et du rattrapage des retards des priorités européennes pour les régions ultrapériphériques (RUP) et les pays et territoires d’outre-mer (PTOM)",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-2-en-finir-avec-le-dumping-social/",
-     "source": "ch2",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch2"
     },
     {
      "ordre": 11,
@@ -195,10 +164,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Mettre la politique de cohésion au service de la planification écologique, du développement des territoires, de la lutte contre la précarité urbaine et la désertification rurale (déserts médicaux, administratifs, économiques, etc.)",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-2-en-finir-avec-le-dumping-social/",
-     "source": "ch2",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch2"
     },
     {
      "ordre": 12,
@@ -207,10 +173,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Bloquer l’ensemble des accords de libre-échange en cours de négociation, de signature, ou de renouvellement et abroger ceux en vigueur",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-3-sortir-du-libre-echange-et-relocaliser/",
-     "source": "ch3",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch3"
     },
     {
      "ordre": 13,
@@ -219,10 +182,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Mettre un terme à la contradiction des pratiques commerciales délétères de l’Union européenne avec ses propres règles visant à protéger les droits humains et l’environnement, notamment les législations européennes sur le devoir de vigilance des entreprises, le travail forcé, la déforestation et la restauration de la nature",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-3-sortir-du-libre-echange-et-relocaliser/",
-     "source": "ch3",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch3"
     },
     {
      "ordre": 14,
@@ -231,10 +191,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Interdire l’accès au marché européen aux produits ne respectant pas des normes sociales et environnementales suffisantes ou violant les droits humains dans leur chaîne de production et renforcer les contrôles",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-3-sortir-du-libre-echange-et-relocaliser/",
-     "source": "ch3",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch3"
     },
     {
      "ordre": 15,
@@ -243,10 +200,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Mettre un terme à la concurrence libre et non-faussée qui empêche la constitution de pôles publics (énergie, transports, etc.) et la sortie des biens communs du marché",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-3-sortir-du-libre-echange-et-relocaliser/",
-     "source": "ch3",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch3"
     },
     {
      "ordre": 16,
@@ -255,10 +209,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Sortir du marché européen de l’électricité et créer un pôle public de l’énergie, remettre en place des tarifs réglementés pérennes calculés à partir des coûts de production, pour les particuliers comme pour les entreprises, les collectivités locales et les bailleurs sociaux. Y inclure des objectifs sociaux, comme la gratuité des premiers kilowattheures, garantissant le droit à l’énergie pour les usages de base.",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-3-sortir-du-libre-echange-et-relocaliser/",
-     "source": "ch3",
-     "themes": [
-      "ecologie"
-     ]
+     "source": "ch3"
     },
     {
      "ordre": 17,
@@ -267,10 +218,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Acter la défaillance du marché carbone (SEQE-UE) et instaurer une véritable planification de la réduction des émissions des secteurs énergétiques et industriels, par le biais d’objectifs sectoriels contraignants et d’un objectif de réduction des émissions pour la période 2021-2030 conforme au respect de l’Accord de Paris, notamment en appliquant le principe pollueur-payeur pour les entreprises",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-4-faire-la-planification-ecologique-europeenne/",
-     "source": "ch4",
-     "themes": [
-      "ecologie"
-     ]
+     "source": "ch4"
     },
     {
      "ordre": 18,
@@ -279,10 +227,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Planifier la sortie du nucléaire et des énergies carbonées et s’orienter vers un mix énergétique 100 % renouvelable à horizon 2050 en planifiant à long terme le déploiement des infrastructures de production et de stockage d’énergie",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-4-faire-la-planification-ecologique-europeenne/",
-     "source": "ch4",
-     "themes": [
-      "ecologie"
-     ]
+     "source": "ch4"
     },
     {
      "ordre": 19,
@@ -291,10 +236,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Favoriser le développement et la rénovation des lignes de fret, des trains du quotidien et des trains de nuit entre pays européens plutôt que de financer des grands projets inutiles et imposés comme le Lyon-Turin",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-4-faire-la-planification-ecologique-europeenne/",
-     "source": "ch4",
-     "themes": [
-      "ecologie"
-     ]
+     "source": "ch4"
     },
     {
      "ordre": 20,
@@ -303,10 +245,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Garantir des prix rémunérateurs aux agriculteurs et encadrer les marges de l’industrie agroalimentaire et de la grande distribution",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-4-faire-la-planification-ecologique-europeenne/",
-     "source": "ch4",
-     "themes": [
-      "ecologie"
-     ]
+     "source": "ch4"
     },
     {
      "ordre": 21,
@@ -315,10 +254,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Interdire le glyphosate et établir un plan de sortie de l’ensemble des pesticides de synthèse et des engrais chimiques dangereux pour l’environnement et la santé humaine",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-4-faire-la-planification-ecologique-europeenne/",
-     "source": "ch4",
-     "themes": [
-      "ecologie"
-     ]
+     "source": "ch4"
     },
     {
      "ordre": 22,
@@ -327,10 +263,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Constituer des pôles publics nationaux ou européens de production de médicaments (par exemple : paracétamol, pilule abortive)",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-4-faire-la-planification-ecologique-europeenne/",
-     "source": "ch4",
-     "themes": [
-      "sante"
-     ]
+     "source": "ch4"
     },
     {
      "ordre": 23,
@@ -339,10 +272,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Porter au niveau international la reconnaissance de l’écocide, le respect du principe de précaution et l’interdiction de l’exploitation minière en eaux profondes",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-4-faire-la-planification-ecologique-europeenne/",
-     "source": "ch4",
-     "themes": [
-      "ecologie"
-     ]
+     "source": "ch4"
     },
     {
      "ordre": 24,
@@ -351,10 +281,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Nommer un Commissaire européen en charge de la protection des animaux et faire adopter une charte européenne des droits des animaux",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-4-faire-la-planification-ecologique-europeenne/",
-     "source": "ch4",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch4"
     },
     {
      "ordre": 25,
@@ -363,10 +290,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Faire du droit à l’eau un droit fondamental en Europe et instaurer la gratuité de l’accès aux mètres cubes vitaux, à des fontaines et à des bains douches",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-4-faire-la-planification-ecologique-europeenne/",
-     "source": "ch4",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch4"
     },
     {
      "ordre": 26,
@@ -375,10 +299,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Interdire les rémunérations annexes des députés et responsables européens susceptibles de créer des conflits d’intérêts, tout comme les cadeaux et voyages offerts",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-5-faire-respecter-la-souverainete-populaire-en-europe-aussi/",
-     "source": "ch5",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch5"
     },
     {
      "ordre": 27,
@@ -387,10 +308,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Mettre fin à la culture d’opacité qui mine la confiance des citoyens envers les institutions européennes et donne tout pouvoir aux lobbies et aux entreprises transnationales contraires à l’intérêt général",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-5-faire-respecter-la-souverainete-populaire-en-europe-aussi/",
-     "source": "ch5",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch5"
     },
     {
      "ordre": 28,
@@ -399,10 +317,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Défendre un RIC européen : rendre obligatoire l’examen par le Parlement européen de ce texte et abaisser le seuil pour l’initiative citoyenne européenne à 500 000 personnes dans 4 États membres",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-5-faire-respecter-la-souverainete-populaire-en-europe-aussi/",
-     "source": "ch5",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch5"
     },
     {
      "ordre": 29,
@@ -411,10 +326,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Proposer de nouveaux traités respectueux de la souveraineté des peuples et les faire ratifier par référendum",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-5-faire-respecter-la-souverainete-populaire-en-europe-aussi/",
-     "source": "ch5",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch5"
     },
     {
      "ordre": 30,
@@ -423,10 +335,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Systématiser le recours au mécanisme de respect de l’État de droit, déclencher ce mécanisme dès qu’une liberté fondamentale est attaquée, et renforcer les sanctions, notamment financières, contre les États concernés",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-5-faire-respecter-la-souverainete-populaire-en-europe-aussi/",
-     "source": "ch5",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch5"
     },
     {
      "ordre": 31,
@@ -435,11 +344,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Mettre dans la charte des droits fondamentaux l’accès gratuit et sûr à la contraception et à l’IVG, garantir le droit à l’éducation à la sexualité dans tous les États membres de l’Union européenne. Garantir leur effectivité en pratique en étendant le mécanisme de respect de l’État de droit, la possibilité de sanctions financières et de blocage des subventions européennes en cas de violations de ces libertés fondamentales",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-6-etendre-les-droits-et-libertes-face-aux-reactionnaires/",
-     "source": "ch6",
-     "themes": [
-      "sante",
-      "education"
-     ]
+     "source": "ch6"
     },
     {
      "ordre": 32,
@@ -448,10 +353,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Lutter contre les mouvements réactionnaires qui s’opposent aux droits des femmes et des personnes LGBTI à travers toute l’Europe",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-6-etendre-les-droits-et-libertes-face-aux-reactionnaires/",
-     "source": "ch6",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch6"
     },
     {
      "ordre": 33,
@@ -460,10 +362,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Donner des droits identiques au reste de la population à toutes les personnes en situation de handicap : éducation, emploi, déplacements, prestations sociales, vie politique, vie culturelle et sportive",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-6-etendre-les-droits-et-libertes-face-aux-reactionnaires/",
-     "source": "ch6",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch6"
     },
     {
      "ordre": 34,
@@ -472,10 +371,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Combattre toutes les manifestations du racisme, notamment l’antisémitisme et l’islamophobie",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-6-etendre-les-droits-et-libertes-face-aux-reactionnaires/",
-     "source": "ch6",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch6"
     },
     {
      "ordre": 35,
@@ -484,10 +380,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Lutter contre la concentration des médias dans les mains de quelques ultra-riches",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-6-etendre-les-droits-et-libertes-face-aux-reactionnaires/",
-     "source": "ch6",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch6"
     },
     {
      "ordre": 36,
@@ -496,10 +389,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Mettre fin à la sélection à l’université partout en Europe en remettant en cause le processus de Bologne et en réunissant une nouvelle conférence pour l’enseignement supérieur gratuit et ouvert à tous",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-6-etendre-les-droits-et-libertes-face-aux-reactionnaires/",
-     "source": "ch6",
-     "themes": [
-      "education"
-     ]
+     "source": "ch6"
     },
     {
      "ordre": 37,
@@ -508,10 +398,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Défendre l’exception culturelle française, à savoir la préservation des arts et de la culture de la prédation du marché et de ses logiques",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-6-etendre-les-droits-et-libertes-face-aux-reactionnaires/",
-     "source": "ch6",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch6"
     },
     {
      "ordre": 38,
@@ -520,10 +407,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Agir pour la lutte contre le dérèglement climatique et créer un statut de détresse environnementale couvrant tout type de catastrophe ayant entraîné une migration forcée",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-7-lutter-contre-lexil-force-et-organiser-un-accueil-coordonne/",
-     "source": "ch7",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch7"
     },
     {
      "ordre": 39,
@@ -532,10 +416,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Remplacer l’agence meurtrière Frontex par une agence européenne civile de sauvetage en mer et sur terre, en appui de l’agence de l’Union européenne pour l’asile (AUEA)",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-7-lutter-contre-lexil-force-et-organiser-un-accueil-coordonne/",
-     "source": "ch7",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch7"
     },
     {
      "ordre": 40,
@@ -544,10 +425,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Garantir l’application stricte de l’ensemble des dispositifs de droit international liés à l’asile et abroger le pacte asile-immigration qui prévoit une augmentation de la rétention aux frontières, l’affaiblissement du droit d’asile et une accélération de l’externalisation de la politique migratoire",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-7-lutter-contre-lexil-force-et-organiser-un-accueil-coordonne/",
-     "source": "ch7",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch7"
     },
     {
      "ordre": 41,
@@ -556,10 +434,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Combattre la criminalisation et les campagnes de harcèlement conduites à l’encontre des associations d’aide et des personnes solidaires avec les migrants",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-7-lutter-contre-lexil-force-et-organiser-un-accueil-coordonne/",
-     "source": "ch7",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch7"
     },
     {
      "ordre": 42,
@@ -568,10 +443,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Exiger un cessez-le-feu immédiat au Proche-Orient, la création de corridors humanitaires, le retour de tous les déplacés et la fin immédiate du blocus de la bande de Gaza",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-8-refuser-la-vassalisation-de-leurope/",
-     "source": "ch8",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch8"
     },
     {
      "ordre": 43,
@@ -580,10 +452,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Refuser l’alignement de la France dans l’Union européenne sur toute autre puissance et défendre le droit international, l’inviolabilité des frontières et la paix",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-8-refuser-la-vassalisation-de-leurope/",
-     "source": "ch8",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch8"
     },
     {
      "ordre": 44,
@@ -592,10 +461,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Refuser de régler nos différends commerciaux avec la Chine en entrant dans l’alliance militaire que les États-Unis créent contre elle",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-8-refuser-la-vassalisation-de-leurope/",
-     "source": "ch8",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch8"
     },
     {
      "ordre": 45,
@@ -604,10 +470,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Refuser tout nouvel élargissement de l’Union européenne, notamment à l’Ukraine, tant qu’une harmonisation écologique, sociale, fiscale et des droits humains n’a pas été menée",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-8-refuser-la-vassalisation-de-leurope/",
-     "source": "ch8",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch8"
     },
     {
      "ordre": 46,
@@ -616,10 +479,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Porter au niveau international la reconnaissance de l’écocide",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-8-refuser-la-vassalisation-de-leurope/",
-     "source": "ch8",
-     "themes": [
-      "ecologie"
-     ]
+     "source": "ch8"
     },
     {
      "ordre": 47,
@@ -628,10 +488,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Refuser une Europe de la défense arrimée à l’OTAN car elle ne serait qu’une extension des intérêts géopolitiques des États-Unis et un débouché contraint supplémentaire pour son industrie de l’armement",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-8-refuser-la-vassalisation-de-leurope/",
-     "source": "ch8",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch8"
     },
     {
      "ordre": 48,
@@ -640,10 +497,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Maintenir l’unanimité sur les questions d’interventions militaires et d’envoi de troupes, qui relèvent de la souveraineté des États",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-8-refuser-la-vassalisation-de-leurope/",
-     "source": "ch8",
-     "themes": [
-      "autres"
-     ]
+     "source": "ch8"
     },
     {
      "ordre": 49,
@@ -652,10 +506,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Créer un véritable réseau connecté d’aires marines protégées en Europe, dédiées exclusivement à la conservation et à la restauration de la biodiversité",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-9-nouvelles-frontieres-de-lhumanite/",
-     "source": "ch9",
-     "themes": [
-      "ecologie"
-     ]
+     "source": "ch9"
     },
     {
      "ordre": 50,
@@ -664,10 +515,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Inscrire la neutralité du net, c’est​-à​-dire l’accès égal de chacun et l’égalité de traitement, dans la Charte des droits fondamentaux de l’Union européenne",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-9-nouvelles-frontieres-de-lhumanite/",
-     "source": "ch9",
-     "themes": [
-      "numerique"
-     ]
+     "source": "ch9"
     },
     {
      "ordre": 51,
@@ -676,10 +524,7 @@ window.MARIAN_PROGRAMMES = {
      "texte": "Conserver une prise de décision humaine en toute circonstance dans les entreprises et les services publics qui utilisent l’intelligence artificielle (IA)",
      "page": null,
      "url": "https://lafranceinsoumise.fr/europeennes-2024/programme-de-lunion-populaire/chapitre-9-nouvelles-frontieres-de-lhumanite/",
-     "source": "ch9",
-     "themes": [
-      "numerique"
-     ]
+     "source": "ch9"
     }
    ]
   },

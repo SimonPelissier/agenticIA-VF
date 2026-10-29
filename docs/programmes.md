@@ -20,16 +20,7 @@ Pour `premiere-par-chapitre`, le champ `regle` précise ce qui compte comme « u
 - Seules différences tolérées par la vérification : apostrophes et guillemets droits ou courbes, espaces insécables, retours à la ligne. Rien d'autre.
 - Page web : chaque texte doit correspondre à un bloc entier de la page (titre, paragraphe, puce), ou à plusieurs blocs qui se suivent. Une mesure coupée en route est rejetée. Un titre en gras au début du paragraphe peut être séparé dans `titre`.
 - Texte de PDF : la vérification retrouve le texte à la page indiquée, mais ne peut pas détecter une coupe. Relire ce point à la main.
-
-## Classement par sujet
-
-À l'écran, on choisit un parti, puis un des sujets de l'application (Logement, Travail…), et on voit les mesures liées. Ce classement est le seul choix fait par l'équipe ; il est signalé comme tel.
-
-- Champ `themes` de chaque mesure : un ou plusieurs identifiants de sujet de `js/data.js`, ou `autres`.
-- Un sujet seulement quand la mesure agit directement dessus. Une mesure qui ne fait que citer un domaine (« …déserts médicaux… » dans une liste) n'y entre pas.
-- Rien n'est écarté : ce qui n'entre dans aucun sujet va dans « Autres sujets ».
-- `classement_relu` : `false` tant qu'un humain n'a pas relu le classement ; l'écran affiche alors « à relire ».
-- Le script d'extraction garde le classement des mesures dont le texte n'a pas changé.
+- Le classement par sujet (Logement, Travail…) n'est pas fait ici.
 
 ## Circuit
 
