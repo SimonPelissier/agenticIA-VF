@@ -54,8 +54,8 @@ window.MARIAN_DONNEES = {
      "votes": 71
     },
     "tous": {
-     "scrutins": 9293,
-     "taux": 19.0,
+     "scrutins": 9426,
+     "taux": 18.8,
      "votes": 1770
     }
    },
@@ -150,9 +150,9 @@ window.MARIAN_DONNEES = {
      "votes": 101
     },
     "tous": {
-     "scrutins": 13308,
-     "taux": 8.1,
-     "votes": 1074
+     "scrutins": 13441,
+     "taux": 8.0,
+     "votes": 1075
     }
    },
    "votesCles": {
@@ -259,8 +259,8 @@ window.MARIAN_DONNEES = {
      "votes": 105
     },
     "tous": {
-     "scrutins": 13308,
-     "taux": 10.6,
+     "scrutins": 13441,
+     "taux": 10.5,
      "votes": 1406
     }
    },
