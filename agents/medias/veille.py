@@ -14,6 +14,7 @@ Usage :
   python3 agents/medias/veille.py                  lit les flux et met à jour la liste
   python3 agents/medias/veille.py --a-traiter      affiche les articles pas encore lus par Claude
   python3 agents/medias/veille.py --traites ID,ID  marque des articles comme lus
+  python3 agents/medias/veille.py --chapo ID       affiche le chapô du flux RSS (repli si l'article est inaccessible)
 """
 
 import datetime
@@ -32,6 +33,8 @@ import xml.etree.ElementTree as ET
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DOSSIER = os.path.dirname(os.path.abspath(__file__))
 SORTIE = os.path.join(RACINE, "data", "medias", "articles.json")
+# Chapôs des flux RSS : fichier de travail, jamais publié (droit d'auteur), lu par verifier.py en repli.
+CHAPOS = os.path.join(DOSSIER, ".cache", "chapos.json")
 CONSERVATION_JOURS = 30
 AGENT = "Mozilla/5.0 (compatible; marIAn-veille; +https://github.com/SimonPelissier/agenticIA-VF)"
 
@@ -152,6 +155,7 @@ def collecter():
     sources = charger_sources()
     motifs = motifs_candidats(sources["candidats"])
     articles = {a["id"]: a for a in charger_articles()}
+    chapos = charger_chapos()
     aujourdhui = datetime.date.today().isoformat()
     limite = (datetime.date.today() - datetime.timedelta(days=CONSERVATION_JOURS)).isoformat()
     nouveaux = 0
@@ -171,6 +175,8 @@ def collecter():
             if not cites:
                 continue
             ident = hashlib.sha1(e["lien"].split("?")[0].encode("utf-8")).hexdigest()[:12]
+            if e["chapo"]:
+                chapos[ident] = e["chapo"]
             if ident in articles or (e["date"] and e["date"] < limite):
                 continue  # déjà connu, ou trop ancien (certains flux remontent des articles de plusieurs mois)
             articles[ident] = {
@@ -180,9 +186,27 @@ def collecter():
             nouveaux += 1
     gardes = [a for a in articles.values() if (a["date"] or a["vuLe"]) >= limite]
     ecrire_articles(gardes)
+    ids = {a["id"] for a in gardes}
+    os.makedirs(os.path.dirname(CHAPOS), exist_ok=True)
+    with open(CHAPOS, "w", encoding="utf-8") as f:
+        json.dump({k: v for k, v in chapos.items() if k in ids}, f, ensure_ascii=False, indent=0)
     ecrire_actu()
     a_traiter = sum(1 for a in gardes if not a["traite"])
     print("%d nouvel(s) article(s) ; %d à lire par Claude ; %d gardé(s) sur %d jours." % (nouveaux, a_traiter, len(gardes), CONSERVATION_JOURS))
+
+
+def charger_chapos():
+    try:
+        with open(CHAPOS, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def afficher_chapo(ident):
+    """Chapô du flux RSS d'un article, à utiliser seulement si l'article lui-même est inaccessible."""
+    chapo = charger_chapos().get(ident)
+    print(chapo if chapo else "(pas de chapô en cache pour cet article : relancer veille.py, ou l'article n'est plus dans le flux)")
 
 
 def afficher_a_traiter():
@@ -204,7 +228,9 @@ def marquer_traites(ids):
 
 
 if __name__ == "__main__":
-    if "--a-traiter" in sys.argv:
+    if "--chapo" in sys.argv:
+        afficher_chapo(sys.argv[sys.argv.index("--chapo") + 1])
+    elif "--a-traiter" in sys.argv:
         afficher_a_traiter()
     elif "--traites" in sys.argv:
         marquer_traites(sys.argv[sys.argv.index("--traites") + 1])

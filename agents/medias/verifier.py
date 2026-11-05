@@ -7,7 +7,8 @@ Pour chaque déclaration de contenu/declarations/*.json pas encore vérifiée :
     (espaces, apostrophes et guillemets normalisés).
 
 Statut écrit dans chaque déclaration :
-  verifiee     la citation figure telle quelle dans l'article
+  verifiee     la citation figure telle quelle dans le corps de l'article, ou, si l'article est
+               inaccessible, dans le chapô de son flux RSS (champ verifieDans : article ou flux RSS)
   a-verifier   article payant ou inaccessible : un humain doit vérifier
   rejetee      article lisible mais citation introuvable : à corriger ou supprimer
 
@@ -37,6 +38,8 @@ RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 DOSSIER = os.path.dirname(os.path.abspath(__file__))
 DECLARATIONS = os.path.join(RACINE, "contenu", "declarations")
 RAPPORT = os.path.join(DOSSIER, ".cache", "rapport.md")
+CHAPOS = os.path.join(DOSSIER, ".cache", "chapos.json")      # écrit par veille.py, jamais publié
+ARTICLES = os.path.join(RACINE, "data", "medias", "articles.json")
 AGENT = "Mozilla/5.0 (compatible; marIAn-veille; +https://github.com/SimonPelissier/agenticIA-VF)"
 
 TYPES = {"engagement", "position"}
@@ -68,8 +71,9 @@ def texte_article(url):
     except OSError as erreur:
         return None, str(erreur)
     brut = re.sub(r"(?is)<(script|style|noscript)[^>]*>.*?</\1>", " ", brut)
-    # Le corps des articles est dans des paragraphes ; on garde aussi les intertitres et les citations.
-    blocs = re.findall(r"(?is)<(?:p|h[1-6]|blockquote|li)[^>]*>(.*?)</(?:p|h[1-6]|blockquote|li)>", brut)
+    # Le corps des articles : paragraphes, citations, listes. Jamais les titres ni les intertitres :
+    # une citation prise dans un titre (souvent raccourcie par la rédaction) n'est pas acceptée.
+    blocs = re.findall(r"(?is)<(?:p|blockquote|li)[^>]*>(.*?)</(?:p|blockquote|li)>", brut)
     texte = " ".join(re.sub(r"<[^>]+>", " ", b) for b in blocs)
     return normaliser(texte), len(texte.split())
 
@@ -103,6 +107,16 @@ def main():
     aujourdhui = datetime.date.today().isoformat()
 
     problemes, verifiees_ce_jour = [], []
+    try:
+        with open(CHAPOS, encoding="utf-8") as f:
+            chapos = json.load(f)
+    except (OSError, ValueError):
+        chapos = {}
+    try:
+        with open(ARTICLES, encoding="utf-8") as f:
+            id_par_url = {a["url"]: a["id"] for a in json.load(f)}
+    except (OSError, ValueError):
+        id_par_url = {}
     cache_articles = {}
     for chemin in sorted(glob.glob(os.path.join(DECLARATIONS, "*.json"))):
         with open(chemin, encoding="utf-8") as f:
@@ -120,11 +134,17 @@ def main():
                     cache_articles[d["url"]] = texte_article(d["url"])
                     time.sleep(1)  # politesse envers les sites des médias
                 texte, info = cache_articles[d["url"]]
-                if texte is None:
-                    d["statut"], d["motif"] = "a-verifier", "article inaccessible (%s) : vérifier à la main" % info
-                elif normaliser(d["citation"]) in texte:
-                    d["statut"] = "verifiee"
+                citation = normaliser(d["citation"])
+                chapo = chapos.get(id_par_url.get(d["url"]), "")
+                if texte is not None and citation in texte:
+                    d["statut"], d["verifieDans"] = "verifiee", "article"
                     d.pop("motif", None)
+                elif chapo and citation in normaliser(chapo):
+                    # Repli : article payant, bloqué ou sans texte, mais la citation est dans le chapô du flux RSS.
+                    d["statut"], d["verifieDans"] = "verifiee", "flux RSS"
+                    d.pop("motif", None)
+                elif texte is None:
+                    d["statut"], d["motif"] = "a-verifier", "article inaccessible (%s) et citation absente du chapô RSS : vérifier à la main" % info
                 elif info < MOTS_MIN_ARTICLE:
                     d["statut"], d["motif"] = "a-verifier", "article incomplet (%d mots lisibles, abonnement ?) : vérifier à la main" % info
                 else:
@@ -145,7 +165,10 @@ def main():
     par_media = collections.Counter(d.get("media") for d in verifiees_ce_jour if d["statut"] != "rejetee")
     retenues = sum(par_candidat.values())
     lignes = ["## Vérification des déclarations", "",
-              "- Vérifiées mot pour mot : **%d**" % statuts.get("verifiee", 0),
+              "- Vérifiées mot pour mot : **%d** (dans l'article : %d ; dans le chapô du flux RSS : %d)" % (
+                  statuts.get("verifiee", 0),
+                  sum(1 for d in verifiees_ce_jour if d["statut"] == "verifiee" and d.get("verifieDans") != "flux RSS"),
+                  sum(1 for d in verifiees_ce_jour if d.get("verifieDans") == "flux RSS")),
               "- À vérifier à la main (article payant ou inaccessible) : **%d**" % statuts.get("a-verifier", 0),
               "- Rejetées : **%d**" % statuts.get("rejetee", 0), "",
               "## Équilibre", "", "| Candidat | Déclarations |", "| --- | --- |"]

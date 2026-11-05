@@ -23,6 +23,10 @@ Ouvre les articles un par un, en commençant par les plus récents, et note chaq
 - **Vote lié** : si la déclaration porte exactement sur un vote clé de `contenu/votes-cles.json`, mets son `id` dans `voteLie`. Sinon `null`. Dans le doute, `null`.
 - **Fact-check** : seulement si l'article lui-même renvoie à un fact-check de cette déclaration (AFP Factuel, Les Décodeurs, franceinfo Vrai ou faux, Les Surligneurs). Sinon `null`. N'en invente jamais.
 
+**Jamais un titre** : ni le titre de l'article, ni un intertitre, ni le titre d'une page vidéo. Les titres sont souvent raccourcis par la rédaction ; le vérificateur ne les lit pas et rejettera la citation.
+
+**Article inaccessible** (payant, bloqué, page vidéo sans texte) : affiche son chapô avec `python3 agents/medias/veille.py --chapo ID`. Tu peux y prendre une citation, avec les mêmes règles : des mots du candidat, entre guillemets, attribués à lui, copiés mot pour mot. Le vérificateur la contrôle alors dans ce chapô et la marque « vérifiée dans le flux RSS ». Ne mélange jamais : la citation doit se trouver telle quelle soit dans le corps de l'article, soit dans le chapô.
+
 « Rien trouvé » est une réponse normale : beaucoup d'articles citent un candidat sans contenir de déclaration utile.
 
 **Limite : 15 déclarations par jour au maximum.** Si tu en trouves plus :
@@ -58,7 +62,7 @@ Ouvre les articles un par un, en commençant par les plus récents, et note chaq
 ## 5. Vérifier
 - Lance `python3 agents/medias/verifier.py`.
 - Pour chaque déclaration **rejetée** : relis l'article. Si tu avais mal copié, corrige la citation et relance le vérificateur. Sinon, **supprime** la déclaration. Il ne doit rester aucune déclaration rejetée.
-- Les déclarations « à vérifier » (article payant ou bloqué) restent : un humain les vérifiera.
+- Les déclarations « à vérifier » (article inaccessible et citation absente du chapô RSS) restent : un humain les vérifiera.
 
 ## 6. Proposer
 - Fais un commit : « Veille médias du AAAA-MM-JJ : N déclarations ».
