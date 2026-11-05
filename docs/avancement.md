@@ -13,3 +13,4 @@ Mis à jour à la fin de chaque tâche.
 | Routine quotidienne de veille médias (/veille-medias) | Simon | Terminé | Relire chaque jour la pull request « Veille médias du … » |
 | Couleurs de la version bleu-blanc-rouge d'Anaïs | Simon | Terminé | Vérifier le rendu sur téléphone |
 | Publication automatique des votes (fusion après contrôles) | Simon | Terminé | Vérifier le premier passage automatique après fusion |
+| Page Programmes : couleurs officielles des partis (proposition A) | Simon | En cours | |
