@@ -3,3 +3,9 @@ agents/collecte/.cache/
 __pycache__/
 .DS_Store
 agents/medias/.cache/
+
+# Données collectées : elles vont dans Supabase, plus dans le dépôt (docs/supabase.md).
+# Les agents les produisent sur la machine qui les fait tourner. data/programmes.js (Kevan) reste publié.
+data/*
+!data/programmes.js
+contenu/declarations/

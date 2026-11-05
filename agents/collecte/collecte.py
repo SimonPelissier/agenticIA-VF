@@ -133,7 +133,7 @@ def ecrire(nom, donnees, une_ligne_par_element=False):
     """Écrit un fichier JSON stable : même contenu en entrée, même fichier en sortie.
 
     Avec une_ligne_par_element, une liste est écrite à raison d'un élément par ligne :
-    le fichier reste compact et une pull request montre clairement ce qui a changé.
+    le fichier reste compact et lisible.
     """
     os.makedirs(SORTIE, exist_ok=True)
     chemin = os.path.join(SORTIE, nom)
@@ -457,8 +457,7 @@ def main():
     print("Écrit : data/votes.js (%d grands votes)" % n)
 
     # Ni date ni empreinte ici : l'Assemblée régénère ses archives chaque nuit. Le fichier ne change
-    # que si les données changent, ce qui évite une pull request chaque nuit pour rien.
-    # Les empreintes vont dans le cache, et la pull request les affiche.
+    # que si les données changent. Les empreintes vont dans le cache ; la tâche GitHub les affiche.
     with open(os.path.join(CACHE, "empreintes.json"), "w", encoding="utf-8") as f:
         json.dump(empreintes, f, indent=2)
     ecrire("collecte.json", {

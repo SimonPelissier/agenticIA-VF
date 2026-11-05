@@ -9,7 +9,7 @@ Pas d'IA, pas de clé, pas de librairie à installer : Python seul.
 - **Chaque nuit** sur GitHub Actions (`.github/workflows/collecte.yml`), à 4 h 30 UTC.
 - **À la demande** : onglet *Actions* du dépôt → *Agent de collecte* → *Run workflow*.
 
-S'il y a du nouveau, il ouvre une pull request « Mise à jour des votes du … », puis **la fusionne lui-même si les contrôles de sécurité passent** (`controles.py`) : nombre de scrutins qui ne baisse pas, dernier scrutin qui ne recule pas, aucun grand vote disparu, mêmes candidats suivis, fichiers valides. Sinon la pull request reste ouverte, avec le motif en commentaire, et attend un humain. Vercel republie le site après chaque fusion.
+Il compare ses données à celles déjà publiées dans **Supabase** (`controles.py`) : nombre de scrutins qui ne baisse pas, dernier scrutin qui ne recule pas, aucun grand vote disparu, mêmes candidats suivis, fichiers valides. **Si tout passe, il écrit les votes dans Supabase** (`agents/supabase/importer.py`), et le site les affiche aussitôt. Sinon rien n'est écrit : la tâche apparaît en rouge dans l'onglet *Actions* (GitHub prévient par e-mail) et un humain regarde. Plus de pull request ni de fichier dans le dépôt depuis novembre 2026 (voir `docs/supabase.md`).
 
 ## Ce qu'il lit
 
@@ -21,7 +21,9 @@ S'il y a du nouveau, il ouvre une pull request « Mise à jour des votes du … 
 
 Source : [data.assemblee-nationale.fr](https://data.assemblee-nationale.fr), sous Licence Ouverte (citer « Assemblée nationale »).
 
-## Ce qu'il produit (dossier `data/`)
+## Ce qu'il produit (dossier `data/`, sur la machine qui le fait tourner)
+
+Ces fichiers ne sont **plus publiés dans le dépôt** : `importer.py` les envoie dans Supabase (tables `scrutins`, `groupes`, `candidats`, `votes_candidats`, `collecte`). `app.js` et `votes.js` y sont rangés tels quels (lignes `site_donnees` et `site_votes` de la table `collecte`), et le site les lit.
 
 | Fichier | Contenu |
 | --- | --- |

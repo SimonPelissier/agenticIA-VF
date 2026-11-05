@@ -66,3 +66,10 @@ def lire(table, **filtres):
         if not lot or len(lot) < 1000:
             return lignes
         debut += 1000
+
+
+if __name__ == "__main__":
+    # python3 agents/supabase/client.py : vérifie que les variables sont là et que la base répond.
+    if not disponible():
+        sys.exit("Supabase : variables SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY absentes.")
+    print("Supabase : connecté (%d ligne(s) dans la table collecte)." % len(lire("collecte", select="cle")))

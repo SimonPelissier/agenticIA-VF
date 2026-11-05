@@ -8,7 +8,7 @@ La migration se fait en trois étapes :
 | --- | --- | --- |
 | 1 | Tables, règles d'accès, import des données actuelles | fait |
 | 2 | Les agents (votes chaque nuit, veille chaque matin) écrivent dans Supabase ; validation des déclarations dans Supabase | fait (novembre 2026) |
-| 3 | Le site lit Supabase ; le dossier `data/` quitte le dépôt | à venir |
+| 3 | Le site lit Supabase ; le dossier `data/` quitte le dépôt ; plus de pull request quotidienne | fait (novembre 2026) |
 
 ## Les tables (`supabase/schema.sql`)
 
@@ -18,7 +18,7 @@ La migration se fait en trois étapes :
 | `groupes` | Les groupes politiques et leurs dates | agent de collecte |
 | `candidats` | Mandats, groupes et participation des candidats | agent de collecte |
 | `votes_candidats` | Vote personnel de chaque candidat sur chaque scrutin | agent de collecte |
-| `collecte` | Chiffres de la dernière collecte (dernier scrutin, médiane…) | agent de collecte |
+| `collecte` | Chiffres de la dernière collecte (dernier scrutin, médiane…), et les données prêtes pour le site : `site_donnees` (votes clés, fiches des candidats), `site_votes` (grands votes de « Qui a voté quoi ? »), `medias` (noms des journaux) | agent de collecte, veille médias |
 | `articles` | Articles repérés : média, titre, date, lien, candidats cités (jamais le texte) | veille médias |
 | `declarations` | Citations relevées, leur vérification automatique et leur **validation humaine** | veille médias, puis l'équipe |
 
@@ -35,13 +35,26 @@ Projet Supabase : **supabase-political-arrow** (`rjpqgdxdomktrysokdnv`, relié �
 
 Secrets rangés dans GitHub et dans l'environnement Claude « Poli - media » (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`).
 
-## Étape 2 : ce que font les agents (transition)
+## Comment ça marche (depuis l'étape 3)
 
-- **Chaque nuit**, la tâche des votes envoie dans Supabase les scrutins des 60 derniers jours, tous les grands votes, les groupes, les candidats et les chiffres de collecte (`importer.py --recents 60`). Elle continue aussi, pendant la transition, à mettre à jour les fichiers `data/` du site.
-- **Chaque matin**, la routine de veille envoie les articles (`veille.py`) et les déclarations vérifiées (`verifier.py`). Une nouvelle déclaration arrive avec `validation = a-valider` ; une validation déjà faite n'est jamais écrasée. Les déclarations rejetées ne sont pas envoyées. La routine ouvre toujours sa pull request pendant la transition.
-- Sans les variables Supabase (sur un ordinateur sans clé), les scripts fonctionnent comme avant, sans rien envoyer.
+```
+Chaque nuit, GitHub Actions          Chaque matin, routine Claude          L'équipe
+agents/collecte/collecte.py          veille.py → Claude → verifier.py      Table Editor :
+controles.py (comparaison            articles + déclarations               declarations
+  avec Supabase)                       « à valider »                         → validee
+importer.py --recents 60                     │                                 │
+        │                                    ▼                                 │
+        └──────────────►  SUPABASE  ◄──────────────────────────────────────────┘
+                              │  lecture seule (clé « anon »)
+                              ▼
+                 le site : js/supabase.js → js/app.js
+```
 
-L'étape 3 fera lire Supabase par le site ; on retirera alors le dossier `data/` et les pull requests quotidiennes, et la validation des déclarations se fera seulement dans Supabase.
+- **Le site** (`js/supabase.js`) lit au chargement : `site_donnees`, `site_votes` et `medias` dans la table `collecte`, les articles des 30 derniers jours, et les déclarations **validées**. L'adresse et la clé publique sont dans `js/config.js`. Si Supabase ne répond pas, la page Programmes et le lexique restent affichés, avec un message.
+- **Chaque nuit**, la tâche « Agent de collecte » relance l'agent, compare ses chiffres à ceux de Supabase (`controles.py` : scrutins qui ne baissent pas, dernier scrutin qui ne recule pas, aucun grand vote disparu, mêmes candidats), puis écrit les scrutins des 60 derniers jours, tous les grands votes et les données du site. Si un contrôle échoue, **rien n'est écrit** et la tâche apparaît en rouge (GitHub prévient par e-mail). Plus de pull request.
+- **Chaque matin**, la routine de veille lit dans Supabase les articles déjà connus, envoie les nouveaux, puis les déclarations vérifiées. Une nouvelle déclaration arrive avec `validation = a-valider` ; une validation déjà faite n'est jamais écrasée, et une déclaration déjà en base n'est jamais remplacée par une autre. Les déclarations rejetées ne sont pas envoyées. La routine ne modifie plus le dépôt.
+- **Import complet** (tous les scrutins, si besoin) : onglet *Actions* → *Supabase : import complet des votes* → *Run workflow*.
+- Les fichiers `data/` (sauf `data/programmes.js`, les programmes de Kevan) et `contenu/declarations/` ne sont plus dans le dépôt (`.gitignore`) : les agents les produisent sur la machine qui les fait tourner.
 
 ## Mise en place (à faire une fois)
 
@@ -49,13 +62,13 @@ L'étape 3 fera lire Supabase par le site ; on retirera alors le dossier `data/`
 2. **Ranger les secrets dans GitHub.** Dans le dépôt : *Settings* → *Secrets and variables* → *Actions* → *New repository secret*, deux fois :
    - `SUPABASE_URL` : l'adresse du projet (Supabase → *Project Settings* → *API* → *Project URL*) ;
    - `SUPABASE_SERVICE_ROLE_KEY` : la clé *service_role* (même page, section *Project API keys*).
-3. **Lancer l'import.** Onglet *Actions* → *Supabase : import initial* → *Run workflow*. Il vérifie d'abord les données sans rien envoyer, puis importe (quelques minutes).
+3. **Lancer l'import.** Onglet *Actions* → *Supabase : import complet des votes* → *Run workflow*. Il relance l'agent de collecte, vérifie les données sans rien envoyer, puis importe (quelques minutes).
 4. **Vérifier.** Dans Supabase → *Table Editor* : environ 13 900 scrutins, 4 500 votes de candidats, 230 articles, 3 déclarations.
 
-## Valider une déclaration (à partir de l'étape 2)
+## Valider une déclaration
 
-Dans Supabase → *Table Editor* → `declarations`, filtrer `validation = a-valider`. Pour chaque ligne : relire la citation (ouvrir l'`url`), puis mettre `validation` à `validee` (ou `refusee`) et son prénom dans `valide_par`. Seules les déclarations validées apparaissent sur le site.
+Dans Supabase → *Table Editor* → `declarations`, filtrer `validation = a-valider`. Pour chaque ligne : relire la citation (ouvrir l'`url` ; obligatoire si `verification = a-verifier`), puis mettre `validation` à `validee` (ou `refusee`), son prénom dans `valide_par` et la date dans `valide_le`. Seules les déclarations validées apparaissent sur le site, dès le prochain chargement de la page. C'est le seul endroit où l'on valide : il n'y a plus de pull request de veille.
 
 ## Et Vercel ?
 
-Le site est statique : il n'a pas d'étape de compilation pour lire les variables qu'ajoute l'intégration Vercel–Supabase. À l'étape 3, l'adresse du projet et la clé publique « anon » seront écrites dans un petit fichier du site (`js/config.js`) : c'est prévu par Supabase, cette clé ne permet que ce que les règles d'accès autorisent, c'est-à-dire la lecture.
+Le site est statique : il n'a pas d'étape de compilation pour lire les variables qu'ajoute l'intégration Vercel–Supabase. L'adresse du projet et la clé publique « anon » sont donc écrites dans `js/config.js` : c'est prévu par Supabase, cette clé ne permet que ce que les règles d'accès autorisent, c'est-à-dire la lecture. Si Supabase désactive un jour les anciennes clés « anon », la remplacer par la clé « publishable » (*Project Settings* → *API Keys*). Vercel republie le site seulement quand le code change : les données, elles, sont à jour dès qu'elles arrivent dans Supabase.
