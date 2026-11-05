@@ -151,6 +151,18 @@ def ecrire_actu():
         f.write('"declarations": [\n' + ",\n".join(compact(d) for d in sorted(declarations, key=lambda d: d.get("id", ""))) + "\n]\n};\n")
 
 
+def envoyer_supabase():
+    """Envoie les articles dans Supabase (table articles), si la routine a les variables Supabase."""
+    sys.path.insert(0, os.path.join(RACINE, "agents", "supabase"))
+    import client
+    if not client.disponible():
+        return
+    lignes = [{"id": a["id"], "media": a["media"], "titre": a["titre"], "url": a["url"], "date": a["date"] or a["vuLe"],
+               "candidats": a["candidats"], "vu_le": a["vuLe"], "traite": a["traite"]} for a in charger_articles()]
+    client.upsert("articles", lignes)
+    print("Supabase : %d article(s) envoyé(s)." % len(lignes))
+
+
 def collecter():
     sources = charger_sources()
     motifs = motifs_candidats(sources["candidats"])
@@ -191,6 +203,7 @@ def collecter():
     with open(CHAPOS, "w", encoding="utf-8") as f:
         json.dump({k: v for k, v in chapos.items() if k in ids}, f, ensure_ascii=False, indent=0)
     ecrire_actu()
+    envoyer_supabase()
     a_traiter = sum(1 for a in gardes if not a["traite"])
     print("%d nouvel(s) article(s) ; %d à lire par Claude ; %d gardé(s) sur %d jours." % (nouveaux, a_traiter, len(gardes), CONSERVATION_JOURS))
 
@@ -224,6 +237,7 @@ def marquer_traites(ids):
             a["traite"] = True
     ecrire_articles(articles)
     ecrire_actu()
+    envoyer_supabase()
     print("%d article(s) marqué(s) comme lus." % len(ids))
 
 

@@ -16,3 +16,4 @@ Mis à jour à la fin de chaque tâche.
 | Page Programmes : couleurs officielles des partis (proposition A) | Simon | Terminé | Logos officiels (fichiers et autorisation) ; confirmer la couleur d'Horizons |
 | Veille médias : chapô du flux RSS quand l'article est inaccessible | Simon | Terminé | Surveiller les premières citations « vérifiées dans le flux RSS » lors des relectures |
 | Supabase 1/3 : tables, règles d'accès et import des données | Simon | Terminé | Simon : coller le SQL, ranger les secrets GitHub, lancer l'import (docs/supabase.md) |
+| Supabase 2/3 : les agents écrivent dans Supabase | Simon | Terminé | Étape 3 : le site lit Supabase, retrait de data/ et des pull requests quotidiennes |

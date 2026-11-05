@@ -32,6 +32,15 @@ jobs:
       - name: Lancer l'agent de collecte (votes de l'Assemblée)
         run: python3 agents/collecte/collecte.py
 
+      - name: Écrire les votes dans Supabase
+        # Les scrutins des 60 derniers jours et tous les grands votes. Une panne de Supabase
+        # n'empêche pas la mise à jour des fichiers du site (pendant la transition).
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python3 agents/supabase/importer.py --tables groupes,scrutins,candidats,votes_candidats,collecte --recents 60
+
       - name: Ouvrir une pull request si les données ont changé
         env:
           GH_TOKEN: ${{ github.token }}

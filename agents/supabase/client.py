@@ -14,6 +14,11 @@ import urllib.parse
 import urllib.request
 
 
+def disponible():
+    """Vrai si les variables Supabase sont présentes (secrets GitHub, environnement de la routine)."""
+    return bool(os.environ.get("SUPABASE_URL") and os.environ.get("SUPABASE_SERVICE_ROLE_KEY"))
+
+
 def _config():
     url = (os.environ.get("SUPABASE_URL") or "").rstrip("/")
     cle = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or ""

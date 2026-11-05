@@ -98,6 +98,23 @@ def controler_format(d, candidats, medias):
     return erreurs
 
 
+def envoyer_supabase(declarations):
+    """Envoie les déclarations dans Supabase. La colonne « validation » n'est jamais envoyée :
+    une nouvelle déclaration arrive « à valider », et une validation déjà faite par l'équipe est conservée."""
+    sys.path.insert(0, os.path.join(RACINE, "agents", "supabase"))
+    import client
+    if not client.disponible() or not declarations:
+        return
+    lignes = [{
+        "id": d["id"], "candidat": d["candidat"], "date": d["date"], "media": d["media"], "url": d["url"],
+        "titre_article": d.get("titreArticle"), "citation": d["citation"], "resume": d.get("resume"), "type": d["type"],
+        "theme": d.get("theme"), "vote_lie": d.get("voteLie"), "factcheck": d.get("factcheck"),
+        "verification": d["statut"], "verifie_dans": d.get("verifieDans"), "motif": d.get("motif"), "ajoute_le": d.get("ajouteLe"),
+    } for d in declarations]
+    client.upsert("declarations", lignes)
+    print("Supabase : %d déclaration(s) envoyée(s), à valider dans la table declarations." % len(lignes))
+
+
 def main():
     with open(os.path.join(DOSSIER, "sources.json"), encoding="utf-8") as f:
         sources = json.load(f)
@@ -189,6 +206,7 @@ def main():
     sys.path.insert(0, DOSSIER)
     import veille
     veille.ecrire_actu()
+    envoyer_supabase([d for d in verifiees_ce_jour if d["statut"] != "rejetee"])
     return 1 if problemes else 0
 
 

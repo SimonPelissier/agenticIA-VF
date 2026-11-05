@@ -4,9 +4,14 @@
 À lancer une fois, depuis GitHub : onglet Actions → « Supabase : import initial » → Run workflow.
 Peut être relancé sans risque : chaque ligne est insérée ou mise à jour, jamais dupliquée.
 
-Usage : python3 agents/supabase/importer.py [--essai]
-  --essai  prépare les lignes et affiche les chiffres, sans rien envoyer (aucune clé nécessaire)
+Usage : python3 agents/supabase/importer.py [--essai] [--tables t1,t2] [--recents N]
+  --essai       prépare les lignes et affiche les chiffres, sans rien envoyer (aucune clé nécessaire)
+  --tables      seulement ces tables (par défaut : toutes)
+  --recents N   seulement les scrutins (et votes) des N derniers jours, plus tous les grands votes.
+                Utilisé chaque nuit par la tâche des votes, pour ne pas tout renvoyer.
 """
+
+import datetime
 
 import glob
 import json
@@ -96,15 +101,27 @@ ORDRE = ["groupes", "scrutins", "candidats", "votes_candidats", "collecte", "art
 CONFLITS = {"votes_candidats": "candidat,scrutin"}
 
 
+def option(nom):
+    return sys.argv[sys.argv.index(nom) + 1] if nom in sys.argv else None
+
+
 def main():
     tables = preparer()
-    for t in ORDRE:
+    choisies = option("--tables").split(",") if option("--tables") else ORDRE
+    if option("--recents"):
+        limite = (datetime.date.today() - datetime.timedelta(days=int(option("--recents")))).isoformat()
+        tables["scrutins"] = [s for s in tables["scrutins"] if (s["date"] or "") >= limite or s["genre"]]
+        gardes = {s["uid"] for s in tables["scrutins"]}
+        tables["votes_candidats"] = [v for v in tables["votes_candidats"] if v["scrutin"] in gardes]
+    for t in [x for x in ORDRE if x not in choisies]:
+        tables.pop(t)
+    for t in [x for x in ORDRE if x in tables]:
         print("%-16s %6d lignes" % (t, len(tables[t])))
     if "--essai" in sys.argv:
         print("Essai : rien n'a été envoyé.")
         return 0
     import client
-    for t in ORDRE:
+    for t in [x for x in ORDRE if x in tables]:
         client.upsert(t, tables[t], CONFLITS.get(t))
         print("Envoyé : %s" % t)
     print("Import terminé.")
