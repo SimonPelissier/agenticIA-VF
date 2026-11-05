@@ -72,7 +72,7 @@
       (title ? '<span class="topbar-title">' + title + "</span>" : "") + "</div>" + (right || "") + "</div>";
   }
   function brandBar() {
-    return '<div class="topbar"><a class="brand" href="#/">Mar<span>(IA)</span>n</a><span class="pill-dark" title="1er tour le ' +
+    return '<div class="topbar"><a class="brand" href="#/">Mar<span>(IA)</span>n<span class="flag-fr" aria-hidden="true"><i></i><i></i><i></i></span></a><span class="pill-dark" title="1er tour le ' +
       fmtDate(D.electionDate) + (D.electionDateProvisional ? ", date provisoire" : "") + '">J–' + daysLeft() + "<span>avant le vote</span></span></div>";
   }
   function candidate(id) { return byId(D.candidates, id); }
@@ -446,7 +446,7 @@
       var mid = pts[Math.floor((start + i - 1) / 2)];
       if (g.m >= 12 && mid) {
         labels += '<text data-vg="' + g.g + '" x="' + (H.cx + (H.r1 + 15) * Math.cos(mid.a)).toFixed(1) + '" y="' + (H.cy - (H.r1 + 15) * Math.sin(mid.a)).toFixed(1) +
-          '" text-anchor="middle" dominant-baseline="middle" font-size="9.5" font-weight="800" fill="' + (vs.g === g.g ? "#6D28D9" : "#4C426C") + '" style="cursor:pointer">' + g.g + "</text>";
+          '" text-anchor="middle" dominant-baseline="middle" font-size="9.5" font-weight="800" fill="' + (vs.g === g.g ? "#1A3DB8" : "#444A60") + '" style="cursor:pointer">' + g.g + "</text>";
       }
     });
     var sel = vs.g && gs.filter(function (g) { return g.g === vs.g; })[0];
@@ -456,7 +456,7 @@
       '<h1 class="vote-title">' + esc(l.titre) + "</h1>" +
       '<span class="result">' + (l.sort === "adopté" ? "Adopté" : "Rejeté") + " · " + l.pour + " pour, " + l.contre + " contre, " + l.abst + " abst.</span>" +
       '<svg class="hemi" viewBox="0 0 400 205" role="img" aria-label="Hémicycle : ' + l.pour + " pour, " + l.contre + ' contre">' + dots + labels +
-      '<text x="200" y="172" text-anchor="middle" font-size="24" font-weight="800" fill="#1D1836">' + l.pour + " / " + l.requis + '</text><text x="200" y="190" text-anchor="middle" font-size="10.5" font-weight="600" fill="#796F91">voix pour / voix nécessaires</text></svg>' +
+      '<text x="200" y="172" text-anchor="middle" font-size="24" font-weight="800" fill="#0B1636">' + l.pour + " / " + l.requis + '</text><text x="200" y="190" text-anchor="middle" font-size="10.5" font-weight="600" fill="#555B70">voix pour / voix nécessaires</text></svg>' +
       '<div class="legend"><span><i style="background:' + COL.p + '"></i>Pour</span><span><i style="background:' + COL.a + '"></i>Abstention</span><span><i style="background:' + COL.c + '"></i>Contre</span><span><i style="background:' + COL.n + '"></i>N’a pas voté (' + (n - l.pour - l.contre - l.abst) + ")</span></div>" +
       '<div class="tbar"><i style="width:' + (100 * l.pour / n) + "%;background:" + COL.p + '"></i><i style="width:' + (100 * l.abst / n) + "%;background:" + COL.a + '"></i><i style="width:' + (100 * l.contre / n) + "%;background:" + COL.c + '"></i><span class="thr" style="left:' + (100 * l.requis / n) + '%"></span></div>' +
       '<p class="cap">Trait noir : seuil de ' + l.requis + " voix. " + (l.leg === "16" ? "Ordre des groupes de 2022-2024 à vérifier." : "Groupes placés de gauche à droite comme dans l’hémicycle (d’après les numéros de siège officiels).") + " Dans un groupe, la place de chaque député est indicative.</p>" +
