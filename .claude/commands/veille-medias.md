@@ -63,6 +63,7 @@ Ouvre les articles un par un, en commençant par les plus récents, et note chaq
 - Lance `python3 agents/medias/verifier.py`.
 - Pour chaque déclaration **rejetée** : relis l'article. Si tu avais mal copié, corrige la citation et relance le vérificateur. Sinon, **supprime** la déclaration. Il ne doit rester aucune déclaration rejetée.
 - Les déclarations « à vérifier » (article inaccessible et citation absente du chapô RSS) restent : un humain les vérifiera.
+- Si les variables Supabase sont présentes, `veille.py` et `verifier.py` envoient eux-mêmes articles et déclarations dans Supabase (déclarations « à valider ») : tu n'as rien à faire de plus.
 
 ## 6. Proposer
 - Fais un commit : « Veille médias du AAAA-MM-JJ : N déclarations ».

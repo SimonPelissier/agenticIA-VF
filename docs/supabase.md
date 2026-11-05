@@ -6,8 +6,8 @@ La migration se fait en trois étapes :
 
 | Étape | Contenu | État |
 | --- | --- | --- |
-| 1 | Tables, règles d'accès, import des données actuelles | ce document |
-| 2 | Les agents (votes chaque nuit, veille chaque matin) écrivent dans Supabase ; validation des déclarations dans Supabase | à venir |
+| 1 | Tables, règles d'accès, import des données actuelles | fait |
+| 2 | Les agents (votes chaque nuit, veille chaque matin) écrivent dans Supabase ; validation des déclarations dans Supabase | fait (novembre 2026) |
 | 3 | Le site lit Supabase ; le dossier `data/` quitte le dépôt | à venir |
 
 ## Les tables (`supabase/schema.sql`)
@@ -33,7 +33,15 @@ Vue pratique : `grands_votes` (les grands votes, du plus récent au plus ancien)
 
 Projet Supabase : **supabase-political-arrow** (`rjpqgdxdomktrysokdnv`, relié à Vercel). Tables créées avec la CLI Supabase (`supabase db query --remote=… -f supabase/schema.sql`) et données importées : 13 865 scrutins (dont 509 grands votes), 26 groupes, 9 candidats, 4 492 votes de candidats, 231 articles, 3 déclarations validées. Règles vérifiées : avec la clé publique, la lecture fonctionne et l'écriture est refusée.
 
-Reste à faire pour l'étape 2 : ranger les secrets `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` dans GitHub et dans l'environnement Claude « Poli - media ».
+Secrets rangés dans GitHub et dans l'environnement Claude « Poli - media » (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`).
+
+## Étape 2 : ce que font les agents (transition)
+
+- **Chaque nuit**, la tâche des votes envoie dans Supabase les scrutins des 60 derniers jours, tous les grands votes, les groupes, les candidats et les chiffres de collecte (`importer.py --recents 60`). Elle continue aussi, pendant la transition, à mettre à jour les fichiers `data/` du site.
+- **Chaque matin**, la routine de veille envoie les articles (`veille.py`) et les déclarations vérifiées (`verifier.py`). Une nouvelle déclaration arrive avec `validation = a-valider` ; une validation déjà faite n'est jamais écrasée. Les déclarations rejetées ne sont pas envoyées. La routine ouvre toujours sa pull request pendant la transition.
+- Sans les variables Supabase (sur un ordinateur sans clé), les scripts fonctionnent comme avant, sans rien envoyer.
+
+L'étape 3 fera lire Supabase par le site ; on retirera alors le dossier `data/` et les pull requests quotidiennes, et la validation des déclarations se fera seulement dans Supabase.
 
 ## Mise en place (à faire une fois)
 
