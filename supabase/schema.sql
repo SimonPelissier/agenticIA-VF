@@ -46,7 +46,9 @@ create table if not exists scrutins (
 );
 create index if not exists scrutins_date_idx on scrutins (date desc);
 create index if not exists scrutins_grands_idx on scrutins (date desc) where genre is not null;
-create unique index if not exists scrutins_leg_num_idx on scrutins (legislature, numero);
+-- Pas d'unicité sur (législature, numéro) : le Congrès (identifiants VTCG…) a sa propre numérotation.
+drop index if exists scrutins_leg_num_idx;
+create index if not exists scrutins_leg_numero_idx on scrutins (legislature, numero);
 
 create table if not exists candidats (
   id            text primary key,        -- ex. faure (mêmes identifiants que js/data.js)

@@ -29,6 +29,12 @@ Vue pratique : `grands_votes` (les grands votes, du plus récent au plus ancien)
 - **Le public** (le site, avec la clé « anon ») peut seulement **lire** : les votes, les articles, et les déclarations **validées**. Aucune écriture possible.
 - **Les agents** écrivent avec la clé **« service_role »**. Elle est rangée dans les secrets GitHub et dans l'environnement Claude « Poli - media ». **Elle ne doit jamais être écrite dans le code, dans le site, ni collée dans une conversation.**
 
+## État au 5 novembre 2026
+
+Projet Supabase : **supabase-political-arrow** (`rjpqgdxdomktrysokdnv`, relié à Vercel). Tables créées avec la CLI Supabase (`supabase db query --remote=… -f supabase/schema.sql`) et données importées : 13 865 scrutins (dont 509 grands votes), 26 groupes, 9 candidats, 4 492 votes de candidats, 231 articles, 3 déclarations validées. Règles vérifiées : avec la clé publique, la lecture fonctionne et l'écriture est refusée.
+
+Reste à faire pour l'étape 2 : ranger les secrets `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` dans GitHub et dans l'environnement Claude « Poli - media ».
+
 ## Mise en place (à faire une fois)
 
 1. **Créer les tables.** Dans Supabase : *SQL Editor* → *New query* → coller tout le contenu de `supabase/schema.sql` → *Run*. Relancer ne casse rien.
