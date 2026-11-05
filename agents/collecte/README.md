@@ -9,7 +9,7 @@ Pas d'IA, pas de clé, pas de librairie à installer : Python seul.
 - **Chaque nuit** sur GitHub Actions (`.github/workflows/collecte.yml`), à 4 h 30 UTC.
 - **À la demande** : onglet *Actions* du dépôt → *Agent de collecte* → *Run workflow*.
 
-S'il y a du nouveau, il ouvre une pull request « Collecte du … ». **Un humain la relit avant de la fusionner** : c'est la relecture prévue par le cadrage. Sinon, il ne fait rien.
+S'il y a du nouveau, il ouvre une pull request « Mise à jour des votes du … », puis **la fusionne lui-même si les contrôles de sécurité passent** (`controles.py`) : nombre de scrutins qui ne baisse pas, dernier scrutin qui ne recule pas, aucun grand vote disparu, mêmes candidats suivis, fichiers valides. Sinon la pull request reste ouverte, avec le motif en commentaire, et attend un humain. Vercel republie le site après chaque fusion.
 
 ## Ce qu'il lit
 

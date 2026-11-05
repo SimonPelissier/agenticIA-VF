@@ -1,5 +1,6 @@
 # Mise à jour des votes, chaque nuit : scrutins de l'Assemblée (agent de collecte). Ouvre une pull
-# request si les données ont changé. Aucune clé ni secret à configurer.
+# request si les données ont changé et la fusionne si les contrôles de sécurité passent
+# (agents/collecte/controles.py) ; sinon elle attend un humain. Aucune clé ni secret à configurer.
 # La veille médias (articles et déclarations) est faite par la routine Claude Code quotidienne,
 # dans sa propre pull request : les deux ne touchent jamais les mêmes fichiers.
 name: Agent de collecte
@@ -79,3 +80,16 @@ jobs:
           while read -r ANCIENNE; do
             gh pr close "$ANCIENNE" --delete-branch --comment "Remplacée par une collecte plus récente : $URL"
           done
+
+          # Publication automatique (décision du 5 novembre 2026) : ce sont des chiffres officiels de
+          # l'Assemblée, recopiés sans rédaction. On fusionne seulement si les contrôles de sécurité passent ;
+          # sinon la pull request reste ouverte et attend un humain.
+          if python3 agents/collecte/controles.py HEAD~1 > controles.txt; then
+            cat controles.txt
+            gh pr comment "$URL" --body-file controles.txt
+            gh pr merge "$URL" --merge --delete-branch
+            echo "Publiée automatiquement : Vercel republie le site."
+            exit 0
+          fi
+          cat controles.txt
+          gh pr comment "$URL" --body "$(printf 'Publication automatique bloquée : relecture humaine nécessaire.\n\n```\n%s\n```' "$(cat controles.txt)")"
