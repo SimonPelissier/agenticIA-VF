@@ -49,14 +49,14 @@ window.MARIAN_DONNEES = {
    ],
    "participation": {
     "solennels": {
-     "scrutins": 75,
+     "scrutins": 76,
      "taux": 94.7,
-     "votes": 71
+     "votes": 72
     },
     "tous": {
-     "scrutins": 9293,
-     "taux": 19.0,
-     "votes": 1770
+     "scrutins": 9850,
+     "taux": 18.0,
+     "votes": 1771
     }
    },
    "votesCles": {
@@ -145,14 +145,14 @@ window.MARIAN_DONNEES = {
    ],
    "participation": {
     "solennels": {
-     "scrutins": 111,
-     "taux": 91.0,
-     "votes": 101
+     "scrutins": 112,
+     "taux": 91.1,
+     "votes": 102
     },
     "tous": {
-     "scrutins": 13308,
-     "taux": 8.1,
-     "votes": 1074
+     "scrutins": 13865,
+     "taux": 7.8,
+     "votes": 1076
     }
    },
    "votesCles": {
@@ -254,14 +254,14 @@ window.MARIAN_DONNEES = {
    ],
    "participation": {
     "solennels": {
-     "scrutins": 111,
+     "scrutins": 112,
      "taux": 94.6,
-     "votes": 105
+     "votes": 106
     },
     "tous": {
-     "scrutins": 13308,
-     "taux": 10.6,
-     "votes": 1406
+     "scrutins": 13865,
+     "taux": 10.1,
+     "votes": 1407
     }
    },
    "votesCles": {
@@ -404,10 +404,10 @@ window.MARIAN_DONNEES = {
    "votesCles": {}
   }
  },
- "dernierScrutin": "2026-10-29",
+ "dernierScrutin": "2026-11-04",
  "medianeSolennels": {
   "deputes": 819,
-  "taux": 87.8
+  "taux": 87.5
  },
  "source": "Assemblée nationale, data.assemblee-nationale.fr (Licence Ouverte)",
  "votesCles": [
