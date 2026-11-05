@@ -54,14 +54,14 @@
     "nom": "Gabriel Attal",
     "participation": {
       "solennels": {
-        "scrutins": 75,
+        "scrutins": 76,
         "taux": 94.7,
-        "votes": 71
+        "votes": 72
       },
       "tous": {
-        "scrutins": 9293,
-        "taux": 19.0,
-        "votes": 1770
+        "scrutins": 9850,
+        "taux": 18.0,
+        "votes": 1771
       }
     },
     "votes": [
@@ -12461,6 +12461,13 @@
         "parDelegation": false,
         "position": "contre",
         "scrutin": "VTANR5L17V8707"
+      },
+      {
+        "date": "2026-11-04",
+        "groupe": "EPR",
+        "parDelegation": true,
+        "position": "contre",
+        "scrutin": "VTANR5L17V9759"
       }
     ]
   },
@@ -12519,14 +12526,14 @@
     "nom": "Olivier Faure",
     "participation": {
       "solennels": {
-        "scrutins": 111,
-        "taux": 91.0,
-        "votes": 101
+        "scrutins": 112,
+        "taux": 91.1,
+        "votes": 102
       },
       "tous": {
-        "scrutins": 13308,
-        "taux": 8.1,
-        "votes": 1074
+        "scrutins": 13865,
+        "taux": 7.8,
+        "votes": 1076
       }
     },
     "votes": [
@@ -20047,6 +20054,20 @@
         "parDelegation": false,
         "position": "contre",
         "scrutin": "VTANR5L17V8751"
+      },
+      {
+        "date": "2026-10-29",
+        "groupe": "SOC",
+        "parDelegation": false,
+        "position": "pour",
+        "scrutin": "VTANR5L17V9203"
+      },
+      {
+        "date": "2026-11-04",
+        "groupe": "SOC",
+        "parDelegation": true,
+        "position": "contre",
+        "scrutin": "VTANR5L17V9759"
       }
     ]
   },
@@ -20121,14 +20142,14 @@
     "nom": "Marine Le Pen",
     "participation": {
       "solennels": {
-        "scrutins": 111,
+        "scrutins": 112,
         "taux": 94.6,
-        "votes": 105
+        "votes": 106
       },
       "tous": {
-        "scrutins": 13308,
-        "taux": 10.6,
-        "votes": 1406
+        "scrutins": 13865,
+        "taux": 10.1,
+        "votes": 1407
       }
     },
     "votes": [
@@ -29973,6 +29994,13 @@
         "parDelegation": true,
         "position": "pour",
         "scrutin": "VTANR5L17V8706"
+      },
+      {
+        "date": "2026-11-04",
+        "groupe": "RN",
+        "parDelegation": true,
+        "position": "contre",
+        "scrutin": "VTANR5L17V9759"
       }
     ]
   },
