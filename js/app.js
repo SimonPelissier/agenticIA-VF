@@ -195,7 +195,7 @@
             return '<div class="quote-card"><blockquote>« ' + esc(d.citation) + " »</blockquote>" +
               '<div class="keys"><span>Qui</span><b>' + esc(c ? c.name : d.candidat) + "</b><span>Quoi</span><b>" + (d.type === "engagement" ? "Un engagement" : "Une position") + "</b>" +
               (d.theme ? "<span>Sujet</span><b>" + esc(themeLabel(d.theme) || d.theme) + "</b>" : "") +
-              "<span>Vérifié</span><b>" + (d.statut === "verifiee" ? "Mot pour mot dans l’article" : "À la main (article payant)") + "</b></div></div>";
+              "<span>Vérifié</span><b>" + (d.statut === "verifiee" ? (d.verifieDans === "flux RSS" ? "Mot pour mot dans le chapô du flux RSS (article inaccessible)" : "Mot pour mot dans l’article") : "À la main (article payant)") + "</b></div></div>";
           }).join("") + "</section>"
         : '<div class="empty"><strong>Pas encore de déclaration relevée dans cet article.</strong>La veille lit les articles chaque jour et relève les citations directes des candidats ; elles apparaissent ici une fois vérifiées et relues.</div>') +
       (plus ? '<section style="display:flex;flex-direction:column;gap:10px"><h2 class="h2">Pour aller plus loin</h2>' + plus + "</section>" : "") +

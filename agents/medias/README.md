@@ -22,6 +22,8 @@ Un candidat est repéré par son nom complet. Le nom de famille seul ne suffit q
 ## Ce qui est relevé
 
 - **Seulement des citations directes** du candidat, copiées mot pour mot, une ou deux phrases (400 caractères maximum).
+- **Jamais un titre** (article, intertitre, page vidéo) : le vérificateur ne lit que le corps de l'article.
+- **Article inaccessible** (payant, bloqué, vidéo) : la citation peut venir du chapô du flux RSS, vérifié mot pour mot de la même façon (décision du 5 novembre 2026).
 - **Deux types** : `engagement` (« je ferai… ») et `position` (« je suis pour… »). Les critiques d'adversaires et les petites phrases sont ignorées (décision du 25 octobre 2026).
 - **15 déclarations par jour au maximum, 4 par candidat** : un candidat très présent dans l'actualité ne doit pas écraser les autres.
 - Un sujet parmi les 8 de l'application, ou `null`.
@@ -34,14 +36,15 @@ Un candidat est repéré par son nom complet. Le nom de famille seul ne suffit q
 | `data/medias/articles.json` | Articles repérés : média, titre, date, lien, candidats cités, lu ou non. **Ni texte ni chapô** (droit d'auteur). Gardés 30 jours |
 | `contenu/declarations/AAAA-MM.json` | Les déclarations du mois, avec leur statut de vérification |
 | `data/actu.js` | Ce que lit la page Actualité : articles des 30 derniers jours et déclarations retenues (jamais les rejetées). Refait par `veille.py` et `verifier.py` |
+| `agents/medias/.cache/chapos.json` | Chapô (texte d'accroche) de chaque article tiré des flux RSS : solution de repli quand l'article est inaccessible. Fichier de travail, **jamais publié** (droit d'auteur) |
 | `agents/medias/.cache/rapport.md` | Rapport du jour (vérification, équilibre), repris dans la pull request. Pas envoyé sur GitHub |
 
 ## Les statuts de vérification
 
 | Statut | Signification | Que faire |
 | --- | --- | --- |
-| `verifiee` | Citation retrouvée mot pour mot dans l'article | Relire le sens et le sujet |
-| `a-verifier` | Article payant (Le Monde) ou qui bloque les robots (Libération) | **Ouvrir l'article et vérifier la citation à la main** avant de fusionner |
+| `verifiee` | Citation retrouvée mot pour mot dans le corps de l'article (`verifieDans: article`), ou, si l'article est inaccessible, dans le chapô de son flux RSS (`verifieDans: flux RSS`) | Relire le sens et le sujet ; pour le flux RSS, vérifier que les guillemets sont bien ceux du candidat |
+| `a-verifier` | Article inaccessible (payant, bloqué) et citation absente du chapô RSS | **Ouvrir l'article et vérifier la citation à la main** avant de fusionner |
 | `rejetee` | Article lisible mais citation introuvable, ou format faux | Claude doit la corriger ou la supprimer : aucune ne doit rester |
 
 ## Relire une pull request « Veille médias »
