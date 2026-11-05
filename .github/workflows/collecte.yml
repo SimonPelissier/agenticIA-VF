@@ -1,18 +1,18 @@
-# Mise à jour des votes, chaque nuit : scrutins de l'Assemblée (agent de collecte). Ouvre une pull
-# request si les données ont changé et la fusionne si les contrôles de sécurité passent
-# (agents/collecte/controles.py) ; sinon elle attend un humain. Aucune clé ni secret à configurer.
-# La veille médias (articles et déclarations) est faite par la routine Claude Code quotidienne,
-# dans sa propre pull request : les deux ne touchent jamais les mêmes fichiers.
+# Mise à jour des votes, chaque nuit : l'agent de collecte télécharge les scrutins de l'Assemblée,
+# les compare à ceux déjà publiés (agents/collecte/controles.py), puis les écrit dans Supabase,
+# que lit le site. Plus de pull request ni de fichier dans le dépôt (décision du 5 novembre 2026).
+# Si un contrôle échoue, rien n'est écrit : la tâche apparaît en rouge et GitHub prévient par e-mail.
+# Secrets nécessaires (Settings → Secrets and variables → Actions) : SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
+# La veille médias (articles et déclarations) est faite par la routine Claude Code quotidienne.
 name: Agent de collecte
 
 on:
   schedule:
-    - cron: "30 4 * * *"   # chaque jour à 4 h 30 UTC (6 h 30 à Paris l'été)
+    - cron: "30 4 * * *"   # chaque jour à 4 h 30 UTC (GitHub la lance souvent avec du retard)
   workflow_dispatch:        # bouton « Run workflow » dans l'onglet Actions
 
 permissions:
-  contents: write          # pousser la branche de collecte
-  pull-requests: write     # ouvrir la pull request
+  contents: read
 
 concurrency:
   group: collecte
@@ -22,6 +22,9 @@ jobs:
   collecte:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -30,75 +33,16 @@ jobs:
           python-version: "3.12"
 
       - name: Lancer l'agent de collecte (votes de l'Assemblée)
-        run: python3 agents/collecte/collecte.py
+        run: |
+          python3 agents/collecte/collecte.py
+          echo "Chiffres de la collecte :"
+          cat data/collecte.json
+          echo "Empreintes SHA-256 des archives téléchargées :"
+          cat agents/collecte/.cache/empreintes.json
+
+      - name: Contrôler les données (comparaison avec Supabase)
+        run: python3 agents/collecte/controles.py
 
       - name: Écrire les votes dans Supabase
-        # Les scrutins des 60 derniers jours et tous les grands votes. Une panne de Supabase
-        # n'empêche pas la mise à jour des fichiers du site (pendant la transition).
-        continue-on-error: true
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: python3 agents/supabase/importer.py --tables groupes,scrutins,candidats,votes_candidats,collecte --recents 60
-
-      - name: Ouvrir une pull request si les données ont changé
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if [ -z "$(git status --porcelain data/)" ]; then
-            echo "Aucun changement dans les données : rien à proposer."
-            exit 0
-          fi
-
-          JOUR=$(date -u +%F)
-          BRANCHE="collecte/$JOUR-${{ github.run_number }}"
-          git config user.name "agent-collecte[bot]"
-          git config user.email "agent-collecte@users.noreply.github.com"
-          git switch -c "$BRANCHE"
-          git add data/
-          git commit -m "Mise à jour des votes du $JOUR : scrutins de l'Assemblée nationale"
-          git push origin "$BRANCHE"
-
-          {
-            echo "Mise à jour automatique du $JOUR : votes de l'Assemblée nationale (données ouvertes)."
-            echo
-            echo "## Ce qui a changé"
-            echo '```'
-            git diff --stat HEAD~1 -- data/
-            echo '```'
-            echo
-            echo "## Chiffres"
-            echo '```json'
-            cat data/collecte.json
-            echo '```'
-            echo
-            echo "## Empreintes SHA-256 des archives téléchargées"
-            echo '```json'
-            cat agents/collecte/.cache/empreintes.json
-            echo '```'
-            echo
-            echo "À relire avant fusion : vérifier sur assemblee-nationale.fr un ou deux scrutins récents."
-          } > corps.md
-
-          URL=$(gh pr create --base main --head "$BRANCHE" --title "Mise à jour des votes du $JOUR" --body-file corps.md)
-          echo "Pull request : $URL"
-
-          # Une seule collecte en attente à la fois : les plus anciennes sont fermées.
-          gh pr list --state open --json number,headRefName \
-            --jq ".[] | select(.headRefName | startswith(\"collecte/\")) | select(.headRefName != \"$BRANCHE\") | .number" |
-          while read -r ANCIENNE; do
-            gh pr close "$ANCIENNE" --delete-branch --comment "Remplacée par une collecte plus récente : $URL"
-          done
-
-          # Publication automatique (décision du 5 novembre 2026) : ce sont des chiffres officiels de
-          # l'Assemblée, recopiés sans rédaction. On fusionne seulement si les contrôles de sécurité passent ;
-          # sinon la pull request reste ouverte et attend un humain.
-          if python3 agents/collecte/controles.py HEAD~1 > controles.txt; then
-            cat controles.txt
-            gh pr comment "$URL" --body-file controles.txt
-            gh pr merge "$URL" --merge --delete-branch
-            echo "Publiée automatiquement : Vercel republie le site."
-            exit 0
-          fi
-          cat controles.txt
-          gh pr comment "$URL" --body "$(printf 'Publication automatique bloquée : relecture humaine nécessaire.\n\n```\n%s\n```' "$(cat controles.txt)")"
+        # Les scrutins des 60 derniers jours, tous les grands votes, et les données prêtes pour le site.
+        run: python3 agents/supabase/importer.py --recents 60

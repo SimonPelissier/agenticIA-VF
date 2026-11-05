@@ -17,3 +17,4 @@ Mis à jour à la fin de chaque tâche.
 | Veille médias : chapô du flux RSS quand l'article est inaccessible | Simon | Terminé | Surveiller les premières citations « vérifiées dans le flux RSS » lors des relectures |
 | Supabase 1/3 : tables, règles d'accès et import des données | Simon | Terminé | Simon : coller le SQL, ranger les secrets GitHub, lancer l'import (docs/supabase.md) |
 | Supabase 2/3 : les agents écrivent dans Supabase | Simon | Terminé | Étape 3 : le site lit Supabase, retrait de data/ et des pull requests quotidiennes |
+| Supabase 3/3 : le site lit Supabase, retrait de data/ et des pull requests quotidiennes | Simon | Terminé | Après fusion : mettre à jour le texte de la routine (fait par Claude) ; vérifier le premier passage de la routine (accès réseau à Supabase depuis « Poli - media ») et de la tâche de nuit ; valider chaque jour les déclarations dans Supabase |

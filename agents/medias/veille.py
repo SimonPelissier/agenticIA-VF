@@ -5,8 +5,11 @@ Lit les flux RSS des médias généralistes (sources.json) et garde les articles
 dont le titre ou le chapô cite un candidat. Ne stocke que le titre, la date,
 le média et le lien, jamais le texte de l'article (droit d'auteur).
 
-Sorties : data/medias/articles.json (un article par ligne, gardé 30 jours)
-et data/actu.js, lu par la page Actualité de l'application.
+Les articles vont dans Supabase (table articles), que lit la page Actualité du site.
+Les articles déjà connus et leur état « lu » sont relus dans Supabase à chaque passage :
+la routine part chaque jour d'une copie neuve du dépôt. Sans les variables Supabase
+(ordinateur sans clé), le script travaille seulement sur sa copie locale.
+Copie de travail, jamais publiée : agents/medias/.cache/articles.json.
 
 Aucune IA, aucune clé, aucune librairie à installer (Python 3.7 ou plus récent).
 
@@ -32,7 +35,7 @@ import xml.etree.ElementTree as ET
 
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DOSSIER = os.path.dirname(os.path.abspath(__file__))
-SORTIE = os.path.join(RACINE, "data", "medias", "articles.json")
+SORTIE = os.path.join(DOSSIER, ".cache", "articles.json")
 # Chapôs des flux RSS : fichier de travail, jamais publié (droit d'auteur), lu par verifier.py en repli.
 CHAPOS = os.path.join(DOSSIER, ".cache", "chapos.json")
 CONSERVATION_JOURS = 30
@@ -113,7 +116,21 @@ def lire_flux(contenu):
     return elements
 
 
+def supabase():
+    """Le module d'accès à Supabase, ou None si les variables Supabase sont absentes."""
+    sys.path.insert(0, os.path.join(RACINE, "agents", "supabase"))
+    import client
+    return client if client.disponible() else None
+
+
 def charger_articles():
+    """Articles des 30 derniers jours : depuis Supabase si possible, sinon depuis la copie locale."""
+    client = supabase()
+    if client:
+        limite = (datetime.date.today() - datetime.timedelta(days=CONSERVATION_JOURS)).isoformat()
+        lignes = client.lire("articles", select="id,media,titre,url,date,candidats,vu_le,traite", date="gte." + limite)
+        return [{"id": l["id"], "media": l["media"], "titre": l["titre"], "url": l["url"], "date": (l["date"] or "")[:16] or None,
+                 "candidats": l["candidats"] or [], "vuLe": l["vu_le"], "traite": l["traite"]} for l in lignes]
     if not os.path.exists(SORTIE):
         return []
     with open(SORTIE, encoding="utf-8") as f:
@@ -129,37 +146,16 @@ def ecrire_articles(articles):
         f.write("\n]\n")
 
 
-def ecrire_actu():
-    """Écrit data/actu.js, lu par la page Actualité : articles des 30 derniers jours et déclarations
-    retenues (vérifiées mot pour mot, ou vérifiées à la main lors de la relecture ; jamais les rejetées)."""
-    sources = charger_sources()
-    declarations = []
-    dossier = os.path.join(RACINE, "contenu", "declarations")
-    if os.path.isdir(dossier):
-        for nom in sorted(os.listdir(dossier)):
-            if nom.endswith(".json"):
-                with open(os.path.join(dossier, nom), encoding="utf-8") as f:
-                    declarations += [d for d in json.load(f).get("declarations", []) if d.get("statut") in ("verifiee", "a-verifier")]
-    # Sans date dans le flux, on prend le jour où l'agent a repéré l'article.
-    articles = [dict({k: a[k] for k in ("id", "media", "titre", "url", "candidats")}, date=a["date"] or a["vuLe"]) for a in charger_articles()]
-    compact = lambda x: json.dumps(x, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    with open(os.path.join(RACINE, "data", "actu.js"), "w", encoding="utf-8") as f:
-        f.write("// Fichier produit par agents/medias/veille.py et verifier.py : ne pas modifier à la main.\n")
-        f.write("window.MARIAN_ACTU = {\n")
-        f.write('"medias": ' + compact({m["id"]: m["nom"] for m in sources["medias"]}) + ",\n")
-        f.write('"articles": [\n' + ",\n".join(compact(a) for a in articles) + "\n],\n")
-        f.write('"declarations": [\n' + ",\n".join(compact(d) for d in sorted(declarations, key=lambda d: d.get("id", ""))) + "\n]\n};\n")
-
-
-def envoyer_supabase():
-    """Envoie les articles dans Supabase (table articles), si la routine a les variables Supabase."""
-    sys.path.insert(0, os.path.join(RACINE, "agents", "supabase"))
-    import client
-    if not client.disponible():
+def envoyer_supabase(articles):
+    """Envoie les articles dans Supabase (table articles), avec les noms des journaux pour le site."""
+    client = supabase()
+    if not client:
+        print("Supabase : variables absentes, rien n'est envoyé (copie locale seulement).")
         return
     lignes = [{"id": a["id"], "media": a["media"], "titre": a["titre"], "url": a["url"], "date": a["date"] or a["vuLe"],
-               "candidats": a["candidats"], "vu_le": a["vuLe"], "traite": a["traite"]} for a in charger_articles()]
+               "candidats": a["candidats"], "vu_le": a["vuLe"], "traite": a["traite"]} for a in articles]
     client.upsert("articles", lignes)
+    client.upsert("collecte", [{"cle": "medias", "valeur": {m["id"]: m["nom"] for m in charger_sources()["medias"]}}])
     print("Supabase : %d article(s) envoyé(s)." % len(lignes))
 
 
@@ -202,8 +198,7 @@ def collecter():
     os.makedirs(os.path.dirname(CHAPOS), exist_ok=True)
     with open(CHAPOS, "w", encoding="utf-8") as f:
         json.dump({k: v for k, v in chapos.items() if k in ids}, f, ensure_ascii=False, indent=0)
-    ecrire_actu()
-    envoyer_supabase()
+    envoyer_supabase(gardes)
     a_traiter = sum(1 for a in gardes if not a["traite"])
     print("%d nouvel(s) article(s) ; %d à lire par Claude ; %d gardé(s) sur %d jours." % (nouveaux, a_traiter, len(gardes), CONSERVATION_JOURS))
 
@@ -236,8 +231,7 @@ def marquer_traites(ids):
         if a["id"] in ids:
             a["traite"] = True
     ecrire_articles(articles)
-    ecrire_actu()
-    envoyer_supabase()
+    envoyer_supabase([a for a in articles if a["id"] in ids])
     print("%d article(s) marqué(s) comme lus." % len(ids))
 
 

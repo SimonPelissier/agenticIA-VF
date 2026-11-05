@@ -1,7 +1,8 @@
-# Import initial des données du dépôt (dossier data/) dans Supabase. À lancer à la main, une fois :
-# onglet Actions → « Supabase : import initial » → Run workflow. Peut être relancé sans risque.
+# Import complet des votes dans Supabase : relance l'agent de collecte et envoie TOUS les scrutins
+# (la tâche de chaque nuit n'envoie que les 60 derniers jours). À lancer à la main, si besoin :
+# onglet Actions → « Supabase : import complet des votes » → Run workflow. Peut être relancé sans risque.
 # Secrets nécessaires (Settings → Secrets and variables → Actions) : SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
-name: "Supabase : import initial"
+name: "Supabase : import complet des votes"
 
 on:
   workflow_dispatch:
@@ -9,16 +10,23 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: collecte
+  cancel-in-progress: false
+
 jobs:
   importer:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Lancer l'agent de collecte (votes de l'Assemblée)
+        run: python3 agents/collecte/collecte.py
 
       - name: Vérifier les données à importer (sans rien envoyer)
         run: python3 agents/supabase/importer.py --essai

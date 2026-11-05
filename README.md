@@ -29,23 +29,24 @@ index.html      page unique, barre d'onglets à 4 entrées, écran de chargement
 css/style.css   style V4 (crème et jaune, accent violet, contours noirs)
 js/data.js      données éditoriales : sujets, groupes, candidats, lexique
 js/app.js       écrans et navigation (#/actu, #/programmes, #/votes…)
+js/config.js    adresse de Supabase et clé publique (lecture seule)
+js/supabase.js  lit les votes et l'actualité dans Supabase, puis lance js/app.js
 contenu/        votes clés choisis par l'équipe (texte + numéro du scrutin officiel)
 contenu/programmes/  mesures des programmes, recopiées mot pour mot (règles : docs/programmes.md)
 data/programmes.js   programmes vérifiés, produit par agents/verification/programmes.py
-data/app.js     votes clés et participation des candidats (agent de collecte)
-data/votes.js   grands votes classés par catégorie, pour « Qui a voté quoi ? » (agent de collecte)
-data/actu.js    articles et déclarations, pour l'Actualité (veille médias)
-data/*.json     données brutes collectées (scrutins, votes, groupes)
-agents/         agents : collecte des votes de l'Assemblée, veille médias
+agents/         agents : collecte des votes de l'Assemblée, veille médias, envoi dans Supabase
+supabase/       tables et règles d'accès de la base (docs/supabase.md)
 .claude/        commande /veille-medias (consignes d'extraction pour Claude)
 docs/           cadrage, avancement, décisions du groupe
 ```
 
 Aucune dépendance, aucune étape de compilation : HTML, CSS et JavaScript simples.
 
+Les **données collectées** (votes de l'Assemblée, articles, déclarations) sont dans **Supabase**, plus dans le dépôt : les agents y écrivent, le site les lit (voir `docs/supabase.md`). Les contenus écrits par l'équipe (votes clés, programmes, lexique) restent ici.
+
 ## Lancer en local
 
-Ouvrir `index.html` dans un navigateur.
+Ouvrir `index.html` dans un navigateur (connexion internet nécessaire : les votes et l'actualité viennent de Supabase).
 
 ## Mettre en ligne sur Vercel
 
@@ -55,17 +56,17 @@ Ouvrir `index.html` dans un navigateur.
 
 ## Ajouter ou corriger une donnée
 
-- **Un vote clé** : dans `contenu/votes-cles.json`, le texte et le numéro du scrutin officiel. Les chiffres sont ajoutés par l'agent de collecte (`data/app.js`), jamais à la main.
+- **Un vote clé** : dans `contenu/votes-cles.json`, le texte et le numéro du scrutin officiel. Les chiffres sont ajoutés par l'agent de collecte la nuit suivante, jamais à la main.
 - **Un candidat** : dans `js/data.js` (`candidates`) et, s'il a été député, dans `agents/collecte/candidats.json`.
 - **Une question de quiz** : dans `js/data.js` (`quiz`), liée à un vote clé par son `id`. Vérifier la réponse sur la page du scrutin officiel.
-- **Ne jamais modifier `data/` à la main** : ces fichiers sont refaits par l'agent chaque nuit.
+- **Une déclaration** : elle se valide dans Supabase (table `declarations`, colonne `validation`), voir `agents/medias/README.md`.
+- **Ne jamais modifier les votes à la main dans Supabase** : l'agent de collecte les réécrit chaque nuit.
 
 Règle : pas de source, pas de publication.
 
 ## Prochaines étapes techniques
 
 - Classer les scrutins collectés par thème, pour afficher plus que les votes clés
-- Créer la routine quotidienne `/veille-medias` (relevé des déclarations par Claude)
 - Collecte Sénat et Parlement européen
 - Agent de vérification des citations (code, sans IA)
 - Base Supabase et interface de relecture humaine, puis lecture des données depuis Supabase

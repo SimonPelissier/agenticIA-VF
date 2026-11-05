@@ -113,7 +113,7 @@ def construire(tous_scrutins, groupes, candidats, votes_candidats, mandats_candi
     with open(sortie, "w", encoding="utf-8") as f:
         f.write("// Fichier produit par agents/collecte/collecte.py : ne pas modifier à la main.\n")
         f.write("window.MARIAN_VOTES = {\n")
-        # Un grand vote par ligne : la pull request de chaque nuit montre clairement ce qui change.
+        # Un grand vote par ligne : le fichier reste lisible.
         f.write('"lois": [\n' + ",\n".join(compact(x) for x in donnees.pop("lois")) + "\n],\n")
         f.write(",\n".join(compact(k) + ": " + compact(v) for k, v in sorted(donnees.items())))
         f.write("\n};\n")

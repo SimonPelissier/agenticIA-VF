@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Agent de veille médias de MarIAn, étape 3 : vérifier les déclarations relevées par Claude.
 
-Pour chaque déclaration de contenu/declarations/*.json pas encore vérifiée :
+Pour chaque déclaration de agents/medias/.cache/declarations.json (fichier de travail de la routine,
+jamais publié) pas encore vérifiée :
   - contrôle du format (candidat, type, sujet, longueur de la citation...) ;
   - téléchargement de l'article et recherche de la citation MOT POUR MOT
     (espaces, apostrophes et guillemets normalisés).
@@ -12,8 +13,11 @@ Statut écrit dans chaque déclaration :
   a-verifier   article payant ou inaccessible : un humain doit vérifier
   rejetee      article lisible mais citation introuvable : à corriger ou supprimer
 
+Les déclarations retenues (vérifiées ou à vérifier) sont envoyées dans Supabase, où l'équipe les valide :
+seules celles passées à « validee » apparaissent sur le site.
+
 Produit aussi un rapport d'équilibre (par candidat, par média) dans
-agents/medias/.cache/rapport.md, repris dans la pull request.
+agents/medias/.cache/rapport.md, repris dans le compte rendu de la routine.
 
 Aucune IA, aucune clé, aucune librairie à installer.
 
@@ -23,7 +27,6 @@ Code de sortie 1 si une déclaration est mal formée ou rejetée.
 
 import collections
 import datetime
-import glob
 import html
 import json
 import os
@@ -36,10 +39,10 @@ import urllib.request
 
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DOSSIER = os.path.dirname(os.path.abspath(__file__))
-DECLARATIONS = os.path.join(RACINE, "contenu", "declarations")
+DECLARATIONS = os.path.join(DOSSIER, ".cache", "declarations.json")   # écrit par la routine, jamais publié
 RAPPORT = os.path.join(DOSSIER, ".cache", "rapport.md")
 CHAPOS = os.path.join(DOSSIER, ".cache", "chapos.json")      # écrit par veille.py, jamais publié
-ARTICLES = os.path.join(RACINE, "data", "medias", "articles.json")
+ARTICLES = os.path.join(DOSSIER, ".cache", "articles.json")   # copie de travail écrite par veille.py
 AGENT = "Mozilla/5.0 (compatible; marIAn-veille; +https://github.com/SimonPelissier/agenticIA-VF)"
 
 TYPES = {"engagement", "position"}
@@ -100,10 +103,37 @@ def controler_format(d, candidats, medias):
 
 def envoyer_supabase(declarations):
     """Envoie les déclarations dans Supabase. La colonne « validation » n'est jamais envoyée :
-    une nouvelle déclaration arrive « à valider », et une validation déjà faite par l'équipe est conservée."""
+    une nouvelle déclaration arrive « à valider », et une validation déjà faite par l'équipe est conservée.
+
+    Une déclaration déjà en base n'est jamais remplacée par une autre : si son identifiant est pris
+    par une citation différente (routine relancée le même jour), elle reçoit le numéro libre suivant ;
+    si la même citation existe déjà sous un autre identifiant, elle n'est pas renvoyée."""
     sys.path.insert(0, os.path.join(RACINE, "agents", "supabase"))
     import client
-    if not client.disponible() or not declarations:
+    if not client.disponible():
+        print("Supabase : variables absentes, aucune déclaration envoyée.")
+        return
+    if not declarations:
+        return
+    existantes = {l["id"]: (l["candidat"], normaliser(l["citation"])) for l in client.lire("declarations", select="id,candidat,citation")}
+    deja = {v: k for k, v in existantes.items()}
+    gardees = []
+    for d in declarations:
+        cle = (d["candidat"], normaliser(d["citation"]))
+        if cle in deja and deja[cle] != d["id"]:
+            print("Déjà en base sous %s, pas renvoyée : %s" % (deja[cle], d["id"]))
+            continue
+        if d["id"] in existantes and existantes[d["id"]] != cle:
+            base, n = d["id"].rsplit("-", 1)[0], 1
+            while "%s-%d" % (base, n) in existantes:
+                n += 1
+            print("Identifiant %s déjà pris : renommée %s-%d" % (d["id"], base, n))
+            d["id"] = "%s-%d" % (base, n)
+        existantes[d["id"]] = cle
+        deja[cle] = d["id"]
+        gardees.append(d)
+    declarations = gardees
+    if not declarations:
         return
     lignes = [{
         "id": d["id"], "candidat": d["candidat"], "date": d["date"], "media": d["media"], "url": d["url"],
@@ -135,7 +165,7 @@ def main():
     except (OSError, ValueError):
         id_par_url = {}
     cache_articles = {}
-    for chemin in sorted(glob.glob(os.path.join(DECLARATIONS, "*.json"))):
+    for chemin in [DECLARATIONS] if os.path.exists(DECLARATIONS) else []:
         with open(chemin, encoding="utf-8") as f:
             fichier = json.load(f)
         modifie = False
@@ -202,10 +232,6 @@ def main():
     with open(RAPPORT, "w", encoding="utf-8") as f:
         f.write("\n".join(lignes) + "\n")
     print("\n".join(lignes))
-    # Met à jour le fichier de la page Actualité avec les déclarations retenues.
-    sys.path.insert(0, DOSSIER)
-    import veille
-    veille.ecrire_actu()
     envoyer_supabase([d for d in verifiees_ce_jour if d["statut"] != "rejetee"])
     return 1 if problemes else 0
 

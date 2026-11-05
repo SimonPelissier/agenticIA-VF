@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Import initial dans Supabase des données aujourd'hui stockées dans le dépôt (dossier data/).
+"""Envoie dans Supabase les votes produits par l'agent de collecte (dossier data/, jamais publié dans le dépôt).
 
-À lancer une fois, depuis GitHub : onglet Actions → « Supabase : import initial » → Run workflow.
+Lancé chaque nuit par la tâche « Agent de collecte », après les contrôles (agents/collecte/controles.py).
+Import complet à la main : onglet Actions → « Supabase : import complet des votes » → Run workflow.
 Peut être relancé sans risque : chaque ligne est insérée ou mise à jour, jamais dupliquée.
+Les articles et les déclarations sont envoyés par la veille médias elle-même (agents/medias/).
 
 Usage : python3 agents/supabase/importer.py [--essai] [--tables t1,t2] [--recents N]
   --essai       prépare les lignes et affiche les chiffres, sans rien envoyer (aucune clé nécessaire)
@@ -12,8 +14,6 @@ Usage : python3 agents/supabase/importer.py [--essai] [--tables t1,t2] [--recent
 """
 
 import datetime
-
-import glob
 import json
 import os
 import sys
@@ -68,36 +68,23 @@ def preparer():
     } for f in fiches for v in f["votes"]]
 
     app = lire_js("data/app.js")
+    medias = lire_json("agents/medias/sources.json")["medias"]
     tables["collecte"] = [
         {"cle": "collecte", "valeur": lire_json("data/collecte.json")},
         {"cle": "mediane_solennels", "valeur": app.get("medianeSolennels")},
         {"cle": "dernier_scrutin", "valeur": app.get("dernierScrutin")},
+        # Données prêtes pour le site (js/supabase.js) : votes clés et fiches des candidats,
+        # grands votes de « Qui a voté quoi ? », noms des journaux.
+        {"cle": "site_donnees", "valeur": app},
+        {"cle": "site_votes", "valeur": lire_js("data/votes.js")},
+        {"cle": "medias", "valeur": {m["id"]: m["nom"] for m in medias}},
     ]
 
-    tables["articles"] = [{
-        "id": a["id"], "media": a["media"], "titre": a["titre"], "url": a["url"], "date": a["date"] or a["vuLe"],
-        "candidats": a["candidats"], "vu_le": a["vuLe"], "traite": a["traite"],
-    } for a in lire_json("data/medias/articles.json")]
-
-    declarations = []
-    for chemin in sorted(glob.glob(os.path.join(RACINE, "contenu", "declarations", "*.json"))):
-        with open(chemin, encoding="utf-8") as f:
-            for d in json.load(f).get("declarations", []):
-                declarations.append({
-                    "id": d["id"], "candidat": d["candidat"], "date": d["date"], "media": d["media"], "url": d["url"],
-                    "titre_article": d.get("titreArticle"), "citation": d["citation"], "resume": d.get("resume"),
-                    "type": d["type"], "theme": d.get("theme"), "vote_lie": d.get("voteLie"), "factcheck": d.get("factcheck"),
-                    "verification": d.get("statut"), "verifie_dans": d.get("verifieDans"), "motif": d.get("motif"),
-                    # Déjà relues et fusionnées dans main par l'équipe : validées.
-                    "validation": "validee" if d.get("statut") in ("verifiee", "a-verifier") else "refusee",
-                    "valide_par": "pull request GitHub", "ajoute_le": d.get("ajouteLe"),
-                })
-    tables["declarations"] = declarations
     return tables
 
 
 # Ordre d'envoi : les tables référencées d'abord.
-ORDRE = ["groupes", "scrutins", "candidats", "votes_candidats", "collecte", "articles", "declarations"]
+ORDRE = ["groupes", "scrutins", "candidats", "votes_candidats", "collecte"]
 CONFLITS = {"votes_candidats": "candidat,scrutin"}
 
 
