@@ -239,14 +239,33 @@
     return "Pas encore ajouté";
   }
 
+  // Couleur et sigle d'un parti (js/data.js) ; texte blanc ou foncé selon la clarté de la couleur.
+  function partyLook(id, nom) {
+    var x = (D.partis && D.partis[id]) || {}, c = x.couleur || "#555B70";
+    // Contraste (WCAG) : on garde le texte, blanc ou bleu nuit, qui se lit le mieux sur la couleur du parti.
+    var lum = function (hex) {
+      return [1, 3, 5].map(function (i) { var v = parseInt(hex.slice(i, i + 2), 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); })
+        .reduce(function (s, v, i) { return s + v * [0.2126, 0.7152, 0.0722][i]; }, 0);
+    };
+    var L = lum(c), blanc = 1.05 / (L + 0.05), nuit = (L + 0.05) / (lum("#0B1636") + 0.05);
+    return { couleur: c, texte: blanc >= nuit ? "#FFFFFF" : "#0B1636", sigle: x.sigle || nom.split(/\s+/).map(function (w) { return w[0]; }).join("").slice(0, 3), logo: x.logo };
+  }
+  function partyBadge(look, size) {
+    return '<span class="party-badge" style="width:' + size + "px;height:" + size + "px;background:" + look.couleur + ";color:" + look.texte + '" aria-hidden="true">' +
+      (look.logo ? '<img src="' + esc(look.logo) + '" alt="">' : esc(look.sigle)) + "</span>";
+  }
+
   function programmes() {
     return '<div class="screen enter">' + topbar(null, "Programmes") +
       '<h1 class="h1" style="font-size:34px">Ce qu’ils <span>proposent</span></h1>' +
       '<p class="note">Les mesures sont recopiées mot pour mot depuis le programme de chaque parti. On ne résume pas et on ne choisit pas : ce sont les mesures que le parti met lui-même en avant, ou, s’il n’en désigne pas, celle qu’il présente en premier dans chaque partie de son programme.</p>' +
-      '<div class="people stagger">' + PARTIS.map(function (p) {
-        return '<a class="person' + (p.statut === "publie" ? "" : " off") + '" href="#/programmes/' + p.id + '"><span class="n">' + esc(p.nom) + '</span><span class="p">' + esc(progStatus(p)) + "</span></a>";
+      '<div class="party-list stagger">' + PARTIS.map(function (p) {
+        var look = partyLook(p.id, p.nom), publie = p.statut === "publie";
+        return '<a class="party-card" href="#/programmes/' + p.id + '"><span class="party-band" style="background:' + look.couleur + '"></span>' +
+          partyBadge(look, 48) + '<span class="party-t"><b>' + esc(p.nom) + '</b><span class="party-s">' + esc(publie ? (p.programme || "") : progStatus(p)) + "</span></span>" +
+          (publie ? '<span class="party-n"><strong>' + p.mesures.length + "</strong><span>mesure" + (p.mesures.length > 1 ? "s" : "") + "</span></span>" : "") + "</a>";
       }).join("") + "</div>" +
-      '<p class="cap">Ordre alphabétique, aucune couleur de parti.</p>' + foot() + "</div>";
+      '<p class="cap">Ordre alphabétique. Les couleurs servent seulement à reconnaître chaque parti (sources : Wikipédia et sites des partis).</p>' + foot() + "</div>";
   }
 
   var openChapter = null;
@@ -277,7 +296,9 @@
   function programme(id) {
     var p = byId(PARTIS, id);
     if (!p) return notFound();
-    var head = '<section class="box flat"><p class="eb">Programme</p><span class="name-tag">' + esc(p.nom) + "</span>" +
+    var look = partyLook(p.id, p.nom);
+    var head = '<section class="box flat party-head" style="border-top:10px solid ' + look.couleur + '"><div class="cand-head">' + partyBadge(look, 56) +
+      '<div><p class="eb">Programme</p><span class="name-tag" style="background:' + look.couleur + ";color:" + look.texte + ";border-color:" + look.couleur + '">' + esc(p.nom) + "</span></div></div>" +
       (p.programme ? '<span class="meta">' + esc(p.programme) + "</span>" : "") + "</section>";
     if (p.statut !== "publie") {
       return '<div class="screen enter">' + topbar("#/programmes", "Programme") + head +
@@ -525,7 +546,7 @@
     return '<div class="screen enter">' + topbar("#/", "Comment on travaille") +
       '<section class="box flat"><p class="eb">Nos règles</p><ul class="list">' +
       "<li>Une source par information, cliquable. Pas de source, pas de publication.</li>" +
-      "<li>Aucune consigne de vote, aucune comparaison entre candidats. Ordre alphabétique, aucune couleur de parti.</li>" +
+      "<li>Aucune consigne de vote, aucune comparaison entre candidats. Ordre alphabétique. Les couleurs des partis servent seulement à les reconnaître dans Programmes.</li>" +
       "<li><b>Actualité</b> : titres et liens des articles de 10 médias généralistes ; les déclarations des candidats sont relevées en citation directe, vérifiées mot pour mot dans l’article, puis relues par l’équipe.</li>" +
       "<li><b>Programmes</b> : recopiés mot pour mot, jamais résumés. Un programme vérifie que chaque mesure se trouve telle quelle dans la source.</li>" +
       "<li><b>Qui a voté quoi ?</b> : votes officiels de l’Assemblée nationale, collectés chaque nuit et relus avant publication. Quand un candidat a siégé, c’est son vote ; sinon, celui de son groupe, toujours écrit comme tel.</li>" +

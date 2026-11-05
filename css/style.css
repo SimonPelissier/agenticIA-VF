@@ -583,3 +583,18 @@ button.vote-item svg { flex: none; color: var(--accent); }
 .flag-fr i:nth-child(1) { background: var(--accent); }
 .flag-fr i:nth-child(2) { background: var(--white); }
 .flag-fr i:nth-child(3) { background: var(--rouge); }
+
+/* Programmes : cartes à bandeau aux couleurs des partis (proposition A, 5 novembre 2026) */
+.party-list { display: flex; flex-direction: column; gap: 10px; }
+.party-card { display: flex; align-items: center; gap: 14px; padding: 12px 14px 12px 0; background: var(--white); border: var(--edge); border-radius: 18px; box-shadow: var(--drop-sm); overflow: hidden; text-decoration: none; color: var(--ink); }
+.party-card:hover { color: var(--ink); }
+.party-band { align-self: stretch; width: 10px; flex: none; }
+.party-badge { flex: none; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid var(--ink); font: 800 15px var(--sans); letter-spacing: -0.02em; overflow: hidden; }
+.party-badge img { width: 100%; height: 100%; object-fit: contain; background: var(--white); }
+.party-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.party-t b { font-size: 16px; line-height: 1.2; }
+.party-s { font-size: 12px; font-weight: 600; color: var(--mute); line-height: 1.35; }
+.party-n { flex: none; text-align: right; display: flex; flex-direction: column; }
+.party-n strong { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+.party-n span { font-size: 11px; font-weight: 600; color: var(--mute); }
+.party-head .cand-head > div { gap: 4px; }
