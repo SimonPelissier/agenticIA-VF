@@ -15,3 +15,4 @@ Mis à jour à la fin de chaque tâche.
 | Publication automatique des votes (fusion après contrôles) | Simon | Terminé | Vérifier le premier passage automatique après fusion |
 | Page Programmes : couleurs officielles des partis (proposition A) | Simon | Terminé | Logos officiels (fichiers et autorisation) ; confirmer la couleur d'Horizons |
 | Veille médias : chapô du flux RSS quand l'article est inaccessible | Simon | Terminé | Surveiller les premières citations « vérifiées dans le flux RSS » lors des relectures |
+| Supabase 1/3 : tables, règles d'accès et import des données | Simon | Terminé | Simon : coller le SQL, ranger les secrets GitHub, lancer l'import (docs/supabase.md) |

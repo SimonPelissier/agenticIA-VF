@@ -1,0 +1,30 @@
+# Import initial des données du dépôt (dossier data/) dans Supabase. À lancer à la main, une fois :
+# onglet Actions → « Supabase : import initial » → Run workflow. Peut être relancé sans risque.
+# Secrets nécessaires (Settings → Secrets and variables → Actions) : SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
+name: "Supabase : import initial"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  importer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Vérifier les données à importer (sans rien envoyer)
+        run: python3 agents/supabase/importer.py --essai
+
+      - name: Importer dans Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python3 agents/supabase/importer.py
