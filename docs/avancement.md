@@ -12,4 +12,4 @@ Mis à jour à la fin de chaque tâche.
 | Application à 4 pages : Accueil, Actualité, Programmes, Qui a voté quoi ? | Simon | Terminé | Valider en groupe les décisions de Kevan sur Programmes (publier avec 4 partis, droit de citation) ; vérifier l'ordre des groupes de 2022-2024 ; affiner le classement des votes (72 en « Autres ») ; créer docs/spec.md |
 | Routine quotidienne de veille médias (/veille-medias) | Simon | Terminé | Relire chaque jour la pull request « Veille médias du … » |
 | Couleurs de la version bleu-blanc-rouge d'Anaïs | Simon | Terminé | Vérifier le rendu sur téléphone |
-| Publication automatique des votes (fusion après contrôles) | Simon | En cours | |
+| Publication automatique des votes (fusion après contrôles) | Simon | Terminé | Vérifier le premier passage automatique après fusion |
