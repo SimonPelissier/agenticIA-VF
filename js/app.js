@@ -262,8 +262,7 @@
       '<div class="party-list stagger">' + PARTIS.map(function (p) {
         var look = partyLook(p.id, p.nom), publie = p.statut === "publie";
         return '<a class="party-card" href="#/programmes/' + p.id + '"><span class="party-band" style="background:' + look.couleur + '"></span>' +
-          partyBadge(look, 48) + '<span class="party-t"><b>' + esc(p.nom) + '</b><span class="party-s">' + esc(publie ? (p.programme || "") : progStatus(p)) + "</span></span>" +
-          (publie ? '<span class="party-n"><strong>' + p.mesures.length + "</strong><span>mesure" + (p.mesures.length > 1 ? "s" : "") + "</span></span>" : "") + "</a>";
+          partyBadge(look, 48) + '<span class="party-t"><b>' + esc(p.nom) + '</b><span class="party-s">' + esc(publie ? (p.programme || "") : progStatus(p)) + "</span></span></a>";
       }).join("") + "</div>" +
       '<p class="cap">Ordre alphabétique. Les couleurs servent seulement à reconnaître chaque parti (sources : Wikipédia et sites des partis).</p>' + foot() + "</div>";
   }

@@ -58,17 +58,17 @@ window.DATA = {
   // Couleurs des partis, pour les reconnaître dans la page Programmes (décision du groupe, 5 novembre 2026).
   // Sources : le modèle « Données parti politique » de Wikipédia, recoupé avec le site du parti.
   // Horizons : couleur du site du parti, à confirmer (pas de donnée Wikipédia). À remplacer par la charte
-  // officielle de chaque parti si elle diffère. 'logo' : chemin du fichier officiel, une fois obtenu et autorisé.
+  // officielle de chaque parti si elle diffère. 'logo' : fichier dans img/partis/ (origine et droits : img/partis/SOURCES.md).
   partis: {
-    "lfi": { sigle: "LFI", couleur: "#56277E", source: "Wikipédia" },
-    "ecologistes": { sigle: "ÉCO", couleur: "#4BB166", source: "Wikipédia" },
-    "horizons": { sigle: "HOR", couleur: "#CE675E", source: "site du parti, à confirmer" },
-    "lr": { sigle: "LR", couleur: "#034EA2", source: "Wikipédia" },
-    "pcf": { sigle: "PCF", couleur: "#E4002A", source: "Wikipédia" },
-    "ps": { sigle: "PS", couleur: "#F70059", source: "site du parti" },
-    "place-publique": { sigle: "PP", couleur: "#0F345C", source: "site du parti" },
-    "rn": { sigle: "RN", couleur: "#104E8B", source: "Wikipédia" },
-    "renaissance": { sigle: "RE", couleur: "#001A5B", source: "Wikipédia" }
+    "lfi": { sigle: "LFI", couleur: "#56277E", source: "Wikipédia", logo: "img/partis/lfi.png" },
+    "ecologistes": { sigle: "ÉCO", couleur: "#4BB166", source: "Wikipédia", logo: "img/partis/ecologistes.png" },
+    "horizons": { sigle: "HOR", couleur: "#CE675E", source: "site du parti, à confirmer", logo: "img/partis/horizons.png" },
+    "lr": { sigle: "LR", couleur: "#034EA2", source: "Wikipédia", logo: "img/partis/lr.svg" },
+    "pcf": { sigle: "PCF", couleur: "#E4002A", source: "Wikipédia", logo: "img/partis/pcf.svg" },
+    "ps": { sigle: "PS", couleur: "#F70059", source: "site du parti", logo: "img/partis/ps.webp" },
+    "place-publique": { sigle: "PP", couleur: "#0F345C", source: "site du parti", logo: "img/partis/place-publique.png" },
+    "rn": { sigle: "RN", couleur: "#104E8B", source: "Wikipédia", logo: "img/partis/rn.svg" },
+    "renaissance": { sigle: "RE", couleur: "#001A5B", source: "Wikipédia", logo: "img/partis/renaissance.svg" }
   },
 
   glossary: [
