@@ -19,7 +19,7 @@ from datetime import date
 from pathlib import Path
 
 RACINE = Path(__file__).resolve().parents[2]
-STRUCTURES = {"mesures-cles", "premiere-par-chapitre", "pas-publie"}
+STRUCTURES = {"mesures-cles", "premiere-par-chapitre", "toutes-les-mesures", "pas-publie"}
 
 # Seules différences tolérées entre la source et le texte recopié (docs/programmes.md).
 EQUIVALENCES = {
@@ -92,7 +92,7 @@ def verifier_parti(dossier, prog):
         return []
     if structure == "mesures-cles" and not prog.get("libelle"):
         erreurs.append("'libelle' manquant : l'intitulé employé par le parti (ex. « Mesures clés »)")
-    if structure == "premiere-par-chapitre" and not prog.get("regle"):
+    if structure in ("premiere-par-chapitre", "toutes-les-mesures") and not prog.get("regle"):
         erreurs.append("'regle' manquante : ce qui compte comme une mesure dans ce programme")
 
     sources = {}
@@ -156,6 +156,16 @@ def verifier_parti(dossier, prog):
                 absent("titre", titre)
             if not src.contient(texte, page):
                 absent("texte", texte)
+
+    # Chapitres annoncés par le parti mais encore sans mesure (« À venir ») : nom et phrase de présentation au mot près.
+    for i, c in enumerate(prog.get("a_venir", []), 1):
+        src = sources.get(c.get("source"))
+        if src is None:
+            erreurs.append("à venir %d : source '%s' inconnue ou rejetée" % (i, c.get("source")))
+            continue
+        for champ in ("chapitre", "texte"):
+            if not c.get(champ) or not src.contient(c[champ]):
+                erreurs.append("à venir %d : %s introuvable tel quel dans la source : « %s »" % (i, champ, (c.get(champ) or "")[:80]))
     return erreurs
 
 
@@ -180,6 +190,8 @@ def publier(prog):
             "url": m.get("url") or sources[m["source"]]["url"] + ("#page=%d" % m["page"] if m.get("page") else ""),
             "source": m["source"],
         } for m in prog.get("mesures", [])],
+        "a_venir": [{"chapitre": c["chapitre"], "texte": c["texte"], "url": sources[c["source"]]["url"]}
+                    for c in prog.get("a_venir", [])],
     }
 
 

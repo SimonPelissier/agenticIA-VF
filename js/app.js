@@ -258,7 +258,7 @@
   function programmes() {
     return '<div class="screen enter">' + topbar(null, "Programmes") +
       '<h1 class="h1" style="font-size:34px">Ce qu’ils <span>proposent</span></h1>' +
-      '<p class="note">Les mesures sont recopiées mot pour mot depuis le programme de chaque parti. On ne résume pas et on ne choisit pas : ce sont les mesures que le parti met lui-même en avant, ou, s’il n’en désigne pas, celle qu’il présente en premier dans chaque partie de son programme.</p>' +
+      '<p class="note">Les mesures sont recopiées mot pour mot depuis le programme de chaque parti. On ne résume pas et on ne choisit pas : ce sont toutes les mesures quand le parti les publie une à une, sinon celles qu’il met lui-même en avant, ou, s’il n’en désigne pas, celle qu’il présente en premier dans chaque partie de son programme.</p>' +
       '<div class="party-list stagger">' + PARTIS.map(function (p) {
         var look = partyLook(p.id, p.nom), publie = p.statut === "publie";
         return '<a class="party-card" href="#/programmes/' + p.id + '"><span class="party-band" style="background:' + look.couleur + '"></span>' +
@@ -276,6 +276,10 @@
       return "<b>" + esc(p.nom) + " présente lui-même ces mesures comme « " + esc(p.libelle) + " ».</b> On les recopie telles quelles, dans son ordre, sans en choisir ni en reformuler aucune.";
     }
     var u = p.unite || "chapitre";
+    if (p.structure === "toutes-les-mesures") {
+      return "<b>Toutes les mesures publiées par " + esc(p.nom) + "</b>, classées par " + esc(u) + " comme sur son site, dans son ordre. MarIAn n’en choisit ni n’en reformule aucune." +
+        (p.a_venir && p.a_venir.length ? " Les " + esc(u) + "s que le parti annonce sans mesure encore publiée sont indiqués « À venir »." : "");
+    }
     return "<b>" + esc(p.nom) + " ne met pas de mesures en avant.</b> Pour chaque " + esc(u) +
       ", on affiche donc celle qui ouvre sa liste dans le programme : c’est l’ordre choisi par le parti, pas une sélection de MarIAn. Les autres mesures sont dans le programme.";
   }
@@ -284,10 +288,11 @@
     var k = ref.lastIndexOf(":"), p = byId(PARTIS, ref.slice(0, k)), n = +ref.slice(k + 1);
     var m = p && p.mesures.filter(function (x) { return x.ordre === n; })[0];
     if (!m) return;
+    var premiere = p.structure === "premiere-par-chapitre";
     var eb = p.structure === "mesures-cles" ? p.libelle + (m.repere ? " · " + m.repere : "")
-      : (m.repere ? m.repere + " · " : "") + "1re mesure de la liste";
+      : premiere ? (m.repere ? m.repere + " · " : "") + "1re mesure de la liste" : m.repere || "Mesure";
     var extra = (m.chapitre ? '<p class="cap">' + esc(m.chapitre) + "</p>" : "") +
-      (p.structure === "mesures-cles" ? "" : '<p class="group-note">C’est la première mesure que ' + esc(p.nom) + " présente pour ce " + esc(p.unite || "chapitre") + ". Elle n’a pas été choisie par MarIAn.</p>") +
+      (premiere ? '<p class="group-note">C’est la première mesure que ' + esc(p.nom) + " présente pour ce " + esc(p.unite || "chapitre") + ". Elle n’a pas été choisie par MarIAn.</p>" : "") +
       '<a class="link" href="' + esc(m.url) + '" target="_blank" rel="noopener">Lire dans le programme' + (m.page ? ", page " + m.page : "") + " ↗</a>" +
       '<p class="cap">Texte reproduit mot pour mot.</p>';
     showSheet(eb, m.titre || p.nom, m.texte, extra, true);
@@ -329,13 +334,27 @@
             '<span class="t">' + esc(m.titre || m.texte) + "</span></span>" + icon(I.arrow, 18) + "</button>";
         }).join("") + "</div>" : "") + "</div>";
     });
+    // Chapitres annoncés par le parti, sans mesure publiée : sa phrase de présentation, mot pour mot.
+    (p.a_venir || []).forEach(function (c, i) {
+      var key = p.id + ":v" + i, open = openChapter === key;
+      html += '<div class="acc"><button type="button" class="acc-head" data-chap="' + esc(key) + '" aria-expanded="' + open + '">' +
+        '<span class="l">' + esc(c.chapitre) + '</span><span class="c">À venir ' + (open ? "▴" : "▾") + "</span></button>" +
+        (open ? '<div class="acc-body"><p class="cap">Pas encore de mesure publiée. Présentation du parti :</p>' +
+          '<p style="margin:0">« ' + esc(c.texte) + " »</p>" +
+          '<a class="link" href="' + esc(c.url) + '" target="_blank" rel="noopener">Voir sur le site du parti ↗</a></div>' : "") + "</div>";
+    });
+    // Une source par mesure (LR : 121 pages) : on ne liste que les sources générales, le lien de chaque mesure est dans sa fiche.
+    var parMesure = {};
+    p.mesures.forEach(function (m) { parMesure[m.source] = (parMesure[m.source] || 0) + 1; });
+    var sourcesListees = p.sources.length > 20 ? p.sources.filter(function (s) { return !parMesure[s.id]; }) : p.sources;
     return '<div class="screen enter">' + topbar("#/programmes", "Programme") + head +
       '<p class="group-note">' + progRule(p) + "</p>" +
       '<p class="cap">Touche un titre pour lire la mesure en entier.</p>' +
       '<div class="stagger" style="display:flex;flex-direction:column;gap:10px">' + html + "</div>" +
-      '<section class="box flat"><p class="eb">Sources</p>' + p.sources.map(function (s) {
+      '<section class="box flat"><p class="eb">Sources</p>' + sourcesListees.map(function (s) {
         return '<div class="kv"><a class="link" href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.titre) + " ↗</a><span>consulté le " + fmtDate(s.consulte_le) + "</span></div>";
       }).join("") +
+      (sourcesListees.length < p.sources.length ? '<p class="cap">Et une page par mesure (' + (p.sources.length - sourcesListees.length) + " pages) : le lien est dans chaque mesure.</p>" : "") +
       '<p class="cap">Texte reproduit sans modification. Vérifié par un programme le ' + fmtDate(PR.verifieLe) +
       " : chaque mesure a été retrouvée mot pour mot dans la source archivée.</p></section>" +
       '<a class="btn-dark" href="https://github.com/SimonPelissier/agenticIA-VF/issues/new" target="_blank" rel="noopener">Signaler une erreur</a>' +

@@ -8,6 +8,7 @@ Ce n'est jamais l'équipe qui choisit. Une seule règle par parti, écrite dans 
 
 | `structure` | Quand | Ce qu'on affiche |
 | --- | --- | --- |
+| `toutes-les-mesures` | Le parti publie son programme mesure par mesure (une carte, une page par mesure) | Toutes les mesures, classées comme sur son site (`unite` : thème…), dans son ordre. Les divisions annoncées sans mesure sont affichées « À venir » (`a_venir`), avec leur phrase de présentation recopiée au mot près |
 | `mesures-cles` | Le parti met lui-même en avant certaines mesures | Ces mesures, dans l'ordre du parti, sous l'intitulé qu'il emploie (`libelle`, ex. « Mesure-clé ») |
 | `premiere-par-chapitre` | Le parti ne met rien en avant | Pour chaque division du programme (`unite` : chapitre, chantier…), la mesure qu'il présente en premier. Le site dit que c'est l'ordre du parti, pas un choix de MarIAn |
 | `pas-publie` | Pas encore de programme | « Programme pas encore publié » |
@@ -38,7 +39,7 @@ On choisit un parti, puis on ouvre un chapitre : il liste les titres (sous-parti
 
 ## Circuit
 
-1. **Archiver la source** dans `contenu/programmes/sources/<parti>/` (pages HTML ou PDF), avec son adresse, sa date de consultation et son empreinte SHA-256.
+1. **Archiver la source** dans `contenu/programmes/sources/<parti>/` (pages HTML ou PDF), avec son adresse, sa date de consultation et son empreinte SHA-256. Vérifier que chaque page est complète (elle se termine par `</html>`) : sans compression, certains sites coupent la page en route.
 2. **Extraire** avec un script propre au programme, sans IA (`agents/extraction/`) : il lit la mise en forme de la source et recopie les textes.
 3. **Vérifier** : `python agents/verification/programmes.py` (les PDF demandent `pip install pymupdf`). Le script contrôle l'empreinte de chaque source et retrouve chaque texte, au mot près, dans la source archivée. Il écrit `data/programmes.js`, lu par l'application, avec **uniquement les partis dont toutes les mesures sont retrouvées**.
 4. **Relire** : pull request, relue par un humain avant fusion.
@@ -52,7 +53,7 @@ Ne jamais modifier `data/programmes.js` à la main.
 | La France insoumise | Programme de l'Union populaire, européennes 2024 (site) | `mesures-cles` : le bloc « Mesure-clé » de chaque sous-partie | 51 |
 | Place publique | « Acte un », PDF | `premiere-par-chapitre` : première puce « Nous voulons : » de chaque chantier. Le « chantier cadre » (financement) n'a pas de telle liste et n'est pas repris | 42 |
 | Parti socialiste | « Vivre libres », projet-socialiste.fr (avril 2026) | `premiere-par-chapitre` : première puce « Propositions » de chaque sous-partie. La page contient 5 chapitres ; l'index du site était injoignable le 29 octobre 2026 pour vérifier s'il en existe d'autres | 18 |
-| Les Républicains | Projet de Bruno Retailleau, avecretailleau.fr (une page par thème, une page par mesure) | `premiere-par-chapitre` : première mesure de chaque thème publié, texte du bloc « L'engagement. ». Thèmes « À venir » non repris | 11 |
+| Les Républicains | Projet de Bruno Retailleau, avecretailleau.fr/projet (une carte et une page par mesure), consulté le 12 novembre 2026. On suit ce site plutôt que « Nos propositions » du site des Républicains | `toutes-les-mesures` : les 120 mesures des 11 thèmes publiés, texte du bloc « L'engagement. » ; 7 thèmes « À venir » (Justice, Immigration, Sécurité, Culture, Santé, Tourisme, Écologie). Le site regroupe aussi ses thèmes en 3 « ambitions », mais ses données ne disent pas quel thème va dans quelle ambition : non repris | 120 |
 
 Pas encore ajoutés (29 octobre 2026) :
 
