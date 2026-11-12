@@ -18,6 +18,8 @@ Usage :
   python3 agents/medias/veille.py --a-traiter      affiche les articles pas encore lus par Claude
   python3 agents/medias/veille.py --traites ID,ID  marque des articles comme lus
   python3 agents/medias/veille.py --chapo ID       affiche le chapô du flux RSS (repli si l'article est inaccessible)
+  python3 agents/medias/veille.py --telecharger    télécharge le corps de tous les articles pas encore lus
+                                                   (agents/medias/.cache/textes/ID.txt, jamais publiés)
 """
 
 import datetime
@@ -38,6 +40,7 @@ DOSSIER = os.path.dirname(os.path.abspath(__file__))
 SORTIE = os.path.join(DOSSIER, ".cache", "articles.json")
 # Chapôs des flux RSS : fichier de travail, jamais publié (droit d'auteur), lu par verifier.py en repli.
 CHAPOS = os.path.join(DOSSIER, ".cache", "chapos.json")
+TEXTES = os.path.join(DOSSIER, ".cache", "textes")
 CONSERVATION_JOURS = 30
 AGENT = "Mozilla/5.0 (compatible; marIAn-veille; +https://github.com/SimonPelissier/agenticIA-VF)"
 
@@ -224,6 +227,30 @@ def afficher_a_traiter():
             print(json.dumps(dict(a, media=medias.get(a["media"], a["media"])), ensure_ascii=False))
 
 
+def telecharger_textes():
+    """Télécharge le corps de chaque article pas encore lu, pour que Claude les lise tous rapidement.
+    Un paragraphe par ligne ; seuls les paragraphes du corps (jamais les titres), comme le vérificateur.
+    Fichiers de travail, jamais publiés (droit d'auteur)."""
+    sys.path.insert(0, DOSSIER)
+    import verifier
+    os.makedirs(TEXTES, exist_ok=True)
+    medias = {m["id"]: m["nom"] for m in charger_sources()["medias"]}
+    a_lire = sorted((a for a in charger_articles() if not a["traite"]), key=lambda a: a["date"] or a["vuLe"], reverse=True)
+    for a in a_lire:
+        paragraphes, erreur = verifier.corps_article(a["url"])
+        if paragraphes is None:
+            print("%s  %-12s inaccessible (%s) : chapô avec --chapo %s" % (a["id"], medias.get(a["media"], a["media"])[:12], erreur, a["id"]))
+            continue
+        paragraphes = [p for p in paragraphes if len(p.split()) >= 6]  # sans les menus du site
+        with open(os.path.join(TEXTES, a["id"] + ".txt"), "w", encoding="utf-8") as f:
+            f.write("\n".join(paragraphes) + "\n")
+        guillemets = sum(p.count("«") + p.count("“") + p.count('"') // 2 for p in paragraphes)
+        print("%s  %-12s %5d mots  %3d citation(s)  %s" % (a["id"], medias.get(a["media"], a["media"])[:12],
+              sum(len(p.split()) for p in paragraphes), guillemets, a["titre"][:70]))
+        time.sleep(0.5)  # politesse envers les sites des médias
+    print("%d article(s) à lire ; textes dans %s" % (len(a_lire), TEXTES))
+
+
 def marquer_traites(ids):
     ids = {i.strip() for i in ids.split(",") if i.strip()}
     articles = charger_articles()
@@ -238,6 +265,8 @@ def marquer_traites(ids):
 if __name__ == "__main__":
     if "--chapo" in sys.argv:
         afficher_chapo(sys.argv[sys.argv.index("--chapo") + 1])
+    elif "--telecharger" in sys.argv:
+        telecharger_textes()
     elif "--a-traiter" in sys.argv:
         afficher_a_traiter()
     elif "--traites" in sys.argv:

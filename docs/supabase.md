@@ -20,7 +20,7 @@ La migration se fait en trois étapes :
 | `votes_candidats` | Vote personnel de chaque candidat sur chaque scrutin | agent de collecte |
 | `collecte` | Chiffres de la dernière collecte (dernier scrutin, médiane…), et les données prêtes pour le site : `site_donnees` (votes clés, fiches des candidats), `site_votes` (grands votes de « Qui a voté quoi ? »), `medias` (noms des journaux) | agent de collecte, veille médias |
 | `articles` | Articles repérés : média, titre, date, lien, candidats cités (jamais le texte) | veille médias |
-| `declarations` | Citations relevées, leur vérification automatique et leur **validation humaine** | veille médias, puis l'équipe |
+| `declarations` | Citations relevées, leur vérification et leur **décision automatique** (`validee` : publiée, `refusee` : jamais publiée) | veille médias ; l'équipe peut retirer une déclaration |
 
 Vue pratique : `grands_votes` (les grands votes, du plus récent au plus ancien).
 
@@ -39,9 +39,9 @@ Secrets rangés dans GitHub et dans l'environnement Claude « Poli - media » (`
 
 ```
 Chaque nuit, GitHub Actions          Chaque matin, routine Claude          L'équipe
-agents/collecte/collecte.py          veille.py → Claude → verifier.py      Table Editor :
-controles.py (comparaison            articles + déclarations               declarations
-  avec Supabase)                       « à valider »                         → validee
+agents/collecte/collecte.py          veille.py → Claude → verifier.py      (si besoin) Table
+controles.py (comparaison            articles + déclarations               Editor : retirer une
+  avec Supabase)                       publiées automatiquement              déclaration → refusee
 importer.py --recents 60                     │                                 │
         │                                    ▼                                 │
         └──────────────►  SUPABASE  ◄──────────────────────────────────────────┘
@@ -52,7 +52,7 @@ importer.py --recents 60                     │                                
 
 - **Le site** (`js/supabase.js`) lit au chargement : `site_donnees`, `site_votes` et `medias` dans la table `collecte`, les articles des 30 derniers jours, et les déclarations **validées**. L'adresse et la clé publique sont dans `js/config.js`. Si Supabase ne répond pas, la page Programmes et le lexique restent affichés, avec un message.
 - **Chaque nuit**, la tâche « Agent de collecte » relance l'agent, compare ses chiffres à ceux de Supabase (`controles.py` : scrutins qui ne baissent pas, dernier scrutin qui ne recule pas, aucun grand vote disparu, mêmes candidats), puis écrit les scrutins des 60 derniers jours, tous les grands votes et les données du site. Si un contrôle échoue, **rien n'est écrit** et la tâche apparaît en rouge (GitHub prévient par e-mail). Plus de pull request.
-- **Chaque matin**, la routine de veille lit dans Supabase les articles déjà connus, envoie les nouveaux, puis les déclarations vérifiées. Une nouvelle déclaration arrive avec `validation = a-valider` ; une validation déjà faite n'est jamais écrasée, et une déclaration déjà en base n'est jamais remplacée par une autre. Les déclarations rejetées ne sont pas envoyées. La routine ne modifie plus le dépôt.
+- **Chaque matin**, la routine de veille lit dans Supabase les articles déjà connus, envoie les nouveaux, lit tous les articles, puis envoie les déclarations. Depuis le 12 novembre 2026, une nouvelle déclaration est **publiée automatiquement** (`validation = validee`), ou refusée si le plafond de 6 par candidat et par jour est atteint ; une décision déjà prise n'est jamais changée, et une déclaration déjà en base n'est jamais remplacée par une autre. Les déclarations rejetées (citation introuvable ou trop faible) ne sont pas envoyées. La routine ne modifie pas le dépôt.
 - **Import complet** (tous les scrutins, si besoin) : onglet *Actions* → *Supabase : import complet des votes* → *Run workflow*.
 - Les fichiers `data/` (sauf `data/programmes.js`, les programmes de Kevan) et `contenu/declarations/` ne sont plus dans le dépôt (`.gitignore`) : les agents les produisent sur la machine qui les fait tourner.
 
@@ -65,9 +65,9 @@ importer.py --recents 60                     │                                
 3. **Lancer l'import.** Onglet *Actions* → *Supabase : import complet des votes* → *Run workflow*. Il relance l'agent de collecte, vérifie les données sans rien envoyer, puis importe (quelques minutes).
 4. **Vérifier.** Dans Supabase → *Table Editor* : environ 13 900 scrutins, 4 500 votes de candidats, 230 articles, 3 déclarations.
 
-## Valider une déclaration
+## Retirer une déclaration
 
-Dans Supabase → *Table Editor* → `declarations`, filtrer `validation = a-valider`. Pour chaque ligne : relire la citation (ouvrir l'`url` ; obligatoire si `verification = a-verifier`), puis mettre `validation` à `validee` (ou `refusee`), son prénom dans `valide_par` et la date dans `valide_le`. Seules les déclarations validées apparaissent sur le site, dès le prochain chargement de la page. C'est le seul endroit où l'on valide : il n'y a plus de pull request de veille.
+Il n'y a plus de validation humaine (décision du 12 novembre 2026). Pour retirer une déclaration du site : Supabase → *Table Editor* → `declarations`, mettre `validation` à `refusee`, son prénom dans `valide_par` et la date dans `valide_le`. Elle disparaît au prochain chargement de la page ; les agents ne la republieront jamais.
 
 ## Et Vercel ?
 

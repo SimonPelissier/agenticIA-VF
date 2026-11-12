@@ -13,8 +13,11 @@ Statut écrit dans chaque déclaration :
   a-verifier   article payant ou inaccessible : un humain doit vérifier
   rejetee      article lisible mais citation introuvable : à corriger ou supprimer
 
-Les déclarations retenues (vérifiées ou à vérifier) sont envoyées dans Supabase, où l'équipe les valide :
-seules celles passées à « validee » apparaissent sur le site.
+Publication automatique (décision du 12 novembre 2026, médias reconnus) : les déclarations retenues
+(vérifiées ou à vérifier) sont envoyées dans Supabase déjà « validee » et apparaissent aussitôt sur le site,
+sauf si elles échouent aux règles de qualité ou dépassent le plafond par candidat : elles sont alors
+enregistrées « refusee », jamais publiées. Une décision déjà prise sur une déclaration n'est jamais changée,
+sauf pour les anciennes déclarations restées « a-valider », auxquelles les mêmes règles sont appliquées.
 
 Produit aussi un rapport d'équilibre (par candidat, par média) dans
 agents/medias/.cache/rapport.md, repris dans le compte rendu de la routine.
@@ -50,6 +53,9 @@ SUJETS = {"logement", "travail", "ecologie", "sante", "securite", "education", "
 CITATION_MAX = 400          # caractères : une à deux phrases
 MOTS_MIN_ARTICLE = 250      # en dessous, l'article est sans doute coupé (abonnement) : vérification humaine
 PART_MAX = 0.4              # au-delà de 40 % des déclarations du jour pour un candidat, le rapport alerte
+MOTS_MIN_CITATION = 8       # en dessous, la citation est trop courte pour être comprise seule
+PLAFOND_CANDIDAT = 6        # déclarations publiées au plus par candidat et par jour (équilibre)
+AUTOMATIQUE = "automatique (verifier.py)"
 
 
 def normaliser(texte):
@@ -63,8 +69,8 @@ def normaliser(texte):
     return re.sub(r"\s+", " ", texte).strip().lower()
 
 
-def texte_article(url):
-    """Renvoie (texte normalisé, nombre de mots) ou (None, code d'erreur)."""
+def corps_article(url):
+    """Paragraphes du corps de l'article, tels quels : (liste de paragraphes, None) ou (None, code d'erreur)."""
     try:
         requete = urllib.request.Request(url, headers={"User-Agent": AGENT, "Accept-Language": "fr-FR,fr;q=0.9"})
         with urllib.request.urlopen(requete, timeout=30) as reponse:
@@ -77,7 +83,16 @@ def texte_article(url):
     # Le corps des articles : paragraphes, citations, listes. Jamais les titres ni les intertitres :
     # une citation prise dans un titre (souvent raccourcie par la rédaction) n'est pas acceptée.
     blocs = re.findall(r"(?is)<(?:p|blockquote|li)[^>]*>(.*?)</(?:p|blockquote|li)>", brut)
-    texte = " ".join(re.sub(r"<[^>]+>", " ", b) for b in blocs)
+    paragraphes = [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", b))).strip() for b in blocs]
+    return [x for x in paragraphes if x], None
+
+
+def texte_article(url):
+    """Renvoie (texte normalisé, nombre de mots) ou (None, code d'erreur)."""
+    paragraphes, erreur = corps_article(url)
+    if paragraphes is None:
+        return None, erreur
+    texte = " ".join(paragraphes)
     return normaliser(texte), len(texte.split())
 
 
@@ -98,12 +113,42 @@ def controler_format(d, candidats, medias):
         erreurs.append("citation trop longue (%d caractères, maximum %d)" % (len(d["citation"]), CITATION_MAX))
     if len((d.get("resume") or "").split()) > 12:
         erreurs.append("résumé trop long (12 mots maximum)")
+    erreurs += controler_qualite(d)
     return erreurs
 
 
+def controler_qualite(d):
+    """Règles qui remplacent la relecture humaine : une citation doit se comprendre seule."""
+    erreurs = []
+    citation = (d.get("citation") or "").strip()
+    if len(citation.split()) < MOTS_MIN_CITATION:
+        erreurs.append("citation trop courte pour être comprise seule (%d mots, minimum %d)" % (len(citation.split()), MOTS_MIN_CITATION))
+    debut = citation.lstrip("«»\"“”'‘’ .…[(")
+    if debut and not (debut[0].isupper() or debut[0].isdigit()):
+        erreurs.append("citation commencée en milieu de phrase")
+    return erreurs
+
+
+def decider(declarations, deja_publiees):
+    """Décision automatique : « validee », ou « refusee » avec le motif (qualité, plafond par candidat).
+    deja_publiees : nombre de déclarations déjà publiées par (candidat, jour)."""
+    compte = collections.Counter(deja_publiees)
+    for d in declarations:
+        erreurs = controler_qualite(d)
+        jour = (d.get("candidat"), d.get("ajouteLe") or datetime.date.today().isoformat())
+        if not erreurs and compte[jour] >= PLAFOND_CANDIDAT:
+            erreurs.append("plafond de %d déclarations par candidat et par jour atteint" % PLAFOND_CANDIDAT)
+        if erreurs:
+            d["validation"], d["motifRefus"] = "refusee", " ; ".join(erreurs)
+        else:
+            d["validation"] = "validee"
+            compte[jour] += 1
+    return declarations
+
+
 def envoyer_supabase(declarations):
-    """Envoie les déclarations dans Supabase. La colonne « validation » n'est jamais envoyée :
-    une nouvelle déclaration arrive « à valider », et une validation déjà faite par l'équipe est conservée.
+    """Envoie les déclarations dans Supabase. Une nouvelle déclaration arrive avec sa décision automatique
+    (« validee » ou « refusee ») ; une déclaration déjà en base garde sa décision.
 
     Une déclaration déjà en base n'est jamais remplacée par une autre : si son identifiant est pris
     par une citation différente (routine relancée le même jour), elle reçoit le numéro libre suivant ;
@@ -115,7 +160,8 @@ def envoyer_supabase(declarations):
         return
     if not declarations:
         return
-    existantes = {l["id"]: (l["candidat"], normaliser(l["citation"])) for l in client.lire("declarations", select="id,candidat,citation")}
+    lignes_base = client.lire("declarations", select="id,candidat,citation,validation,ajoute_le")
+    existantes = {l["id"]: (l["candidat"], normaliser(l["citation"])) for l in lignes_base}
     deja = {v: k for k, v in existantes.items()}
     gardees = []
     for d in declarations:
@@ -135,14 +181,50 @@ def envoyer_supabase(declarations):
     declarations = gardees
     if not declarations:
         return
+    ids_base = {l["id"] for l in lignes_base}
+    nouvelles = [d for d in declarations if d["id"] not in ids_base]
+    publiees = [(l["candidat"], l["ajoute_le"]) for l in lignes_base if l["validation"] == "validee"]
+    decider(nouvelles, publiees)
+    maintenant = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
     lignes = [{
         "id": d["id"], "candidat": d["candidat"], "date": d["date"], "media": d["media"], "url": d["url"],
         "titre_article": d.get("titreArticle"), "citation": d["citation"], "resume": d.get("resume"), "type": d["type"],
         "theme": d.get("theme"), "vote_lie": d.get("voteLie"), "factcheck": d.get("factcheck"),
         "verification": d["statut"], "verifie_dans": d.get("verifieDans"), "motif": d.get("motif"), "ajoute_le": d.get("ajouteLe"),
     } for d in declarations]
-    client.upsert("declarations", lignes)
-    print("Supabase : %d déclaration(s) envoyée(s), à valider dans la table declarations." % len(lignes))
+    for ligne, d in zip(lignes, declarations):
+        if d["id"] not in ids_base:
+            ligne.update(validation=d["validation"], valide_par=AUTOMATIQUE, valide_le=maintenant)
+            if d["validation"] == "refusee":
+                ligne["motif"] = d["motifRefus"]
+    # Deux envois : les colonnes doivent être les mêmes dans un lot, et une décision déjà prise ne change pas.
+    client.upsert("declarations", [l for l in lignes if "validation" in l])
+    client.upsert("declarations", [l for l in lignes if "validation" not in l])
+    for d in nouvelles:
+        print("%s : %s%s" % (d["id"], "publiée" if d["validation"] == "validee" else "refusée", "" if d["validation"] == "validee" else " (" + d["motifRefus"] + ")"))
+    print("Supabase : %d déclaration(s) envoyée(s), dont %d publiée(s) sur le site." % (len(lignes), sum(1 for d in nouvelles if d["validation"] == "validee")))
+
+
+def decider_en_attente():
+    """Applique les règles automatiques aux anciennes déclarations restées « a-valider » (avant le 12 novembre 2026)."""
+    sys.path.insert(0, os.path.join(RACINE, "agents", "supabase"))
+    import client
+    if not client.disponible():
+        return
+    lignes = client.lire("declarations", select="*")
+    attente = [l for l in lignes if l["validation"] == "a-valider"]
+    if not attente:
+        return
+    publiees = [(l["candidat"], l["ajoute_le"]) for l in lignes if l["validation"] == "validee"]
+    decl = [{"id": l["id"], "candidat": l["candidat"], "citation": l["citation"], "ajouteLe": l["ajoute_le"]} for l in attente]
+    decider(decl, publiees)
+    maintenant = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+    for l, d in zip(attente, decl):
+        l.update(validation=d["validation"], valide_par=AUTOMATIQUE, valide_le=maintenant)
+        if d["validation"] == "refusee":
+            l["motif"] = d["motifRefus"]
+        print("En attente %s : %s" % (d["id"], "publiée" if d["validation"] == "validee" else "refusée (" + d["motifRefus"] + ")"))
+    client.upsert("declarations", attente)
 
 
 def main():
@@ -233,6 +315,7 @@ def main():
         f.write("\n".join(lignes) + "\n")
     print("\n".join(lignes))
     envoyer_supabase([d for d in verifiees_ce_jour if d["statut"] != "rejetee"])
+    decider_en_attente()
     return 1 if problemes else 0
 
 
