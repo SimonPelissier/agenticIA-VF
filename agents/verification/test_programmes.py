@@ -87,6 +87,15 @@ class Verification(unittest.TestCase):
         self.prog["mesures"][1]["ordre"] = 3
         self.assertTrue(any("ordre" in e for e in self.erreurs()))
 
+    def test_toutes_les_mesures_avec_chapitre_a_venir(self):
+        self.prog["structure"] = "toutes-les-mesures"
+        self.prog["a_venir"] = [{"chapitre": "Chapitre 2 : Le travail", "texte": "Porter le salaire minimum à 1 600 € net.", "source": "s1"}]
+        self.assertEqual(self.erreurs(), [])
+
+    def test_a_venir_invente_rejete(self):
+        self.prog["a_venir"] = [{"chapitre": "Chapitre 3 : La santé", "texte": "Porter le salaire minimum à 1 600 € net.", "source": "s1"}]
+        self.assertTrue(any("à venir" in e for e in self.erreurs()))
+
     def test_rien_publie_si_rejete(self):
         self.prog["mesures"][1]["texte"] = "Texte inventé."
         (self.dossier / "x.json").write_text(json.dumps(self.prog), encoding="utf-8")
