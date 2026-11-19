@@ -35,6 +35,7 @@ contenu/        votes clés choisis par l'équipe (texte + numéro du scrutin of
 contenu/programmes/  mesures des programmes, recopiées mot pour mot (règles : docs/programmes.md)
 data/programmes.js   programmes vérifiés, produit par agents/verification/programmes.py
 agents/         agents : collecte des votes de l'Assemblée, veille médias, envoi dans Supabase
+api/mcp.py      serveur MCP public : les votes et les programmes en outils pour les assistants IA (docs/mcp.md)
 supabase/       tables et règles d'accès de la base (docs/supabase.md)
 .claude/        commande /veille-medias (consignes d'extraction pour Claude)
 docs/           cadrage, avancement, décisions du groupe
@@ -43,6 +44,10 @@ docs/           cadrage, avancement, décisions du groupe
 Aucune dépendance, aucune étape de compilation : HTML, CSS et JavaScript simples.
 
 Les **données collectées** (votes de l'Assemblée, articles, déclarations) sont dans **Supabase**, plus dans le dépôt : les agents y écrivent, le site les lit (voir `docs/supabase.md`). Les contenus écrits par l'équipe (votes clés, programmes, lexique) restent ici.
+
+## Utiliser MarIAn depuis Claude (serveur MCP)
+
+Les votes et les programmes sont aussi disponibles comme **outils pour les assistants IA** : dans claude.ai, *Réglages* → *Connecteurs* → *Ajouter un connecteur personnalisé* → `https://agenticia-vf.vercel.app/api/mcp`. Lecture seule, sans compte. Détails et liste des outils : `docs/mcp.md`.
 
 ## Lancer en local
 
