@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MarIAn</title>
+<!--
+  Interface du serveur MCP de MarIAn (MCP App), affichée par Claude dans la conversation.
+  Servie par api/mcp.py sous l'adresse ui://marian/app. Une seule page pour toutes les vues :
+  hémicycle d'un vote, fiche candidat, liste de votes, comparaison de deux candidats, programmes.
+  Elle reçoit les données de l'outil appelé (structuredContent) et peut appeler elle-même
+  detail_vote quand on touche un vote. Aucune connexion externe, sauf les logos des partis.
+-->
+<style>
+  :root {
+    --cream: #FBF4CF; --white: #FFFFFF; --ink: #0B1636; --ink-2: #444A60; --mute: #555B70;
+    --line: #E6DDB0; --line-soft: #F5ECCD; --accent: #1A3DB8; --accent-soft: #E8EEFB; --rouge: #D6001C;
+    --p: #2E9D57; --a: #8C9BB5; --c: #D9480F; --n: #E6DFC6;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: transparent; }
+  #app { background: var(--cream); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  h1 { margin: 0; font-size: 19px; line-height: 1.25; letter-spacing: -0.01em; }
+  h1 span, .rouge { color: var(--rouge); }
+  h2 { margin: 4px 0 0; font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .cap { font-size: 12px; color: var(--mute); }
+  .marque { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 800; font-size: 13px; }
+  .marque b span { color: var(--rouge); }
+  .retour { border: 1.5px solid var(--ink); background: var(--white); border-radius: 999px; padding: 3px 10px; font-weight: 700; font-size: 12px; }
+  .box { background: var(--white); border: 1.5px solid var(--ink); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .pill { display: inline-flex; align-self: flex-start; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; border: 1.5px solid var(--ink); background: var(--accent-soft); }
+  .pill.ok { background: #E3F4E9; } .pill.ko { background: #FDECEC; }
+  .lien { color: var(--accent); font-weight: 700; text-decoration: underline; background: none; border: 0; padding: 0; text-align: left; font-size: 13px; }
+  .grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; align-items: start; }
+  .carte { text-align: left; background: var(--white); border: 1.5px solid var(--ink); border-radius: 14px; padding: 11px 12px; display: flex; flex-direction: column; gap: 6px; }
+  button.carte:hover { box-shadow: 0 4px 0 var(--ink); transform: translateY(-1px); }
+  .carte .m { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 600; color: var(--mute); }
+  .carte b { font-size: 13.5px; line-height: 1.3; }
+  .mini { display: flex; height: 6px; border-radius: 99px; overflow: hidden; background: var(--n); }
+  .mini i { display: block; height: 100%; }
+  .pos { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; font-weight: 700; }
+  .pos i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .type { font-size: 11px; color: var(--mute); font-weight: 600; }
+  svg.hemi { width: 100%; max-width: 480px; height: auto; display: block; margin: 0 auto; overflow: visible; }
+  svg.hemi text { cursor: pointer; }
+  .legende { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; font-weight: 600; }
+  .legende i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+  .groupes { display: flex; flex-direction: column; gap: 4px; }
+  .groupe { display: grid; grid-template-columns: 74px 1fr 56px; gap: 8px; align-items: center; background: none; border: 0; padding: 3px 4px; border-radius: 8px; font-size: 12px; text-align: left; }
+  .groupe[aria-pressed="true"] { background: var(--accent-soft); }
+  .groupe b { font-size: 12px; }
+  .barre { display: flex; height: 10px; border-radius: 99px; overflow: hidden; background: var(--n); }
+  .barre i { display: block; height: 100%; }
+  .detail-groupe { background: var(--accent-soft); border-radius: 12px; padding: 10px 12px; font-size: 13px; }
+  .lignes { display: flex; flex-direction: column; }
+  .ligne { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line-soft); font-size: 13px; }
+  .ligne:last-child { border-bottom: 0; }
+  .jauge { position: relative; height: 14px; border-radius: 99px; background: var(--line-soft); border: 1px solid var(--line); }
+  .jauge i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: var(--accent); }
+  .jauge s { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); }
+  .chiffres { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chiffre { flex: 1; min-width: 90px; background: var(--white); border: 1.5px solid var(--ink); border-radius: 12px; padding: 8px 10px; }
+  .chiffre strong { display: block; font-size: 20px; letter-spacing: -0.02em; }
+  .chiffre span { font-size: 11px; color: var(--mute); font-weight: 600; }
+  .accord { display: flex; height: 18px; border-radius: 99px; overflow: hidden; border: 1.5px solid var(--ink); }
+  .accord i { display: block; height: 100%; }
+  .parti { background: var(--white); border: 1.5px solid var(--ink); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+  .parti-tete { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-top: 6px solid var(--bande, var(--ink)); }
+  .pastille { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--ink); background: var(--white); display: grid; place-items: center; overflow: hidden; font-size: 11px; font-weight: 800; }
+  .pastille img { width: 100%; height: 100%; object-fit: contain; }
+  .parti-tete b { font-size: 15px; }
+  .parti-corps { padding: 0 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .mesure { border-left: 3px solid var(--bande, var(--accent)); padding: 2px 0 2px 10px; display: flex; flex-direction: column; gap: 3px; }
+  .mesure b { font-size: 13.5px; line-height: 1.3; }
+  .mesure p { font-size: 13px; color: var(--ink-2); }
+  .mesure .texte { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .mesure.ouverte .texte { display: block; }
+  .sans { font-size: 13px; color: var(--ink-2); padding: 6px 12px 12px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1.5px solid var(--ink); background: var(--white); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--white); }
+  .note { background: var(--accent-soft); border-radius: 12px; padding: 9px 12px; font-size: 12.5px; color: var(--ink-2); }
+  .erreur { background: #FDECEC; border: 1.5px solid #A3262A; border-radius: 12px; padding: 10px 12px; }
+  @media (prefers-reduced-motion: no-preference) { button.carte { transition: transform .12s, box-shadow .12s; } }
+</style>
+</head>
+<body>
+<div id="app"><p class="cap">Chargement de MarIAn…</p></div>
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Liaison avec Claude (protocole MCP Apps : JSON-RPC par postMessage) ----------
+  var nextId = 1, attente = {};
+  function envoyer(m) { window.parent.postMessage(m, "*"); }
+  function requete(methode, params) {
+    var id = nextId++;
+    envoyer({ jsonrpc: "2.0", id: id, method: methode, params: params || {} });
+    return new Promise(function (ok, ko) { attente[id] = { ok: ok, ko: ko }; });
+  }
+  function notifier(methode, params) { envoyer({ jsonrpc: "2.0", method: methode, params: params || {} }); }
+
+  window.addEventListener("message", function (e) {
+    var m = e.data;
+    if (!m || m.jsonrpc !== "2.0") return;
+    if (m.id !== undefined && attente[m.id] && ("result" in m || "error" in m)) {
+      var r = attente[m.id]; delete attente[m.id];
+      if (m.error) r.ko(m.error); else r.ok(m.result);
+      return;
+    }
+    if (m.method === "ui/notifications/tool-result") recevoir(m.params || {});
+    else if (m.method === "ui/notifications/tool-cancelled") afficherErreur("Recherche annulée.");
+    else if (m.method === "ui/resource-teardown") envoyer({ jsonrpc: "2.0", id: m.id, result: {} });
+  });
+
+  // Hauteur de la page : Claude ajuste le cadre.
+  function signalerTaille() {
+    notifier("ui/notifications/size-changed", { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight });
+  }
+  if (window.ResizeObserver) new ResizeObserver(signalerTaille).observe(document.body);
+
+  requete("ui/initialize", {
+    protocolVersion: "2026-01-26",
+    clientInfo: { name: "marian-app", version: "1.0.0" },
+    appCapabilities: { availableDisplayModes: ["inline"] }
+  }).then(function () { notifier("ui/notifications/initialized", {}); signalerTaille(); })
+    .catch(function () { notifier("ui/notifications/initialized", {}); });
+
+  // ---------- Navigation entre les vues ----------
+  var pile = [], app = document.getElementById("app");
+
+  function recevoir(resultat) {
+    if (resultat.isError || !resultat.structuredContent) {
+      var t = (resultat.content || []).map(function (c) { return c.text || ""; }).join(" ");
+      return afficherErreur(t || "Pas de données à afficher.");
+    }
+    pile = [resultat.structuredContent];
+    afficher();
+  }
+  function ouvrirVote(id) {
+    app.style.opacity = "0.6";
+    requete("tools/call", { name: "detail_vote", arguments: { id: id } }).then(function (r) {
+      app.style.opacity = "";
+      if (r && r.structuredContent) { pile.push(r.structuredContent); afficher(); window.scrollTo(0, 0); }
+      else afficherErreur(((r && r.content) || []).map(function (c) { return c.text; }).join(" ") || "Vote introuvable.");
+    }).catch(function () { app.style.opacity = ""; afficherErreur("Impossible d'ouvrir ce vote pour le moment."); });
+  }
+  // Thème d'un programme : on redemande au serveur toutes les mesures de ce thème (pas seulement celles affichées).
+  function ouvrirTheme(theme) {
+    var d = pile[pile.length - 1], args = { parti: d.parti_id, limite: 150 };
+    if (d._theme !== theme) args.theme = theme;
+    app.style.opacity = "0.6";
+    requete("tools/call", { name: "mesures_du_parti", arguments: args }).then(function (r) {
+      app.style.opacity = "";
+      if (r && r.structuredContent) { r.structuredContent._theme = args.theme || null; pile[pile.length - 1] = r.structuredContent; afficher(); }
+    }).catch(function () { app.style.opacity = ""; });
+  }
+  function ouvrirLien(url) {
+    requete("ui/open-link", { url: url }).catch(function () { window.open(url, "_blank", "noopener"); });
+  }
+
+  function afficher() {
+    var d = pile[pile.length - 1], vue = VUES[d.vue];
+    app.innerHTML = '<div class="marque"><b>Mar<span>(IA)</span>n</b>' +
+      (pile.length > 1 ? '<button type="button" class="retour" data-retour>← Retour</button>' : "") + "</div>" +
+      (vue ? vue(d) : '<p class="cap">Vue inconnue.</p>');
+    signalerTaille();
+  }
+  function afficherErreur(texte) {
+    app.innerHTML = '<div class="marque"><b>Mar<span>(IA)</span>n</b></div><div class="erreur">' + esc(texte) + "</div>";
+    signalerTaille();
+  }
+
+  app.addEventListener("click", function (e) {
+    var el = e.target.closest("[data-retour],[data-vote],[data-lien],[data-groupe],[data-theme],[data-ouvrir]");
+    if (!el) return;
+    if (el.hasAttribute("data-retour")) { pile.pop(); afficher(); }
+    else if (el.hasAttribute("data-vote")) ouvrirVote(el.getAttribute("data-vote"));
+    else if (el.hasAttribute("data-lien")) { e.preventDefault(); ouvrirLien(el.getAttribute("data-lien")); }
+    else if (el.hasAttribute("data-groupe")) { var d = pile[pile.length - 1], g = el.getAttribute("data-groupe"); d._groupe = d._groupe === g ? null : g; afficher(); }
+    else if (el.hasAttribute("data-theme")) ouvrirTheme(el.getAttribute("data-theme"));
+    else if (el.hasAttribute("data-ouvrir")) { el.closest(".mesure").classList.toggle("ouverte"); signalerTaille(); }
+  });
+
+  // ---------- Petits outils d'affichage ----------
+  var COUL = { pour: "var(--p)", contre: "var(--c)", abstention: "var(--a)" };
+  var MOIS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function date(iso) { if (!iso) return ""; var p = iso.slice(0, 10).split("-"); return +p[2] + " " + MOIS[+p[1] - 1] + " " + p[0]; }
+  function lien(url, texte) { return url ? '<button type="button" class="lien" data-lien="' + esc(url) + '">' + esc(texte) + " ↗</button>" : ""; }
+  function couleurPosition(pos) { var k = (pos || "").split(" ")[0]; return COUL[k] || "var(--n)"; }
+  function position(v) {
+    if (!v) return "";
+    return '<span class="pos"><i style="background:' + couleurPosition(v.position) + '"></i>' + esc(v.position) + "</span>" +
+      (v.type && v.type !== "vote personnel" ? ' <span class="type">· ' + esc(v.type) + (v.groupe ? " " + esc(v.groupe) : "") + "</span>" : "");
+  }
+  function resultat(l) { var ok = l.resultat === "adopté"; return '<span class="pill ' + (ok ? "ok" : "ko") + '">' + (ok ? "Adopté" : "Rejeté") + "</span>"; }
+  function mini(l) {
+    var t = (l.pour + l.contre + l.abstentions) || 1;
+    return '<span class="mini"><i style="width:' + 100 * l.pour / t + '%;background:var(--p)"></i><i style="width:' + 100 * l.abstentions / t +
+      '%;background:var(--a)"></i><i style="width:' + 100 * l.contre / t + '%;background:var(--c)"></i></span>';
+  }
+  function carteVote(l, extra) {
+    return '<button type="button" class="carte" data-vote="' + esc(l.id) + '"><span class="m"><span>' + date(l.date) + (l.lecture ? " · " + esc(l.lecture) : "") +
+      "</span>" + resultat(l) + "</span><b>" + esc(l.titre) + "</b>" + (extra || mini(l)) + "</button>";
+  }
+  function source(d) { var s = d.source || d.source_donnees; return s ? '<p class="cap">Source : ' + esc(s.donnees) + (s.votes_a_jour_au ? " · votes à jour au " + date(s.votes_a_jour_au) : "") + "</p>" : ""; }
+
+  // Sièges d'un hémicycle de n places, de gauche à droite (même dessin que le site, js/app.js).
+  function sieges(n) {
+    var RANGS = 11, R0 = 62, R1 = 172, CX = 200, CY = 192, rayons = [], tot = 0, r, pts = [];
+    for (r = 0; r < RANGS; r++) { var rad = R0 + (R1 - R0) * r / (RANGS - 1); rayons.push(rad); tot += rad; }
+    var par = rayons.map(function (rad) { return Math.round(n * rad / tot); });
+    par[RANGS - 1] += n - par.reduce(function (a, b) { return a + b; }, 0);
+    rayons.forEach(function (rad, i) {
+      for (var k = 0; k < par[i]; k++) {
+        var a = Math.PI * (1 - (par[i] > 1 ? k / (par[i] - 1) : 0.5));
+        pts.push({ x: CX + rad * Math.cos(a), y: CY - rad * Math.sin(a), a: a });
+      }
+    });
+    pts.sort(function (p, q) { return q.a - p.a || Math.hypot(p.x - CX, p.y - CY) - Math.hypot(q.x - CX, q.y - CY); });
+    return { pts: pts, cx: CX, cy: CY, r1: R1 };
+  }
+
+  // ---------- Les vues ----------
+  function vueVote(d) {
+    var gs = (d.groupes_de_gauche_a_droite || []).filter(function (g) { return g.membres > 0; });
+    var n = gs.reduce(function (a, g) { return a + g.membres; }, 0), H = sieges(n), i = 0, points = "", noms = "", choix = d._groupe;
+    var C = { p: "#2E9D57", a: "#8C9BB5", c: "#D9480F", n: "#E6DFC6" };
+    gs.forEach(function (g) {
+      var nv = Math.max(0, g.membres - g.pour - g.contre - g.abstention), suite = [], debut = i;
+      [["p", g.pour], ["a", g.abstention], ["c", g.contre], ["n", nv]].forEach(function (x) { for (var j = 0; j < x[1]; j++) suite.push(x[0]); });
+      suite.slice(0, g.membres).forEach(function (k) {
+        var p = H.pts[i++];
+        if (p) points += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="3.9" fill="' + C[k] + '" opacity="' + (choix && choix !== g.groupe ? 0.15 : 1) + '"/>';
+      });
+      var milieu = H.pts[Math.floor((debut + i - 1) / 2)];
+      if (g.membres >= 12 && milieu) {
+        noms += '<text data-groupe="' + esc(g.groupe) + '" x="' + (H.cx + (H.r1 + 15) * Math.cos(milieu.a)).toFixed(1) + '" y="' + (H.cy - (H.r1 + 15) * Math.sin(milieu.a)).toFixed(1) +
+          '" text-anchor="middle" dominant-baseline="middle" font-size="9.5" font-weight="800" fill="' + (choix === g.groupe ? "#1A3DB8" : "#444A60") + '">' + esc(g.groupe) + "</text>";
+      }
+    });
+    var sel = choix && gs.filter(function (g) { return g.groupe === choix; })[0];
+    var absents = n - d.pour - d.contre - d.abstentions;
+    return '<div class="box"><p class="cap">' + date(d.date) + (d.lecture ? " · " + esc(d.lecture) : "") + (d.solennel ? " · scrutin solennel" : "") + " · " + esc(d.legislature) + "</p>" +
+      "<h1>" + esc(d.titre) + "</h1>" +
+      '<span class="pill ' + (d.resultat === "adopté" ? "ok" : "ko") + '">' + (d.resultat === "adopté" ? "Adopté" : "Rejeté") + " · " + d.pour + " pour, " + d.contre + " contre, " + d.abstentions + " abst.</span>" +
+      '<svg class="hemi" viewBox="0 0 400 205" role="img" aria-label="Hémicycle : ' + d.pour + " pour, " + d.contre + ' contre">' + points + noms +
+      '<text x="200" y="172" text-anchor="middle" font-size="24" font-weight="800" fill="#0B1636">' + d.pour + " / " + d.voix_necessaires + "</text>" +
+      '<text x="200" y="190" text-anchor="middle" font-size="10.5" font-weight="600" fill="#555B70">voix pour / voix nécessaires</text></svg>' +
+      '<div class="legende"><span><i style="background:var(--p)"></i>Pour</span><span><i style="background:var(--a)"></i>Abstention</span><span><i style="background:var(--c)"></i>Contre</span><span><i style="background:var(--n)"></i>N’a pas voté (' + absents + ")</span></div>" +
+      (sel ? '<div class="detail-groupe"><b>' + esc(sel.nom) + "</b> : " + sel.pour + " pour, " + sel.contre + " contre, " + sel.abstention + " abstention, " +
+        Math.max(0, sel.membres - sel.pour - sel.contre - sel.abstention) + " n’ont pas voté, sur " + sel.membres + " députés" + (sel.cohesion != null ? " · cohésion " + sel.cohesion + " %" : "") + "</div>"
+        : '<p class="cap">Touche un groupe pour allumer ses sièges.</p>') +
+      lien(d.source, "Voir le scrutin officiel") + "</div>" +
+      "<h2>Groupe par groupe, de gauche à droite</h2><div class=\"groupes\">" + gs.map(function (g) {
+        return '<button type="button" class="groupe" data-groupe="' + esc(g.groupe) + '" aria-pressed="' + (choix === g.groupe) + '" title="' + esc(g.nom) + '"><b>' + esc(g.groupe) + '</b><span class="barre"><i style="width:' +
+          100 * g.pour / g.membres + '%;background:var(--p)"></i><i style="width:' + 100 * g.abstention / g.membres + '%;background:var(--a)"></i><i style="width:' + 100 * g.contre / g.membres +
+          '%;background:var(--c)"></i></span><span class="cap">' + esc(g.position) + "</span></button>";
+      }).join("") + "</div>" +
+      "<h2>Les candidats</h2><div class=\"box lignes\">" + (d.votes_des_candidats || []).map(function (c) {
+        return '<div class="ligne"><span>' + esc(c.candidat) + "</span><span>" + position(c) + "</span></div>";
+      }).join("") + "</div>" +
+      '<p class="cap">Quand un candidat ne siégeait pas, c’est le vote de son groupe, indiqué comme tel. Dans un groupe, la place de chaque député est indicative.</p>' + source(d.source_donnees ? { source: d.source_donnees } : d);
+  }
+
+  function vueCandidat(d) {
+    var part = d.participation, med = part && part.mediane_de_l_hemicycle_aux_solennels, sol = part && part.scrutins_solennels;
+    var g0 = d.grands_votes_personnels || {}, g = {};
+    ["pour", "contre", "abstention"].concat(Object.keys(g0)).forEach(function (k) { if (g0[k] != null && !(k in g)) g[k] = g0[k]; });
+    return '<div class="box"><h1>' + esc(d.candidat) + '</h1><p class="cap">' + esc(d.parti || "") + (d.depute ? " · député(e) entre 2022 et aujourd’hui" : " · pas de mandat de député depuis 2022 : ce sont les votes de son groupe") + "</p>" +
+      ((d.mandats_de_depute || []).length ? '<div class="lignes">' + d.mandats_de_depute.map(function (m) {
+        return '<div class="ligne"><span>' + esc(m.legislature) + "e législature</span><span>" + date(m.debut) + " → " + (m.fin ? date(m.fin) : "aujourd’hui") + "</span></div>";
+      }).join("") + "</div>" : "") + "</div>" +
+      (sol ? "<h2>Participation aux scrutins solennels</h2><div class=\"box\"><div class=\"jauge\"><i style=\"width:" + sol.taux + '%"></i>' + (med ? '<s style="left:' + med.taux + '%" title="médiane"></s>' : "") + "</div>" +
+        "<p><b>" + sol.taux + " %</b> (" + sol.votes + " sur " + sol.scrutins + ")" + (med ? " · médiane de l’hémicycle : " + med.taux + " % (trait noir)" : "") + "</p>" +
+        '<p class="cap">Les scrutins solennels sont les grands votes annoncés à l’avance. Le taux sur tous les scrutins est bas pour tous les députés : des milliers d’amendements.</p></div>' : "") +
+      (Object.keys(g).length ? '<h2>Ses grands votes personnels</h2><div class="chiffres">' + Object.keys(g).map(function (k) {
+        return '<div class="chiffre"><strong>' + g[k] + "</strong><span>" + esc(k.split(" (")[0]) + "</span></div>";
+      }).join("") + "</div>" : "") +
+      "<h2>Les votes clés choisis par MarIAn</h2><div class=\"grille\">" + (d.votes_cles_choisis_par_marian || []).map(function (v) {
+        var tete = '<span class="m"><span>' + esc(v.contexte || "") + "</span>" + (v.resultat ? '<span class="pill ' + (v.resultat === "adopté" ? "ok" : "ko") + '">' + esc(v.resultat) + "</span>" : "") + "</span><b>" + esc(v.vote) + "</b>" +
+          '<span class="cap">' + esc(v.resume || "") + "</span>" + (v.son_vote ? position({ position: v.son_vote }) : '<span class="type">Vote de son groupe : voir l’hémicycle</span>');
+        return v.id ? '<button type="button" class="carte" data-vote="' + esc(v.id) + '">' + tete + "</button>" : '<div class="carte">' + tete + "</div>";
+      }).join("") + "</div>" + source(d);
+  }
+
+  function vueListeVotes(d) {
+    var votes = d.votes || [];
+    var titre = d.candidat ? "Ce qu’a voté <span>" + esc(d.candidat) + "</span>" : "Les grands <span>votes</span>";
+    return "<h1>" + titre + '</h1><p class="cap">' + d.nombre_trouve + " vote" + (d.nombre_trouve > 1 ? "s" : "") + " trouvé" + (d.nombre_trouve > 1 ? "s" : "") +
+      (votes.length < d.nombre_trouve ? ", " + votes.length + " affichés" : "") + ", du plus récent au plus ancien. Touche un vote pour voir son hémicycle.</p>" +
+      (votes.length ? '<div class="grille">' + votes.map(function (l) { return carteVote(l, l.vote ? mini(l) + position(l.vote) : null); }).join("") + "</div>" : '<div class="box"><p>Aucun grand vote trouvé.</p></div>') +
+      (d.regle ? '<p class="note">' + esc(d.regle) + "</p>" : "") + source(d);
+  }
+
+  function vueComparaison(d) {
+    var a = d.candidats[0], b = d.candidats[1], tot = d.votes_compares || 0;
+    var ex = d.exemples_de_desaccords || [];
+    return "<h1>" + esc(a) + " <span>et</span> " + esc(b) + '</h1><p class="cap">Catégorie : ' + esc(d.categorie) + "</p>" +
+      (tot ? '<div class="box"><div class="accord"><i style="width:' + 100 * d.meme_position / tot + '%;background:var(--p)"></i><i style="width:' + 100 * d.positions_differentes / tot + '%;background:var(--c)"></i></div>' +
+        '<div class="chiffres"><div class="chiffre"><strong>' + d.meme_position + "</strong><span>fois la même position</span></div>" +
+        '<div class="chiffre"><strong>' + d.positions_differentes + "</strong><span>fois des positions différentes</span></div>" +
+        '<div class="chiffre"><strong>' + tot + "</strong><span>votes comparés (" + d.dont_deux_votes_personnels + " avec leurs deux votes personnels)</span></div></div></div>"
+        : '<div class="box"><p>Aucun grand vote où l’on connaît leurs deux positions.</p></div>') +
+      '<p class="note">' + esc(d.regle) + "</p>" +
+      (ex.length ? "<h2>Quand ils n’ont pas voté pareil</h2><div class=\"grille\">" + ex.map(function (x) {
+        return '<button type="button" class="carte" data-vote="' + esc(x.id) + '"><span class="m"><span>' + date(x.date) + "</span></span><b>" + esc(x.vote) + "</b>" +
+          '<span class="pos">' + esc(a) + " : " + esc(x[a]) + '</span><span class="pos">' + esc(b) + " : " + esc(x[b]) + "</span></button>";
+      }).join("") + "</div>" : "") + source(d);
+  }
+
+  function pastille(id, look, nom) {
+    var l = (look || {})[id] || {};
+    return '<span class="pastille">' + (l.logo ? '<img src="' + esc(l.logo) + '" alt="">' : esc(l.sigle || (nom || "?").slice(0, 2))) + "</span>";
+  }
+  function bande(id, look) { var l = (look || {})[id]; return l ? ' style="--bande:' + esc(l.couleur) + '"' : ""; }
+  function mesure(m) {
+    return '<div class="mesure">' + (m.theme ? '<span class="type">' + esc(m.theme) + (m.repere ? " · " + esc(m.repere) : "") + "</span>" : "") +
+      "<b>" + esc(m.titre || m.texte) + "</b>" + (m.texte && m.texte !== m.titre ? '<p class="texte">' + esc(m.texte) + '</p><button type="button" class="lien" data-ouvrir>Lire en entier</button>' : "") +
+      lien(m.source, "Dans le programme" + (m.page ? ", page " + m.page : "")) + "</div>";
+  }
+  function carteParti(id, nom, look, corps) {
+    return '<div class="parti"' + bande(id, look) + '><div class="parti-tete">' + pastille(id, look, nom) + "<b>" + esc(nom) + "</b></div>" + corps + "</div>";
+  }
+
+  function vueComparerProgrammes(d) {
+    var look = d.partis_affichage;
+    return "<h1>Ce qu’ils proposent : <span>" + esc(d.sujet) + "</span></h1><p class=\"cap\">Partis dans l’ordre alphabétique. Mesures recopiées mot pour mot.</p>" +
+      '<div class="grille">' + d.partis_ordre_alphabetique.map(function (p) {
+        if (!p.programme_dans_marian) return carteParti(p.id, p.parti, look, '<p class="sans">' + esc(p.statut) + "</p>");
+        return carteParti(p.id, p.parti, look, '<div class="parti-corps">' +
+          (p.mesures.length ? p.mesures.map(mesure).join("") + (p.mesures_trouvees > p.mesures.length ? '<p class="cap">Et ' + (p.mesures_trouvees - p.mesures.length) + " autre(s) mesure(s) sur ce sujet.</p>" : "")
+            : "<p class=\"cap\">Aucune mesure sur ce sujet dans ce que MarIAn a de son programme.</p>") +
+          '<p class="cap">' + esc(p.perimetre) + "</p></div>");
+      }).join("") + "</div>" + '<p class="note">' + esc(d.a_savoir) + "</p>";
+  }
+
+  function vueRechercheMesures(d) {
+    var look = d.partis_affichage, parParti = {}, ordre = [];
+    d.mesures.forEach(function (m) { if (!parParti[m.parti_id]) { parParti[m.parti_id] = { nom: m.parti, mesures: [] }; ordre.push(m.parti_id); } parParti[m.parti_id].mesures.push(m); });
+    return "<h1>« <span>" + esc(d.recherche) + "</span> » dans les programmes</h1><p class=\"cap\">" + d.nombre_trouve + " mesure" + (d.nombre_trouve > 1 ? "s" : "") + " trouvée" + (d.nombre_trouve > 1 ? "s" : "") + "</p>" +
+      (ordre.length ? '<div class="grille">' + ordre.map(function (id) {
+        var p = parParti[id];
+        return carteParti(id, p.nom, look, '<div class="parti-corps">' + p.mesures.map(mesure).join("") + '<p class="cap">' + esc((d.perimetres || {})[p.nom] || "") + "</p></div>");
+      }).join("") + "</div>" : '<div class="box"><p>Aucune mesure trouvée.</p></div>') +
+      ((d.partis_sans_programme_dans_marian || []).length ? '<p class="cap">Pas de programme dans MarIAn : ' + d.partis_sans_programme_dans_marian.map(function (p) { return esc(p.parti); }).join(", ") + ".</p>" : "") +
+      '<p class="note">' + esc(d.a_savoir) + "</p>";
+  }
+
+  function vueMesuresParti(d) {
+    var look = d.partis_affichage;
+    if (d.programme_dans_marian === false) return carteParti(d.parti_id, d.parti, look, '<p class="sans">' + esc(d.statut) + "</p>");
+    var themes = d.themes_du_programme || [], th = d._theme, liste = d.mesures;
+    return carteParti(d.parti_id, d.parti, look, '<div class="parti-corps"><p class="cap">' + esc(d.programme || "") + "</p>" +
+        '<p class="note">' + esc(d.perimetre) + "</p>" +
+        (themes.length > 1 ? '<div class="chips">' + themes.map(function (t) {
+          return '<button type="button" class="chip" data-theme="' + esc(t.theme) + '" aria-pressed="' + (th === t.theme) + '">' + esc(t.theme) + " " + t.mesures + "</button>";
+        }).join("") + "</div>" : "") +
+        (liste.length ? liste.map(mesure).join("") : '<p class="cap">Aucune mesure.</p>') +
+        (d.nombre_trouve > d.mesures.length ? '<p class="cap">' + d.mesures.length + " mesures affichées sur " + d.nombre_trouve + ". Demande à Claude un thème précis pour voir les autres.</p>" : "") +
+        ((d.themes_annonces_sans_mesure || []).length ? '<p class="cap">Annoncés sans mesure encore publiée : ' + d.themes_annonces_sans_mesure.map(function (x) { return esc(String(x).replace(/\.$/, "")); }).join(" · ") + "</p>" : "") +
+        "</div>") + '<p class="note">' + esc(d.a_savoir) + "</p>";
+  }
+
+  var VUES = {
+    detail_vote: vueVote, bilan_candidat: vueCandidat,
+    rechercher_votes: vueListeVotes, vote_du_candidat: vueListeVotes, comparer_candidats: vueComparaison,
+    comparer_programmes: vueComparerProgrammes, rechercher_mesures: vueRechercheMesures, mesures_du_parti: vueMesuresParti
+  };
+})();
+</script>
+</body>
+</html>

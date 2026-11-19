@@ -6,6 +6,7 @@ MarIAn publie ses données sous forme d'**outils pour les assistants IA** (proto
 - **Code :** `api/mcp.py`. Vercel le publie automatiquement comme une fonction, à chaque fusion dans `main`, comme le reste du site.
 - **Lecture seule, aucun secret :** les votes viennent de Supabase avec la clé publique du site, les programmes de `data/programmes.js`. Rien ne peut être modifié par ce serveur.
 - **Aucune IA dans le serveur :** il renvoie des faits sourcés. C'est l'assistant qui comprend la question, choisit les outils et rédige la réponse.
+- **Avec une interface (MCP App) :** dans Claude, les réponses s'affichent aussi en visuel dans la conversation : hémicycle, fiche candidat, programmes côte à côte (voir plus bas).
 
 ## L'ajouter dans claude.ai
 
@@ -26,6 +27,28 @@ Dans Claude Code : `claude mcp add --transport http marian https://agenticia-vf.
 | `mesures_du_parti` | Les mesures d'un parti, mot pour mot, par thème ou par mots, avec leur lien |
 | `rechercher_mesures` | Un mot cherché dans tous les programmes publiés dans MarIAn |
 | `comparer_programmes` | Sur un sujet, les mesures de chaque parti, dans l'ordre alphabétique, ou « pas encore de programme » |
+
+## L'interface (MCP App)
+
+Depuis novembre 2026, le serveur suit l'extension **MCP Apps** (spécification du 26 janvier 2026). Les assistants qui la gèrent, comme Claude, affichent une interface aux couleurs du site sous la réponse :
+
+| Vue | Outils | Ce qu'on voit |
+| --- | --- | --- |
+| Hémicycle | `detail_vote` | Le même hémicycle que le site ; toucher un groupe allume ses sièges ; le vote de chaque candidat |
+| Fiche candidat | `bilan_candidat` | Mandats, jauge de participation et médiane, votes clés (touchés : leur hémicycle) |
+| Liste de votes | `rechercher_votes`, `vote_du_candidat` | Cartes de votes (touchées : leur hémicycle), avec la position du candidat |
+| Comparaison | `comparer_candidats` | Barre « même position / positions différentes », désaccords (touchés : leur hémicycle) |
+| Programmes | `comparer_programmes`, `rechercher_mesures`, `mesures_du_parti` | Une carte par parti avec son logo et sa couleur, les mesures mot pour mot, le périmètre ; thèmes cliquables |
+
+Comment c'est fait :
+
+- La page est **`mcp/app.html`** (HTML, CSS et JavaScript simples, une seule page pour toutes les vues). Le serveur la sert sous l'adresse `ui://marian/app` (`resources/read`) ; chaque outil y renvoie par `_meta.ui.resourceUri`.
+- Chaque réponse d'outil contient **deux versions** : `content` (le texte que lit l'assistant, inchangé) et `structuredContent` (les mêmes données pour l'affichage, plus les couleurs et logos des partis, lus dans `js/data.js`). L'interface ne reçoit que la seconde.
+- Quand on touche un vote ou un thème, l'interface **appelle elle-même** `detail_vote` ou `mesures_du_parti`, sans repasser par l'assistant.
+- **Sécurité :** Claude affiche la page dans un cadre isolé. Elle ne peut charger que les logos du site (`agenticia-vf.vercel.app`) et aucune autre connexion (règle par défaut des MCP Apps, déclarée dans `_meta.ui.csp`).
+- Un assistant qui ne gère pas les interfaces reçoit les mêmes réponses en texte : rien ne change pour lui.
+
+Après une mise à jour des outils, il peut falloir **retirer puis rajouter le connecteur** dans claude.ai pour que Claude recharge la liste.
 
 ## Les règles (les mêmes que sur le site)
 
@@ -49,6 +72,8 @@ python3 api/mcp.py 8001
 
 Le serveur répond alors sur `http://localhost:8001/api/mcp` (sur un Mac, ajouter `SSL_CERT_FILE=/etc/ssl/cert.pem` devant la commande si Python ne trouve pas les certificats). Pour l'essayer avec un vrai assistant : `npx @modelcontextprotocol/inspector`, ou Claude Code avec l'adresse locale.
 
+Pour voir l'interface sans claude.ai, une page « hôte » de test simule Claude : elle lit `ui://marian/app`, l'affiche dans un cadre et lui envoie le résultat d'un outil (protocole `ui/initialize`, `ui/notifications/tool-result`). Elle est dans `mcp/hote-de-test.html` : lancer `python3 api/mcp.py 8001` et `python3 -m http.server 8002 --directory mcp`, puis ouvrir par exemple `http://localhost:8002/hote-de-test.html?outil=detail_vote&args={"id":"VTANR5L17V3300"}`.
+
 ## Modifier un outil
 
-Chaque outil est une fonction de `api/mcp.py`, décrite dans la liste `OUTILS` : nom, titre, **description** et paramètres. La description est ce que lit l'assistant pour choisir l'outil : la soigner autant que le code. Après une modification, relancer le serveur en local et appeler l'outil avant d'ouvrir la pull request.
+Chaque outil est une fonction de `api/mcp.py`, décrite dans la liste `OUTILS` : nom, titre, **description** et paramètres. La description est ce que lit l'assistant pour choisir l'outil : la soigner autant que le code. Sa vue est la fonction du même nom dans `VUES`, en bas de `mcp/app.html`. Après une modification, relancer le serveur en local et appeler l'outil avant d'ouvrir la pull request.
