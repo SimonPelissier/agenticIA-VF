@@ -21,3 +21,4 @@ Mis à jour à la fin de chaque tâche.
 | Veille médias : publication automatique des déclarations et lecture de tous les articles | Simon | Terminé | Après fusion : mettre à jour le texte de la routine et la relancer (Claude) ; surveiller les premières publications automatiques ; retirer au besoin une déclaration dans Supabase (refusee) |
 | Affichage adapté à l'appareil : téléphone, tablette, ordinateur | Simon | Terminé | Vérifier sur de vrais appareils (iPad, ordinateur portable, grand écran) |
 | Serveur MCP public de MarIAn (outils Votes et Programmes) | Simon | Terminé | Après fusion : tester l'adresse publique, l'ajouter dans claude.ai ; plus tard : outils Actualité et « dit et vote » |
+| MCP App : interfaces visuelles du serveur MCP dans Claude | Simon | En cours | |
