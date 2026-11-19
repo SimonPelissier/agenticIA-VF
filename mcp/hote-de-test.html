@@ -1,0 +1,23 @@
+<!doctype html><meta charset="utf-8"><title>Hôte de test de la MCP App</title>
+<!-- Simule Claude pour tester mcp/app.html en local (voir docs/mcp.md). Jamais utilisé en ligne. -->
+<style>body{margin:0;padding:16px;background:#f4f3ee;font:13px system-ui}iframe{border:0;width:100%;display:block}#log{font:11px monospace;color:#888;white-space:pre-wrap;margin-top:8px}</style>
+<iframe id="vue" sandbox="allow-scripts allow-same-origin"></iframe><div id="log"></div>
+<script>
+var q = new URLSearchParams(location.search), MCP = "http://localhost:8001/api/mcp", n = 1;
+var outil = q.get("outil"), args = JSON.parse(q.get("args") || "{}"), clic = q.get("clic");
+function log(t){ document.getElementById("log").textContent += t + "\n"; }
+function rpc(method, params){ return fetch(MCP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:n++,method:method,params:params})}).then(function(r){return r.json();}); }
+var f = document.getElementById("vue");
+function vers(m){ f.contentWindow.postMessage(m,"*"); }
+window.addEventListener("message", function(e){
+  var m = e.data; if (!m || m.jsonrpc!=="2.0" || e.source!==f.contentWindow) return;
+  if (m.method==="ui/initialize") { log("← ui/initialize v"+m.params.protocolVersion); vers({jsonrpc:"2.0",id:m.id,result:{protocolVersion:"2026-01-26",hostInfo:{name:"faux-claude",version:"1"},hostCapabilities:{openLinks:{},serverTools:{}},hostContext:{theme:"light",displayMode:"inline"}}}); }
+  else if (m.method==="ui/notifications/initialized") { log("← initialized ; appel de "+outil);
+    rpc("tools/call",{name:outil,arguments:args}).then(function(r){ vers({jsonrpc:"2.0",method:"ui/notifications/tool-input",params:{arguments:args}}); vers({jsonrpc:"2.0",method:"ui/notifications/tool-result",params:r.result});
+      if (clic) setTimeout(function(){ var el=f.contentDocument.querySelector(clic); log("clic sur "+clic+" : "+(el?"trouvé":"absent")); if(el) el.click(); }, 800); }); }
+  else if (m.method==="tools/call") { log("← tools/call "+m.params.name+" "+JSON.stringify(m.params.arguments)); rpc("tools/call",m.params).then(function(r){ vers({jsonrpc:"2.0",id:m.id,result:r.result}); }); }
+  else if (m.method==="ui/notifications/size-changed") { f.style.height = m.params.height + "px"; }
+  else if (m.method==="ui/open-link") { log("← open-link "+m.params.url); vers({jsonrpc:"2.0",id:m.id,result:{}}); }
+});
+rpc("resources/read",{uri:"ui://marian/app"}).then(function(r){ var c=r.result.contents[0]; log("ressource "+c.uri+" "+c.mimeType+" csp="+JSON.stringify(c._meta.ui.csp)); f.srcdoc = c.text; });
+</script>

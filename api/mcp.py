@@ -9,6 +9,10 @@ Lecture seule, aucun secret :
 Aucune IA ici : le serveur renvoie des faits sourcés, c'est le client (Claude) qui rédige la réponse.
 Mêmes règles que le site : jamais de classement ni de note, une source pour chaque information.
 
+Interface (MCP App) : les outils renvoient aussi des données d'affichage (structuredContent) et pointent vers
+la page ui://marian/app (fichier mcp/app.html), que Claude affiche dans la conversation : hémicycle, fiche
+candidat, programmes côte à côte… La réponse en texte (content) reste celle que lit Claude.
+
 Protocole : MCP en « Streamable HTTP » sans session (chaque requête POST est indépendante, réponse JSON).
 Sans librairie, comme les agents (Python 3.7 ou plus récent) : on peut le tester sur un ordinateur avec
   python3 api/mcp.py 8001          puis   http://localhost:8001/api/mcp
@@ -75,13 +79,31 @@ def donnees_votes():
     return _en_cache("votes", charger)
 
 
+def _fichier_du_site(chemin):
+    """Un fichier publié du site : lu sur le disque s'il est là (essai local), sinon sur le site en ligne."""
+    local = os.path.join(RACINE, *chemin.split("/"))
+    if os.path.exists(local):
+        with open(local, encoding="utf-8") as f:
+            return f.read()
+    return _lire_url(SITE + "/" + chemin)
+
+
+def apparence_partis():
+    """Couleur, sigle et logo de chaque parti, lus dans js/data.js (la même source que le site)."""
+    def charger():
+        partis = {}
+        for ligne in _fichier_du_site("js/data.js").splitlines():
+            m = re.match(r'\s*"([\w-]+)": \{ sigle: "([^"]+)", couleur: "(#[0-9A-Fa-f]{6})"', ligne)
+            if m:
+                logo = re.search(r'logo: "([^"]+)"', ligne)
+                partis[m.group(1)] = {"sigle": m.group(2), "couleur": m.group(3), "logo": SITE + "/" + logo.group(1) if logo else None}
+        return partis
+    return _en_cache("apparence", charger)
+
+
 def donnees_programmes():
     def charger():
-        chemin = os.path.join(RACINE, "data", "programmes.js")
-        if os.path.exists(chemin):
-            with open(chemin, encoding="utf-8") as f:
-                return _js(f.read())
-        return _js(_lire_url(SITE + "/data/programmes.js"))
+        return _js(_fichier_du_site("data/programmes.js"))
     return _en_cache("programmes", charger)
 
 
@@ -286,7 +308,7 @@ def bilan_candidat(args):
     for vc in v["site_donnees"]["votesCles"]:
         perso = (fiche.get("votesCles") or {}).get(vc["id"])
         off = vc.get("officiel") or {}
-        cles.append({"vote": vc["title"], "contexte": vc.get("context"), "resume": vc.get("summary"), "date": off.get("date"),
+        cles.append({"id": off.get("uid"), "vote": vc["title"], "contexte": vc.get("context"), "resume": vc.get("summary"), "date": off.get("date"),
                      "resultat": off.get("sort"), "source": off.get("url") or (vc.get("source") or {}).get("url"),
                      "son_vote": None if not perso else (perso.get("position") if perso.get("siegeait") else "ne siégeait pas"),
                      "groupe": perso and perso.get("groupe")})
@@ -366,7 +388,7 @@ def _mesure(m, x=None):
     sortie = {"theme": m.get("chapitre"), "repere": m.get("repere"), "titre": m.get("titre"), "texte": m.get("texte"),
               "source": m.get("url"), "page": m.get("page")}
     if x:
-        sortie = dict({"parti": x["nom"]}, **sortie)
+        sortie = dict({"parti": x["nom"], "parti_id": x["id"]}, **sortie)
     return {k: val for k, val in sortie.items() if val is not None}
 
 
@@ -380,7 +402,7 @@ def mesures_du_parti(args):
     p = donnees_programmes()
     x = _parti(p, args.get("parti") or "")
     if x["statut"] != "publie":
-        return {"parti": x["nom"], "programme_dans_marian": False, "statut": _statut(x)}
+        return {"parti": x["nom"], "parti_id": x["id"], "programme_dans_marian": False, "statut": _statut(x)}
     mesures = [m for m in x["mesures"]
                if (not args.get("theme") or correspond(args["theme"], m.get("chapitre"), m.get("partie")))
                and (not args.get("texte") or correspond(args["texte"], m.get("titre"), m.get("texte")))]
@@ -389,7 +411,7 @@ def mesures_du_parti(args):
     for m in x["mesures"]:   # dans l'ordre du programme
         themes[m.get("chapitre")] = themes.get(m.get("chapitre"), 0) + 1
     return {
-        "parti": x["nom"], "programme": x.get("programme"), "perimetre": _perimetre(x),
+        "parti": x["nom"], "parti_id": x["id"], "programme": x.get("programme"), "perimetre": _perimetre(x),
         "themes_du_programme": [{"theme": th, "mesures": nb} for th, nb in themes.items()],
         "themes_annonces_sans_mesure": [c.get("chapitre") for c in x.get("a_venir") or []],
         "nombre_trouve": len(mesures), "affichees": min(n, len(mesures)),
@@ -410,7 +432,7 @@ def rechercher_mesures(args):
     return {
         "recherche": texte, "nombre_trouve": len(trouvees), "affichees": min(n, len(trouvees)),
         "mesures": [_mesure(m, x) for x, m in trouvees[:n]],
-        "partis_sans_programme_dans_marian": [x["nom"] for x in partis if x["statut"] != "publie"],
+        "partis_sans_programme_dans_marian": [{"parti": x["nom"], "id": x["id"], "statut": _statut(x)} for x in partis if x["statut"] != "publie"],
         "perimetres": {x["nom"]: _perimetre(x) for x in partis if x["statut"] == "publie"},
         "a_savoir": AVERTISSEMENT, "verifie_le": p.get("verifieLe"),
     }
@@ -425,10 +447,10 @@ def comparer_programmes(args):
     partis = []
     for x in sorted(p["partis"], key=par_nom):
         if x["statut"] != "publie":
-            partis.append({"parti": x["nom"], "programme_dans_marian": False, "statut": _statut(x)})
+            partis.append({"parti": x["nom"], "id": x["id"], "programme_dans_marian": False, "statut": _statut(x)})
             continue
         mesures = [m for m in x["mesures"] if correspond(texte, m.get("titre"), m.get("texte"), m.get("chapitre"))]
-        partis.append({"parti": x["nom"], "programme_dans_marian": True, "perimetre": _perimetre(x),
+        partis.append({"parti": x["nom"], "id": x["id"], "programme_dans_marian": True, "perimetre": _perimetre(x),
                        "mesures_trouvees": len(mesures), "mesures": [_mesure(m) for m in mesures[:n]]})
     return {"sujet": texte, "partis_ordre_alphabetique": partis, "a_savoir": AVERTISSEMENT, "verifie_le": p.get("verifieLe")}
 
@@ -505,6 +527,23 @@ OUTILS = [
 PAR_NOM = {o[0]: o for o in OUTILS}
 
 
+# ---------- Interface (MCP App) ----------
+
+UI_URI = "ui://marian/app"
+UI_MIME = "text/html;profile=mcp-app"
+# Seule origine externe permise dans l'interface : le site, pour les logos des partis.
+UI_META = {"ui": {"csp": {"resourceDomains": [SITE]}, "prefersBorder": False}}
+SANS_INTERFACE = {"references"}
+
+
+def donnees_affichage(nom, donnees):
+    """Ce que reçoit l'interface : les données de l'outil, le nom de la vue, et l'apparence des partis."""
+    affichage = dict(donnees, vue=nom)
+    if nom in ("mesures_du_parti", "rechercher_mesures", "comparer_programmes"):
+        affichage["partis_affichage"] = apparence_partis()
+    return affichage
+
+
 # ---------- Protocole MCP (JSON-RPC) ----------
 
 def repondre(message):
@@ -517,14 +556,26 @@ def repondre(message):
     if methode == "initialize":
         demandee = params.get("protocolVersion")
         resultat = {"protocolVersion": demandee if demandee in VERSIONS else VERSIONS[0],
-                    "capabilities": {"tools": {"listChanged": False}},
+                    "capabilities": {"tools": {"listChanged": False}, "resources": {"listChanged": False}},
                     "serverInfo": {"name": "marian", "title": "MarIAn · Présidentielle 2027", "version": "1.0.0"},
                     "instructions": INSTRUCTIONS}
     elif methode == "ping":
         resultat = {}
     elif methode == "tools/list":
-        resultat = {"tools": [{"name": nom, "title": titre, "description": desc, "inputSchema": schema, "annotations": LECTURE}
+        resultat = {"tools": [dict({"name": nom, "title": titre, "description": desc, "inputSchema": schema, "annotations": LECTURE},
+                                   **({} if nom in SANS_INTERFACE else {"_meta": {"ui": {"resourceUri": UI_URI}}}))
                               for nom, _, titre, desc, schema in OUTILS]}
+    elif methode == "resources/list":
+        resultat = {"resources": [{"uri": UI_URI, "name": "Interface de MarIAn", "mimeType": UI_MIME,
+                                   "description": "Hémicycles, fiches candidats et programmes, affichés dans la conversation."}]}
+    elif methode == "resources/read":
+        if params.get("uri") != UI_URI:
+            return {"jsonrpc": "2.0", "id": ident, "error": {"code": -32002, "message": "Ressource inconnue : %s" % params.get("uri")}}
+        try:
+            page = _en_cache("page", lambda: _fichier_du_site("mcp/app.html"))
+        except Exception as e:
+            return {"jsonrpc": "2.0", "id": ident, "error": {"code": -32603, "message": "Interface indisponible : %s" % e}}
+        resultat = {"contents": [{"uri": UI_URI, "mimeType": UI_MIME, "text": page, "_meta": UI_META}]}
     elif methode == "tools/call":
         outil = PAR_NOM.get(params.get("name"))
         if not outil:
@@ -532,6 +583,8 @@ def repondre(message):
         try:
             donnees = outil[1](params.get("arguments") or {})
             resultat = {"content": [{"type": "text", "text": json.dumps(donnees, ensure_ascii=False)}], "isError": False}
+            if outil[0] not in SANS_INTERFACE:
+                resultat["structuredContent"] = donnees_affichage(outil[0], donnees)
         except Erreur as e:
             resultat = {"content": [{"type": "text", "text": str(e)}], "isError": True}
         except Exception as e:   # données injoignables, etc. : l'erreur est dite à Claude au lieu de casser la conversation
