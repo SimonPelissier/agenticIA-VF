@@ -86,7 +86,7 @@
     var recents = MA.articles.filter(function (a) { return a.date >= semaine; });
     var publies = PR.partis.filter(function (p) { return p.statut === "publie"; });
     var dernier = MV.lois[0];
-    return '<div class="screen enter">' + brandBar() +
+    return '<div class="screen enter wide">' + brandBar() +
       '<h1 class="headline">Ce qu’ils promettent.<br><span>Ce qu’ils ont voté.</span></h1>' +
       '<a class="home-card dark" href="#/actu"><span class="hc-top"><span class="hc-ic">' + icon(I.news) + '</span><span class="hc-n">' + recents.length + " article" + (recents.length > 1 ? "s" : "") + " cette semaine</span></span>" +
       '<span class="hc-title">L’actu qui te parle</span>' +
@@ -157,7 +157,7 @@
     }
     var cur = byId(chips, actu.pick) || chips[0];
     var nomsMedias = Object.keys(MA.medias).filter(function (m) { return !p.medias || p.medias.indexOf(m) !== -1; }).map(function (m) { return MA.medias[m]; });
-    return '<div class="screen enter">' + brandBar() +
+    return '<div class="screen enter wide">' + brandBar() +
       '<div class="actu-head"><h1 class="h1">L’actu <span>qui te parle</span></h1><a class="square-btn" href="#/actu/perso" aria-label="Personnaliser mon fil">' + icon(I.sliders) + "</a></div>" +
       '<div class="tabs2" role="tablist"><button type="button" role="tab" data-amode="cand" aria-selected="' + (actu.mode === "cand") + '">Par candidat</button>' +
       '<button type="button" role="tab" data-amode="sujet" aria-selected="' + (actu.mode === "sujet") + '">Par sujet</button></div>' +
@@ -256,7 +256,7 @@
   }
 
   function programmes() {
-    return '<div class="screen enter">' + topbar(null, "Programmes") +
+    return '<div class="screen enter wide">' + topbar(null, "Programmes") +
       '<h1 class="h1" style="font-size:34px">Ce qu’ils <span>proposent</span></h1>' +
       '<p class="note">Les mesures sont recopiées mot pour mot depuis le programme de chaque parti. On ne résume pas et on ne choisit pas : ce sont toutes les mesures quand le parti les publie une à une, sinon celles qu’il met lui-même en avant, ou, s’il n’en désigne pas, celle qu’il présente en premier dans chaque partie de son programme.</p>' +
       '<div class="party-list stagger">' + PARTIS.map(function (p) {
@@ -407,7 +407,7 @@
   }
 
   function votesStart() {
-    return '<div class="screen enter">' + topbar(null, "Qui a voté quoi ?") +
+    return '<div class="screen enter wide">' + topbar(null, "Qui a voté quoi ?") +
       '<h1 class="h1">Qui a voté <span>quoi</span> ?</h1><p class="note">Les ' + MV.lois.length + " grands votes de l’Assemblée depuis 2022 : le vote final des lois, les motions de censure, les déclarations du gouvernement. Données officielles, mises à jour chaque nuit.</p>" +
       '<div class="modes"><a class="mode dark" href="#/votes/sujets"><span class="mode-ic">🗂</span><span><b>Par sujet</b><small>Économie, sécurité, logement… puis les dernières lois</small></span></a>' +
       '<a class="mode" href="#/votes/personnes"><span class="mode-ic">👤</span><span><b>Par personne</b><small>Comment chaque candidat a voté, ou son groupe s’il n’était pas député</small></span></a></div>' +
@@ -419,7 +419,7 @@
     MV.lois.forEach(function (l) { counts[l.cat] = (counts[l.cat] || 0) + 1; if (!last[l.cat]) last[l.cat] = l.date; });
     var q = vs.q.trim().toLowerCase();
     var res = q ? MV.lois.filter(function (l) { return l.titre.toLowerCase().indexOf(q) !== -1; }).slice(0, 20) : null;
-    return '<div class="screen enter">' + topbar("#/votes", "Par sujet") +
+    return '<div class="screen enter wide">' + topbar("#/votes", "Par sujet") +
       '<label class="search">' + icon(I.search, 18) + '<input id="q" type="search" placeholder="Chercher une loi (ex. « logement »)" value="' + esc(vs.q) + '"></label>' +
       (res ? '<p class="eb">' + res.length + " résultat" + (res.length > 1 ? "s" : "") + "</p>" + (res.map(function (l) { return lawRow(l); }).join("") || '<p class="cap">Aucune loi trouvée.</p>')
         : '<p class="eb">Choisis une catégorie</p><div class="cat-tiles">' + MV.categories.filter(function (c) { return counts[c.id]; }).map(function (c) {
@@ -435,7 +435,7 @@
       return l.cat === cat && (vs.filter === "tout" || (vs.filter === "adopte" ? l.sort === "adopté" : vs.filter === "rejete" ? l.sort !== "adopté" : l.leg === vs.filter));
     });
     var f = [["tout", "Tout"], ["17", "Depuis 2024"], ["16", "2022-2024"], ["adopte", "Adoptés"], ["rejete", "Rejetés"]];
-    return '<div class="screen enter">' + topbar("#/votes/sujets", null).replace("</a></div>", '</a><span class="tag">' + CAT_ICON[cat] + " " + esc(catLabel[cat]) + "</span></div>") +
+    return '<div class="screen enter wide">' + topbar("#/votes/sujets", null).replace("</a></div>", '</a><span class="tag">' + CAT_ICON[cat] + " " + esc(catLabel[cat]) + "</span></div>") +
       '<h1 class="h1">Les derniers votes<br><span>' + esc(catLabel[cat].toLowerCase()) + "</span></h1>" +
       '<div class="chips wrap">' + f.map(function (x) { return '<button type="button" class="chip" data-vfilter="' + x[0] + '" aria-pressed="' + (vs.filter === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
       '<p class="cap">' + list.length + " vote" + (list.length > 1 ? "s" : "") + ", du plus récent au plus ancien. Touche une loi pour voir son hémicycle.</p>" +
@@ -508,7 +508,7 @@
   }
 
   function votesPersonnes() {
-    return '<div class="screen enter">' + topbar("#/votes", "Par personne") +
+    return '<div class="screen enter wide">' + topbar("#/votes", "Par personne") +
       '<h1 class="h1">Qui veux-tu <span>checker</span> ?</h1><div class="people stagger">' + D.candidates.map(function (c) {
         return '<a class="person" href="#/votes/personnes/' + c.id + '"><span class="avatar" aria-hidden="true">' + initials(c.name) + '</span><span class="n">' + esc(c.name) + '</span><span class="p">' + esc(c.party) + "<br>" + esc(candRole(c)) + "</span></a>";
       }).join("") + '</div><p class="cap">Ordre alphabétique, aucune couleur de parti.</p>' + foot() + "</div>";
